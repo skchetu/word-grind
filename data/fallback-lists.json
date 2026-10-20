@@ -1,0 +1,175 @@
+[
+  {
+    "theme": "GRE classics with sneaky letters",
+    "words": [
+      {
+        "word": "acquiesce",
+        "partOfSpeech": "verb",
+        "definition": "to accept or agree to something without protest",
+        "ipa": "/ˌækwiˈɛs/",
+        "syllables": ["ac", "qui", "esce"],
+        "origin": "Latin acquiescere, to rest or remain quiet",
+        "mnemonic": "A C before the Q, and an S-C near the end: ac-qui-esce.",
+        "difficulty": 4,
+        "sentences": [
+          "After a long debate, the board chose to acquiesce to the new plan.",
+          "She would not acquiesce just because everyone else agreed."
+        ]
+      },
+      {
+        "word": "ameliorate",
+        "partOfSpeech": "verb",
+        "definition": "to make something bad or unsatisfactory better",
+        "ipa": "/əˈmiːliəreɪt/",
+        "syllables": ["a", "me", "lio", "rate"],
+        "origin": "Latin melior, better",
+        "mnemonic": "Hide the Latin melior (better) inside: a-melior-ate.",
+        "difficulty": 4,
+        "sentences": [
+          "New bike lanes helped ameliorate traffic downtown.",
+          "Nothing could ameliorate the sting of losing in the final round."
+        ]
+      },
+      {
+        "word": "anachronism",
+        "partOfSpeech": "noun",
+        "definition": "something that belongs to a different time period",
+        "ipa": "/əˈnækrəˌnɪzəm/",
+        "syllables": ["a", "nach", "ro", "nism"],
+        "origin": "Greek ana, against, and khronos, time",
+        "mnemonic": "Chronos is time, spelled with CH, as in chronological.",
+        "difficulty": 3,
+        "sentences": [
+          "A wristwatch on a Roman soldier is an obvious anachronism.",
+          "The fax machine in the office felt like an anachronism."
+        ]
+      },
+      {
+        "word": "belligerent",
+        "partOfSpeech": "adjective",
+        "definition": "hostile and eager to fight or argue",
+        "ipa": "/bəˈlɪdʒərənt/",
+        "syllables": ["bel", "lig", "er", "ent"],
+        "origin": "Latin bellum, war",
+        "mnemonic": "Bellum (war) brings the double L.",
+        "difficulty": 3,
+        "sentences": [
+          "The belligerent customer shouted at every employee.",
+          "His tone turned belligerent as soon as he lost the argument."
+        ]
+      },
+      {
+        "word": "capricious",
+        "partOfSpeech": "adjective",
+        "definition": "changing mood or behavior suddenly and without reason",
+        "ipa": "/kəˈprɪʃəs/",
+        "syllables": ["ca", "pri", "cious"],
+        "origin": "Italian capriccio, a sudden whim",
+        "mnemonic": "Like delicious, it ends in -cious.",
+        "difficulty": 3,
+        "sentences": [
+          "Spring weather here is capricious, so pack an umbrella.",
+          "The capricious manager changed the deadline three times."
+        ]
+      },
+      {
+        "word": "connoisseur",
+        "partOfSpeech": "noun",
+        "definition": "an expert judge in matters of taste, such as food or art",
+        "ipa": "/ˌkɒnəˈsɜːr/",
+        "syllables": ["con", "nois", "seur"],
+        "origin": "Old French conoistre, to know",
+        "mnemonic": "Double N, double S, and a French -eur ending.",
+        "difficulty": 5,
+        "sentences": [
+          "A true connoisseur can name the coffee bean by taste alone.",
+          "He became a connoisseur of street food while traveling."
+        ]
+      },
+      {
+        "word": "conscientious",
+        "partOfSpeech": "adjective",
+        "definition": "careful to do one's work or duty well",
+        "ipa": "/ˌkɒnʃiˈɛnʃəs/",
+        "syllables": ["con", "sci", "en", "tious"],
+        "origin": "Latin conscientia, knowledge within oneself",
+        "mnemonic": "Science is hiding inside: con-SCIEN-tious.",
+        "difficulty": 5,
+        "sentences": [
+          "A conscientious student double-checks every answer.",
+          "She is conscientious about replying to every email."
+        ]
+      },
+      {
+        "word": "dilettante",
+        "partOfSpeech": "noun",
+        "definition": "a person who dabbles in a subject without real commitment",
+        "ipa": "/ˌdɪləˈtɑːnt/",
+        "syllables": ["dil", "et", "tante"],
+        "origin": "Italian dilettare, to delight",
+        "mnemonic": "One L, then a double T: dil-et-tante.",
+        "difficulty": 4,
+        "sentences": [
+          "He is a dilettante who starts a new hobby every month.",
+          "Critics dismissed her as a dilettante, but her paintings sold out."
+        ]
+      },
+      {
+        "word": "egregious",
+        "partOfSpeech": "adjective",
+        "definition": "shockingly bad",
+        "ipa": "/ɪˈɡriːdʒəs/",
+        "syllables": ["e", "gre", "gious"],
+        "origin": "Latin egregius, standing out from the flock",
+        "mnemonic": "E-GREG-ious: Greg stood out from the flock, for the wrong reasons.",
+        "difficulty": 3,
+        "sentences": [
+          "Charging twenty dollars for water is an egregious markup.",
+          "The referee made an egregious call in the final minute."
+        ]
+      },
+      {
+        "word": "idiosyncrasy",
+        "partOfSpeech": "noun",
+        "definition": "a habit or way of behaving that is peculiar to one person",
+        "ipa": "/ˌɪdiəˈsɪŋkrəsi/",
+        "syllables": ["id", "io", "syn", "cra", "sy"],
+        "origin": "Greek idios, own, and synkrasis, mixture",
+        "mnemonic": "It ends in -crasy, not -cracy like democracy.",
+        "difficulty": 5,
+        "sentences": [
+          "Humming while she reads is her strangest idiosyncrasy.",
+          "Every old house has some idiosyncrasy, like a door that sticks."
+        ]
+      },
+      {
+        "word": "mellifluous",
+        "partOfSpeech": "adjective",
+        "definition": "sweet and smooth to hear",
+        "ipa": "/məˈlɪfluəs/",
+        "syllables": ["mel", "lif", "lu", "ous"],
+        "origin": "Latin mel, honey, and fluere, to flow",
+        "mnemonic": "Honey (mel) that flows (flu): mel-li-flu-ous.",
+        "difficulty": 4,
+        "sentences": [
+          "The narrator's mellifluous voice made the audiobook a joy.",
+          "A mellifluous melody drifted out of the cafe."
+        ]
+      },
+      {
+        "word": "surreptitious",
+        "partOfSpeech": "adjective",
+        "definition": "done secretly because it would not be approved of",
+        "ipa": "/ˌsʌrəpˈtɪʃəs/",
+        "syllables": ["sur", "rep", "ti", "tious"],
+        "origin": "Latin surripere, to seize secretly",
+        "mnemonic": "Double R, then a single P sneaks in quietly.",
+        "difficulty": 5,
+        "sentences": [
+          "He took a surreptitious glance at his phone during the meeting.",
+          "Their surreptitious snack run went unnoticed."
+        ]
+      }
+    ]
+  }
+]
