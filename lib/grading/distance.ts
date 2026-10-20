@@ -7,7 +7,17 @@
 export function distance(a: string, b: string): number {
   const s = Array.from(a);
   const t = Array.from(b);
+  // The bottom-right cell compares the whole of s with the whole of t.
+  return editGrid(s, t)(s.length, t.length);
+}
 
+// Fills the dynamic-programming grid behind `distance` and returns a reader
+// for it. `align` walks the same grid backwards to recover which edits were
+// made.
+export function editGrid(
+  s: readonly string[],
+  t: readonly string[],
+): (i: number, j: number) => number {
   // rows[i][j] is the distance between the first i letters of s and the
   // first j letters of t. The first row and column are the base cases:
   // turning i letters into nothing takes i deletions, and turning nothing
@@ -54,6 +64,5 @@ export function distance(a: string, b: string): number {
     }
   }
 
-  // The bottom-right cell compares the whole of s with the whole of t.
-  return at(s.length, t.length);
+  return at;
 }
