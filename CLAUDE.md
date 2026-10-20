@@ -1,6 +1,6 @@
 # Word Grind
 
-A spelling and vocab app for two people: a weekly Claude-generated word list, a daily spaced-repetition drill, and a timed Sunday test with a head-to-head scoreboard. The spec is `docs/GUIDE.md`; non-obvious choices are logged in `docs/DECISIONS.md`.
+A spelling and vocab app for two people: a weekly Claude-generated word list, a daily spaced-repetition drill, and a timed Sunday test with a head-to-head scoreboard. The full spec (`GUIDE.md`) is kept private, outside this repo, in the Claude project's shared files (`/mnt/project-files/GUIDE.md` in Claude sessions). Non-obvious choices are logged in `docs/DECISIONS.md`.
 
 @AGENTS.md
 
