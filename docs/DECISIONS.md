@@ -28,3 +28,6 @@ When Supabase Auth creates a user, a `security definer` trigger adds their profi
 
 ## Leitner boxes over SM-2, with dates as strings
 Five boxes with fixed intervals (1, 2, 4, 7 and 14 days) are easy to explain, test and show in the UI as a mastery level. SM-2 or FSRS would schedule more precisely but needs per-word ease factors that a weekly list of 15 words doesn't benefit from. Due dates are `YYYY-MM-DD` strings that match Postgres `date` columns, so time zones and daylight saving can never shift a review by a day.
+
+## A typed reducer for the session flow, not XState
+The drill is a state machine written as one pure `transition(state, event)` function over a discriminated union. The flow has five phases and a handful of events, so XState's actors, guards and visualizer would add a dependency and a learning curve without removing any code. The plain object state also serializes straight into `sessionStorage` for resume-after-refresh. If the flow grows parallel states (say, a timer running alongside audio), XState is the upgrade path.
