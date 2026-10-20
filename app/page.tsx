@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Suspense } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,9 @@ export default function Home() {
       <p className="text-muted-foreground">
         A weekly word list, a five-minute daily drill and a Sunday test.
       </p>
-      <Button disabled>Coming soon</Button>
+      <Button asChild size="lg">
+        <Link href="/drill">Start a drill</Link>
+      </Button>
       <Suspense>
         <SignedInAs />
       </Suspense>
