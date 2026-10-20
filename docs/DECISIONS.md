@@ -22,3 +22,6 @@ New tables aren't exposed to Supabase's Data API automatically. Each migration g
 
 ## Invite-only magic links
 Sign-in calls `signInWithOtp` with `shouldCreateUser: false`, new sign-ups are turned off in Supabase Auth, and both accounts are created from the Supabase dashboard. Turning sign-ups off matters because the publishable key is public, so anyone could call the sign-up API directly. The allowlist lives in Supabase rather than in code, so no email addresses end up in this public repo. The form shows the same "check your email" message for unknown addresses, so it can't be used to discover who has an account.
+
+## Profiles are created by a database trigger
+When Supabase Auth creates a user, a `security definer` trigger adds their profile and puts them in the oldest household, creating it if none exists. Doing it in the database means no code path can leave a signed-in user without a profile, and clients still never get insert rights on `profiles` or `households`. One shared household fits a two-person app; inviting someone into a specific household can replace this rule if the app ever hosts more than one.
