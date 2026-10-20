@@ -25,3 +25,6 @@ Sign-in calls `signInWithOtp` with `shouldCreateUser: false`, new sign-ups are t
 
 ## Profiles are created by a database trigger
 When Supabase Auth creates a user, a `security definer` trigger adds their profile and puts them in the oldest household, creating it if none exists. Doing it in the database means no code path can leave a signed-in user without a profile, and clients still never get insert rights on `profiles` or `households`. One shared household fits a two-person app; inviting someone into a specific household can replace this rule if the app ever hosts more than one.
+
+## Leitner boxes over SM-2, with dates as strings
+Five boxes with fixed intervals (1, 2, 4, 7 and 14 days) are easy to explain, test and show in the UI as a mastery level. SM-2 or FSRS would schedule more precisely but needs per-word ease factors that a weekly list of 15 words doesn't benefit from. Due dates are `YYYY-MM-DD` strings that match Postgres `date` columns, so time zones and daylight saving can never shift a review by a day.
