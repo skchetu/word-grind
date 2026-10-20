@@ -31,6 +31,7 @@ CI (`.github/workflows/ci.yml`) runs lint, typecheck, test and build on every PR
   - **Why** explains the reasoning and the benefit (what it prevents, what it enables), not just which plan step it is.
   - **How to test** gives exact terminal steps a beginner can copy, plus the tests added.
   - The repo is public: no links to Claude sessions in PR descriptions or commit messages.
+  - Write descriptions in the author's voice, scoped to the project and the change. No asides addressed to the reviewer, and no career or interview commentary.
 
 **Code**
 - TypeScript strict, no `any`. `noUncheckedIndexedAccess` is on, so handle `undefined` from index access.
