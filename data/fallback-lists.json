@@ -171,5 +171,192 @@
         ]
       }
     ]
+  },
+  {
+    "theme": "Doubled, dropped and swapped letters",
+    "words": [
+      {
+        "word": "abstemious",
+        "partOfSpeech": "adjective",
+        "definition": "not indulging much in food or drink",
+        "ipa": "/əbˈstiːmiəs/",
+        "syllables": ["ab", "ste", "mi", "ous"],
+        "origin": "Latin abstemius, from abs-, away from, and temetum, strong drink",
+        "mnemonic": "It has all five vowels in order: a, e, i, o, u.",
+        "difficulty": 4,
+        "sentences": [
+          "Their abstemious grandfather never had more than one coffee a day.",
+          "An abstemious diet before the race left him hungry but fast."
+        ]
+      },
+      {
+        "word": "assiduous",
+        "partOfSpeech": "adjective",
+        "definition": "showing great care and steady effort",
+        "ipa": "/əˈsɪdʒuəs/",
+        "syllables": ["as", "sid", "u", "ous"],
+        "origin": "Latin assiduus, sitting down to a task",
+        "mnemonic": "Double S as you sit down to work: as-sid-u-ous.",
+        "difficulty": 3,
+        "sentences": [
+          "An assiduous editor caught every missing comma.",
+          "Her assiduous practice paid off at the recital."
+        ]
+      },
+      {
+        "word": "camaraderie",
+        "partOfSpeech": "noun",
+        "definition": "trust and friendship among people who spend time together",
+        "ipa": "/ˌkæməˈrɑːdəri/",
+        "syllables": ["ca", "ma", "ra", "de", "rie"],
+        "origin": "French camarade, comrade",
+        "mnemonic": "Three A's in a row of syllables, then -derie: ca-ma-ra-de-rie.",
+        "difficulty": 4,
+        "sentences": [
+          "The team's camaraderie carried them through a losing season.",
+          "Long night shifts built a strong camaraderie among the nurses."
+        ]
+      },
+      {
+        "word": "desiccate",
+        "partOfSpeech": "verb",
+        "definition": "to remove the moisture from something",
+        "ipa": "/ˈdɛsɪkeɪt/",
+        "syllables": ["des", "ic", "cate"],
+        "origin": "Latin desiccare, to dry up",
+        "mnemonic": "One S, two C's, the opposite of what most people guess.",
+        "difficulty": 5,
+        "sentences": [
+          "The desert wind will desiccate any fruit left outside.",
+          "Chefs desiccate coconut to make it last for months."
+        ]
+      },
+      {
+        "word": "ebullient",
+        "partOfSpeech": "adjective",
+        "definition": "cheerful and full of energy",
+        "ipa": "/ɪˈbʊliənt/",
+        "syllables": ["e", "bul", "lient"],
+        "origin": "Latin ebullire, to boil over",
+        "mnemonic": "Energy boils over, and so do the L's: e-bul-lient.",
+        "difficulty": 3,
+        "sentences": [
+          "Her ebullient laugh filled the whole room.",
+          "The coach was ebullient after the upset win."
+        ]
+      },
+      {
+        "word": "fastidious",
+        "partOfSpeech": "adjective",
+        "definition": "very attentive to detail and hard to please",
+        "ipa": "/fæˈstɪdiəs/",
+        "syllables": ["fas", "tid", "i", "ous"],
+        "origin": "Latin fastidium, loathing",
+        "mnemonic": "A fastidious person is fast to tidy: fas-tid-ious.",
+        "difficulty": 2,
+        "sentences": [
+          "He is fastidious about keeping his desk clear.",
+          "A fastidious baker weighs flour to the gram."
+        ]
+      },
+      {
+        "word": "harangue",
+        "partOfSpeech": "noun",
+        "definition": "a long, loud and aggressive speech",
+        "ipa": "/həˈræŋ/",
+        "syllables": ["ha", "rangue"],
+        "origin": "Old French arenge, a speech to a crowd",
+        "mnemonic": "It ends in -ngue, like tongue: you harangue with your tongue.",
+        "difficulty": 3,
+        "sentences": [
+          "The manager delivered a ten-minute harangue about being late.",
+          "Nobody wanted to sit through another harangue at dinner."
+        ]
+      },
+      {
+        "word": "insouciant",
+        "partOfSpeech": "adjective",
+        "definition": "casually unconcerned",
+        "ipa": "/ɪnˈsuːsiənt/",
+        "syllables": ["in", "sou", "ciant"],
+        "origin": "French insouciant, from souci, worry",
+        "mnemonic": "No souci (French for worry) inside: in-SOUCI-ant.",
+        "difficulty": 5,
+        "sentences": [
+          "He gave an insouciant shrug when the bus pulled away without him.",
+          "Her insouciant attitude hid how hard she had studied."
+        ]
+      },
+      {
+        "word": "obstreperous",
+        "partOfSpeech": "adjective",
+        "definition": "noisy and difficult to control",
+        "ipa": "/əbˈstrɛpərəs/",
+        "syllables": ["ob", "strep", "er", "ous"],
+        "origin": "Latin obstrepere, to make a noise against",
+        "mnemonic": "Strep throat from all that shouting: ob-STREP-erous.",
+        "difficulty": 4,
+        "sentences": [
+          "The obstreperous crowd chanted through the entire speech.",
+          "An obstreperous toddler can empty a quiet cafe."
+        ]
+      },
+      {
+        "word": "perspicacious",
+        "partOfSpeech": "adjective",
+        "definition": "quick to notice and understand things",
+        "ipa": "/ˌpɜːrspɪˈkeɪʃəs/",
+        "syllables": ["per", "spi", "ca", "cious"],
+        "origin": "Latin perspicax, sharp-sighted",
+        "mnemonic": "Per-spi-ca-cious: only one C until the -cious ending, like delicious.",
+        "difficulty": 5,
+        "sentences": [
+          "A perspicacious reader spotted the twist by chapter two.",
+          "Her perspicacious questions exposed the flaw in the plan."
+        ]
+      },
+      {
+        "word": "recalcitrant",
+        "partOfSpeech": "adjective",
+        "definition": "stubbornly refusing to obey or cooperate",
+        "ipa": "/rɪˈkælsɪtrənt/",
+        "syllables": ["re", "cal", "ci", "trant"],
+        "origin": "Latin recalcitrare, to kick back with the heels",
+        "mnemonic": "It kicks back with C then C: re-Cal-Ci-trant.",
+        "difficulty": 4,
+        "sentences": [
+          "The recalcitrant printer jammed on every page.",
+          "Even the most recalcitrant student joined the debate."
+        ]
+      },
+      {
+        "word": "sacrilegious",
+        "partOfSpeech": "adjective",
+        "definition": "treating something sacred with disrespect",
+        "ipa": "/ˌsækrəˈlɪdʒəs/",
+        "syllables": ["sac", "ri", "le", "gious"],
+        "origin": "Latin sacrilegus, a stealer of sacred things",
+        "mnemonic": "Not religious: the I and E swap places, sac-RI-LE-gious.",
+        "difficulty": 5,
+        "sentences": [
+          "Putting pineapple on that pizza felt sacrilegious to the chef.",
+          "Talking during the film was sacrilegious to my sister."
+        ]
+      },
+      {
+        "word": "vicissitude",
+        "partOfSpeech": "noun",
+        "definition": "an unwelcome change in circumstances",
+        "ipa": "/vɪˈsɪsɪtjuːd/",
+        "syllables": ["vi", "cis", "si", "tude"],
+        "origin": "Latin vicissitudo, change",
+        "mnemonic": "One C, then a double S: vi-cis-si-tude.",
+        "difficulty": 4,
+        "sentences": [
+          "Every startup faces some vicissitude in its first year.",
+          "She handled each vicissitude of the long trip with humor."
+        ]
+      }
+    ]
   }
 ]
