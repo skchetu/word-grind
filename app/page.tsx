@@ -1,4 +1,8 @@
+import { Suspense } from "react";
+
 import { Button } from "@/components/ui/button";
+
+import { SignedInAs } from "./signed-in-as";
 
 export default function Home() {
   return (
@@ -8,6 +12,9 @@ export default function Home() {
         A weekly word list, a five-minute daily drill and a Sunday test.
       </p>
       <Button disabled>Coming soon</Button>
+      <Suspense>
+        <SignedInAs />
+      </Suspense>
     </main>
   );
 }

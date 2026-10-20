@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { authRedirect } from "@/lib/auth/redirect";
 import { publicEnv } from "@/lib/env";
 
 // Refreshes the auth session before a page renders, writing any new tokens
@@ -36,7 +37,23 @@ export async function updateSession(request: NextRequest) {
 
   // Verifies the token and refreshes it if it has expired. Keep this call
   // directly after creating the client, or users can be signed out at random.
-  await supabase.auth.getClaims();
+  const { data } = await supabase.auth.getClaims();
+
+  const destination = authRedirect(
+    request.nextUrl.pathname,
+    Boolean(data?.claims),
+  );
+  if (destination) {
+    const url = request.nextUrl.clone();
+    url.pathname = destination;
+    url.search = "";
+    // Carry over any refreshed session cookies, or the redirect drops them.
+    const redirect = NextResponse.redirect(url);
+    for (const cookie of response.cookies.getAll()) {
+      redirect.cookies.set(cookie);
+    }
+    return redirect;
+  }
 
   return response;
 }
