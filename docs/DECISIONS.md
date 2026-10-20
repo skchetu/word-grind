@@ -16,3 +16,6 @@ Each PR becomes one commit on `main`, titled with the PR title. History reads li
 
 ## Vitest in a Node environment for now
 The first tests cover pure functions, which don't need a DOM. jsdom and Testing Library get added with the first interactive component.
+
+## Explicit table grants instead of auto-exposing tables
+New tables aren't exposed to Supabase's Data API automatically. Each migration grants only what the app needs: signed-in users can read shared content and write their own progress, word lists are written server-side with the service role, and anonymous visitors get nothing. A forgotten grant fails loudly, while a forgotten policy on an auto-exposed table would fail open.
