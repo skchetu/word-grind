@@ -34,3 +34,6 @@ The drill is a state machine written as one pure `transition(state, event)` func
 
 ## Weekly list: retry bad output once, fall back on API errors
 `generateWeek` asks Claude (Opus 5.5 at low effort, structured output from `weekSchema`) for the list. A list that fails the shape or `checkWeek` gets one more try, since a second sample often fixes it. An API error goes straight to a curated fallback week, because the SDK has already retried timeouts and rate limits, and errors such as an empty credit balance won't fix themselves. Either way the app always has a list.
+
+## Weeks are saved through a database function, not the service role
+`public.save_week` is a `security definer` function that signed-in users can call. It writes the week, any new words, their sentences and the week's word order in one transaction, always for the caller's household. The original plan was to write with the Supabase service role key. The function avoids handling a second, all-powerful secret, and it makes the save atomic, which four separate API inserts can't be. The cost is that a signed-in member could save a week by hand, which is acceptable for a two-person household.
