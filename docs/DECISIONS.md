@@ -40,3 +40,6 @@ The drill is a state machine written as one pure `transition(state, event)` func
 
 ## Weeks start on Monday, Los Angeles time
 "This week" is the Monday on or before today's date in `America/Los_Angeles`, set once in `lib/week/dates.ts`. Using one household time zone, rather than the server's (UTC on Vercel) or each person's, means both people always see the same list. It also stops the week flipping over on Sunday evening.
+
+## One difficulty level per household, nudged weekly
+Both people get the same list and the same Sunday test, so difficulty lives on the household rather than on each profile. After each Sunday test, `adaptDifficulty` pools everyone's answers: 85% or more moves the level up one, 60% or less moves it down one, and anything between leaves it alone. Pooling answers (rather than averaging two scores) weights each word the same, and a one-step limit keeps a single bad week from swinging the list too far. A week where nobody took the test changes nothing.
