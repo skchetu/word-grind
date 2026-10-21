@@ -46,3 +46,6 @@ Both people get the same list and the same Sunday test, so difficulty lives on t
 
 ## Every Claude call is logged with its tokens
 Each call writes a row to `ai_calls` with the feature, model and token counts, including rejected attempts and calls that ended in a fallback, since those are billed too. The same table backs per-person daily limits, so there's no update or delete grant: a limit can't be reset from the browser. Logging failures are reported but don't block saving the week.
+
+## Daily AI limits over a rolling 24 hours
+Each AI feature has a per-person cap (`DAILY_LIMITS` in `lib/ai/limits.ts`), checked by counting that person's `ai_calls` rows from the last 24 hours. A rolling window needs no time zone maths and can't be reset by waiting for midnight. The caps sit well above normal use, so they only catch accidents such as a failing save that would otherwise call Claude again on every click. If the count itself fails, the call is refused rather than allowed.
