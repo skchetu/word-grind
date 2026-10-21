@@ -53,6 +53,7 @@ describe("generateWeek", () => {
 
     expect(result.source).toBe("claude");
     expect(result.week.theme).toBe(goodWeek?.theme);
+    expect(result.usage).toEqual({ inputTokens: 10, outputTokens: 10 });
   });
 
   it("retries once, then falls back when the week keeps failing checks", async () => {
@@ -75,7 +76,11 @@ describe("generateWeek", () => {
     });
 
     expect(calls).toBe(2);
-    expect(result).toEqual({ week: fallbackWeek(2), source: "fallback" });
+    expect(result).toEqual({
+      week: fallbackWeek(2),
+      source: "fallback",
+      usage: { inputTokens: 20, outputTokens: 20 }, // both attempts count
+    });
   });
 
   it("falls back straight away on an API error", async () => {
@@ -101,6 +106,7 @@ describe("generateWeek", () => {
 
     expect(calls).toBe(1);
     expect(result.source).toBe("fallback");
+    expect(result.usage).toEqual({ inputTokens: 0, outputTokens: 0 });
   });
 });
 
