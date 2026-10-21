@@ -110,6 +110,32 @@ describe("generateWeek", () => {
   });
 });
 
+describe("generateWeek with a capitalised word", () => {
+  it("accepts it lowercased instead of retrying", async () => {
+    const first = goodWeek!.words[0]!;
+    const shouty = {
+      ...goodWeek,
+      words: [
+        { ...first, word: first.word.toUpperCase() },
+        ...goodWeek!.words.slice(1),
+      ],
+    };
+    let calls = 0;
+    server.use(
+      http.post(MESSAGES_URL, () => {
+        calls++;
+        return messageWith(shouty);
+      }),
+    );
+
+    const result = await generateWeek(request, { client: testClient() });
+
+    expect(calls).toBe(1);
+    expect(result.source).toBe("claude");
+    expect(result.week.words[0]?.word).toBe(first.word);
+  });
+});
+
 describe("fallbackWeek", () => {
   it("rotates through the fallback lists", () => {
     expect(fallbackWeek(0).theme).toBe(fallbackLists[0]?.theme);
