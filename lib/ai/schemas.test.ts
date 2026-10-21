@@ -44,10 +44,16 @@ describe("wordCardSchema", () => {
     expect(wordCardSchema.safeParse(card()).success).toBe(true);
   });
 
-  it("rejects capitals, spaces and a difficulty out of range", () => {
+  it("lowercases and trims the word", () => {
+    const parsed = wordCardSchema.parse(card({ word: " Ephemeral " }));
+    expect(parsed.word).toBe("ephemeral");
+  });
+
+  it("rejects spaces, hyphens, accents and a difficulty out of range", () => {
     for (const bad of [
-      card({ word: "Ephemeral" }),
       card({ word: "ad hoc" }),
+      card({ word: "well-being" }),
+      card({ word: "naïve" }),
       card({ difficulty: 6 }),
     ]) {
       expect(wordCardSchema.safeParse(bad).success).toBe(false);

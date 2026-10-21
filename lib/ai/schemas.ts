@@ -2,7 +2,13 @@ import { z } from "zod";
 
 // One word as Claude returns it for the weekly list.
 export const wordCardSchema = z.object({
-  word: z.string().regex(/^[a-z]+$/, "a single lowercase word"),
+  // Case and stray spaces are fixed rather than rejected, so "Rhythm "
+  // doesn't cost a retry. Hyphens, spaces and accents still fail.
+  word: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .regex(/^[a-z]+$/, "a single word, letters only"),
   partOfSpeech: z.string().min(1),
   definition: z.string().min(1),
   ipa: z.string().min(1),
