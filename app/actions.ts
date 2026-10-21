@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { generateWeek, WEEK_MODEL } from "@/lib/ai/generate-week";
+import { isOverLimit, limitWindowStart } from "@/lib/ai/limits";
 import { createClient } from "@/lib/supabase/server";
 import { HOUSEHOLD_TIME_ZONE, todayIn, weekStart } from "@/lib/week/dates";
 import { toSavePayload } from "@/lib/week/save";
@@ -37,6 +38,17 @@ export async function generateThisWeek() {
     .eq("starts_on", startsOn)
     .maybeSingle();
   if (existing) return;
+
+  // Each failed save would otherwise cost another Claude call per click.
+  const { count, error: countError } = await supabase
+    .from("ai_calls")
+    .select("id", { count: "exact", head: true })
+    .eq("profile_id", userId)
+    .eq("feature", "week")
+    .gte("created_at", limitWindowStart());
+  if (countError || isOverLimit("week", count ?? 0)) {
+    throw new Error("Daily limit for new lists reached. Try again tomorrow.");
+  }
 
   // The household shares one list, so it uses the household's level and
   // everyone's topics. RLS limits both reads to the caller's household.
