@@ -31,3 +31,6 @@ Five boxes with fixed intervals (1, 2, 4, 7 and 14 days) are easy to explain, te
 
 ## A typed reducer for the session flow, not XState
 The drill is a state machine written as one pure `transition(state, event)` function over a discriminated union. The flow has five phases and a handful of events, so XState's actors, guards and visualizer would add a dependency and a learning curve without removing any code. The plain object state also serializes straight into `sessionStorage` for resume-after-refresh. If the flow grows parallel states (say, a timer running alongside audio), XState is the upgrade path.
+
+## Weekly list: retry bad output once, fall back on API errors
+`generateWeek` asks Claude (Opus 5.5 at low effort, structured output from `weekSchema`) for the list. A list that fails the shape or `checkWeek` gets one more try, since a second sample often fixes it. An API error goes straight to a curated fallback week, because the SDK has already retried timeouts and rate limits, and errors such as an empty credit balance won't fix themselves. Either way the app always has a list.
