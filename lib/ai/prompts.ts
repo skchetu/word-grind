@@ -28,6 +28,24 @@ export function buildWeekRequest({ difficulty, topics, avoid }: WeekRequest) {
   return lines.join("\n");
 }
 
+// Asks for just enough words to refill a list after bad ones were dropped,
+// so they fit the theme and don't repeat what's already there.
+export function buildTopUpRequest(
+  request: WeekRequest,
+  { theme, kept, count }: { theme: string; kept: string[]; count: number },
+) {
+  const lines = [
+    `This week's theme is "${theme}". Write ${count} more words for it, aiming for difficulty ${request.difficulty}.`,
+    `Don't use any of these words: ${[...kept, ...request.avoid].join(", ")}.`,
+  ];
+  if (request.topics.length > 0) {
+    lines.push(
+      `Set the example sentences around: ${request.topics.join(", ")}.`,
+    );
+  }
+  return lines.join("\n");
+}
+
 export const TIP_SYSTEM_PROMPT = `You coach adults on English spelling.
 
 You get a word and how someone misspelled it. Reply with one tip, at most 20 words, about their specific mistake: which letters went wrong and a way to remember the right ones.

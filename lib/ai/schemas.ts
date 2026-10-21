@@ -46,6 +46,20 @@ export function toCloze(sentence: string, word: string): string | null {
   return sentence.replace(pattern, BLANK);
 }
 
+// Rules for one card that the schema can't express. Empty when usable.
+export function checkCard(card: WordCardOutput): string[] {
+  const problems: string[] = [];
+  if (card.syllables.join("").toLowerCase() !== card.word) {
+    problems.push(`"${card.word}" syllables don't spell the word`);
+  }
+  card.sentences.forEach((sentence, i) => {
+    if (toCloze(sentence, card.word) === null) {
+      problems.push(`"${card.word}" sentence ${i + 1} doesn't use the word`);
+    }
+  });
+  return problems;
+}
+
 // Rules the schema can't express. Returns a list of problems, empty when
 // the week is usable.
 export function checkWeek(week: WeekOutput): string[] {
@@ -55,16 +69,7 @@ export function checkWeek(week: WeekOutput): string[] {
   for (const card of week.words) {
     if (seen.has(card.word)) problems.push(`"${card.word}" appears twice`);
     seen.add(card.word);
-
-    if (card.syllables.join("").toLowerCase() !== card.word) {
-      problems.push(`"${card.word}" syllables don't spell the word`);
-    }
-
-    card.sentences.forEach((sentence, i) => {
-      if (toCloze(sentence, card.word) === null) {
-        problems.push(`"${card.word}" sentence ${i + 1} doesn't use the word`);
-      }
-    });
+    problems.push(...checkCard(card));
   }
 
   return problems;
