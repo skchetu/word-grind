@@ -4,8 +4,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import { canCallClaude, logClaudeCall } from "@/lib/ai/calls";
+import { generateTip, TIP_MODEL } from "@/lib/ai/generate-tip";
 import { generateWeek, WEEK_MODEL } from "@/lib/ai/generate-week";
-import { isOverLimit, limitWindowStart } from "@/lib/ai/limits";
+import { normalize } from "@/lib/grading/normalize";
 import { createClient } from "@/lib/supabase/server";
 import { HOUSEHOLD_TIME_ZONE, todayIn, weekStart } from "@/lib/week/dates";
 import { toSavePayload } from "@/lib/week/save";
@@ -15,6 +17,11 @@ const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const householdSchema = z.object({ difficulty: z.int() });
 const topicsSchema = z.array(z.object({ topics: z.array(z.string()) }));
 const recentWordsSchema = z.array(z.object({ text: z.string() }));
+const tipInputSchema = z.object({
+  wordId: z.uuid(),
+  answer: z.string().max(60),
+});
+const wordSchema = z.object({ text: z.string(), mnemonic: z.string() });
 
 export async function signOut() {
   const supabase = await createClient();
@@ -40,13 +47,7 @@ export async function generateThisWeek() {
   if (existing) return;
 
   // Each failed save would otherwise cost another Claude call per click.
-  const { count, error: countError } = await supabase
-    .from("ai_calls")
-    .select("id", { count: "exact", head: true })
-    .eq("profile_id", userId)
-    .eq("feature", "week")
-    .gte("created_at", limitWindowStart());
-  if (countError || isOverLimit("week", count ?? 0)) {
+  if (!(await canCallClaude(supabase, userId, "week"))) {
     throw new Error("Daily limit for new lists reached. Try again tomorrow.");
   }
 
@@ -75,14 +76,12 @@ export async function generateThisWeek() {
   );
 
   // Logged even for a fallback week: rejected attempts are still billed.
-  const { error: logError } = await supabase.from("ai_calls").insert({
-    profile_id: userId,
+  await logClaudeCall(supabase, {
+    userId,
     feature: "week",
     model: WEEK_MODEL,
-    input_tokens: usage.inputTokens,
-    output_tokens: usage.outputTokens,
+    usage,
   });
-  if (logError) console.error("Logging the AI call failed:", logError.message);
 
   const { error } = await supabase.rpc("save_week", {
     p_starts_on: startsOn,
@@ -91,4 +90,59 @@ export async function generateThisWeek() {
   if (error) throw new Error(`Saving the week failed: ${error.message}`);
 
   revalidatePath("/");
+}
+
+// A tip for one misspelling: from the cache when this exact mistake has
+// been seen before, otherwise from Claude (then cached). Falls back to the
+// word's mnemonic whenever Claude can't or shouldn't be called.
+export async function getMistakeTip(wordId: string, answer: string) {
+  const input = tipInputSchema.parse({ wordId, answer });
+  const wrong = normalize(input.answer);
+
+  const supabase = await createClient();
+  const { data: auth } = await supabase.auth.getClaims();
+  const userId = auth?.claims.sub;
+  if (!userId) redirect("/login");
+
+  const [{ data: cached }, { data: wordRow }] = await Promise.all([
+    supabase
+      .from("tip_cache")
+      .select("tip")
+      .eq("word_id", input.wordId)
+      .eq("wrong", wrong)
+      .maybeSingle(),
+    supabase
+      .from("words")
+      .select("text, mnemonic")
+      .eq("id", input.wordId)
+      .single(),
+  ]);
+  if (cached) return z.object({ tip: z.string() }).parse(cached).tip;
+
+  const word = wordSchema.parse(wordRow);
+  if (wrong === "" || wrong === word.text.toLowerCase()) return word.mnemonic;
+  if (!(await canCallClaude(supabase, userId, "tip"))) return word.mnemonic;
+
+  const { tip, source, usage } = await generateTip({
+    word: word.text,
+    wrong,
+    mnemonic: word.mnemonic,
+  });
+  await logClaudeCall(supabase, {
+    userId,
+    feature: "tip",
+    model: TIP_MODEL,
+    usage,
+  });
+
+  // Only Claude's tips are cached; a fallback should get another try later.
+  if (source === "claude") {
+    await supabase
+      .from("tip_cache")
+      .upsert(
+        { word_id: input.wordId, wrong, tip },
+        { onConflict: "word_id,wrong", ignoreDuplicates: true },
+      );
+  }
+  return tip;
 }

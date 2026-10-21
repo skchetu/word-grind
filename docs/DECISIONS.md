@@ -52,3 +52,6 @@ Each AI feature has a per-person cap (`DAILY_LIMITS` in `lib/ai/limits.ts`), che
 
 ## Mistake tips use Haiku and plain text
 A tip is one sentence about one misspelling, so it uses Haiku 5.5 rather than Opus, which keeps each call fast and cheap. The reply is plain text checked with a small Zod schema (non-empty, at most 20 words) instead of structured output, since there's only one field. Any problem falls back to the word's saved mnemonic, so feedback never waits on Claude.
+
+## One shared tip cache, keyed by the normalized misspelling
+`tip_cache` is keyed by word and the misspelling after `normalize()`, so "Acommodate " and "acommodate" share one tip. Like the word bank it's shared across households, since a tip about a misspelling doesn't depend on who made it. Only Claude's tips are cached; a mnemonic fallback isn't, so the next miss gets another chance at a real tip. Signed-in users can add tips but not edit them, which is enough trust for an invite-only app.
