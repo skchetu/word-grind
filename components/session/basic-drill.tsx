@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { SeedWord } from "@/data/seed-words";
 import { initialSession, transition } from "@/lib/session/machine";
+import { useSpeech } from "@/lib/speech/use-speech";
 
 // A bare-bones drill that runs the session machine end to end. The polished
 // drill screen (audio hook, letter diff, shortcuts) replaces it on Day 4.
@@ -15,20 +16,13 @@ export function BasicDrill({ words }: { words: SeedWord[] }) {
   const word = "index" in state ? words[state.index] : undefined;
 
   // Read the word aloud on entering `speaking`; typing unlocks when it ends.
+  const { speak } = useSpeech();
   const speakingIndex = state.phase === "speaking" ? state.index : null;
   useEffect(() => {
     const text =
       speakingIndex === null ? undefined : words[speakingIndex]?.text;
-    if (!text || !("speechSynthesis" in window)) return;
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.9;
-    utterance.onend = () => send({ type: "AUDIO_DONE" });
-    speechSynthesis.cancel();
-    speechSynthesis.speak(utterance);
-    return () => {
-      utterance.onend = null;
-    };
-  }, [speakingIndex, words]);
+    if (text) speak([text], () => send({ type: "AUDIO_DONE" }));
+  }, [speakingIndex, words, speak]);
 
   if (state.phase === "idle") {
     return (
