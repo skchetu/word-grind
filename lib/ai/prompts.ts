@@ -27,3 +27,12 @@ export function buildWeekRequest({ difficulty, topics, avoid }: WeekRequest) {
   }
   return lines.join("\n");
 }
+
+export const TIP_SYSTEM_PROMPT = `You coach adults on English spelling.
+
+You get a word and how someone misspelled it. Reply with one tip, at most 20 words, about their specific mistake: which letters went wrong and a way to remember the right ones.
+Reply with the tip only: no greeting, no quotes, and don't repeat their misspelling.`;
+
+export function buildTipRequest(word: string, wrong: string) {
+  return `Word: ${word}\nThey typed: ${wrong}`;
+}

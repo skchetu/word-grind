@@ -49,3 +49,6 @@ Each call writes a row to `ai_calls` with the feature, model and token counts, i
 
 ## Daily AI limits over a rolling 24 hours
 Each AI feature has a per-person cap (`DAILY_LIMITS` in `lib/ai/limits.ts`), checked by counting that person's `ai_calls` rows from the last 24 hours. A rolling window needs no time zone maths and can't be reset by waiting for midnight. The caps sit well above normal use, so they only catch accidents such as a failing save that would otherwise call Claude again on every click. If the count itself fails, the call is refused rather than allowed.
+
+## Mistake tips use Haiku and plain text
+A tip is one sentence about one misspelling, so it uses Haiku 5.5 rather than Opus, which keeps each call fast and cheap. The reply is plain text checked with a small Zod schema (non-empty, at most 20 words) instead of structured output, since there's only one field. Any problem falls back to the word's saved mnemonic, so feedback never waits on Claude.
