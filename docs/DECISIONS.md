@@ -37,3 +37,6 @@ The drill is a state machine written as one pure `transition(state, event)` func
 
 ## Weeks are saved through a database function, not the service role
 `public.save_week` is a `security definer` function that signed-in users can call. It writes the week, any new words, their sentences and the week's word order in one transaction, always for the caller's household. The original plan was to write with the Supabase service role key. The function avoids handling a second, all-powerful secret, and it makes the save atomic, which four separate API inserts can't be. The cost is that a signed-in member could save a week by hand, which is acceptable for a two-person household.
+
+## Weeks start on Monday, Los Angeles time
+"This week" is the Monday on or before today's date in `America/Los_Angeles`, set once in `lib/week/dates.ts`. Using one household time zone, rather than the server's (UTC on Vercel) or each person's, means both people always see the same list. It also stops the week flipping over on Sunday evening.
