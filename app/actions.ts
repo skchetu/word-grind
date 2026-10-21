@@ -11,10 +11,8 @@ import { toSavePayload } from "@/lib/week/save";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
-const profileSchema = z.object({
-  difficulty: z.int(),
-  topics: z.array(z.string()),
-});
+const householdSchema = z.object({ difficulty: z.int() });
+const topicsSchema = z.array(z.object({ topics: z.array(z.string()) }));
 const recentWordsSchema = z.array(z.object({ text: z.string() }));
 
 export async function signOut() {
@@ -40,20 +38,23 @@ export async function generateThisWeek() {
     .maybeSingle();
   if (existing) return;
 
-  const [{ data: profile }, { data: recent }] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select("difficulty, topics")
-      .eq("id", userId)
-      .single(),
-    supabase
-      .from("words")
-      .select("text")
-      .order("created_at", { ascending: false })
-      .limit(100),
-  ]);
+  // The household shares one list, so it uses the household's level and
+  // everyone's topics. RLS limits both reads to the caller's household.
+  const [{ data: household }, { data: members }, { data: recent }] =
+    await Promise.all([
+      supabase.from("households").select("difficulty").single(),
+      supabase.from("profiles").select("topics"),
+      supabase
+        .from("words")
+        .select("text")
+        .order("created_at", { ascending: false })
+        .limit(100),
+    ]);
 
-  const { difficulty, topics } = profileSchema.parse(profile);
+  const { difficulty } = householdSchema.parse(household);
+  const topics = [
+    ...new Set(topicsSchema.parse(members ?? []).flatMap((m) => m.topics)),
+  ];
   const avoid = recentWordsSchema.parse(recent ?? []).map((row) => row.text);
 
   const { week } = await generateWeek(
