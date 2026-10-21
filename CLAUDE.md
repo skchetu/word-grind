@@ -16,6 +16,7 @@ Node 24 (`.nvmrc`) and pnpm via corepack (`packageManager` in `package.json`).
 | Typecheck | `pnpm typecheck` |
 | Unit tests | `pnpm test` (watch: `pnpm test:watch`) |
 | Production build | `pnpm build` |
+| Weekly list eval (real API, costs a few cents) | `pnpm eval:week` |
 
 CI (`.github/workflows/ci.yml`) runs lint, typecheck, test and build on every PR. End-to-end tests (`pnpm e2e`, Playwright) arrive on Day 6.
 
