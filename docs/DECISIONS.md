@@ -43,3 +43,6 @@ The drill is a state machine written as one pure `transition(state, event)` func
 
 ## One difficulty level per household, nudged weekly
 Both people get the same list and the same Sunday test, so difficulty lives on the household rather than on each profile. After each Sunday test, `adaptDifficulty` pools everyone's answers: 85% or more moves the level up one, 60% or less moves it down one, and anything between leaves it alone. Pooling answers (rather than averaging two scores) weights each word the same, and a one-step limit keeps a single bad week from swinging the list too far. A week where nobody took the test changes nothing.
+
+## Every Claude call is logged with its tokens
+Each call writes a row to `ai_calls` with the feature, model and token counts, including rejected attempts and calls that ended in a fallback, since those are billed too. The same table backs per-person daily limits, so there's no update or delete grant: a limit can't be reset from the browser. Logging failures are reported but don't block saving the week.

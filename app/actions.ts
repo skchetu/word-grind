@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { generateWeek } from "@/lib/ai/generate-week";
+import { generateWeek, WEEK_MODEL } from "@/lib/ai/generate-week";
 import { createClient } from "@/lib/supabase/server";
 import { HOUSEHOLD_TIME_ZONE, todayIn, weekStart } from "@/lib/week/dates";
 import { toSavePayload } from "@/lib/week/save";
@@ -57,10 +57,20 @@ export async function generateThisWeek() {
   ];
   const avoid = recentWordsSchema.parse(recent ?? []).map((row) => row.text);
 
-  const { week } = await generateWeek(
+  const { week, usage } = await generateWeek(
     { difficulty, topics, avoid },
     { weekNumber: Math.floor(Date.parse(startsOn) / WEEK_MS) },
   );
+
+  // Logged even for a fallback week: rejected attempts are still billed.
+  const { error: logError } = await supabase.from("ai_calls").insert({
+    profile_id: userId,
+    feature: "week",
+    model: WEEK_MODEL,
+    input_tokens: usage.inputTokens,
+    output_tokens: usage.outputTokens,
+  });
+  if (logError) console.error("Logging the AI call failed:", logError.message);
 
   const { error } = await supabase.rpc("save_week", {
     p_starts_on: startsOn,
