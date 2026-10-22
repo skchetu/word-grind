@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useReducer } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { SpellInput, SpellInputHelp } from "@/components/session/spell-input";
 import type { SeedWord } from "@/data/seed-words";
 import { initialSession, transition } from "@/lib/session/machine";
 import { useSpeech } from "@/lib/speech/use-speech";
@@ -71,17 +71,12 @@ export function BasicDrill({ words }: { words: SeedWord[] }) {
             send({ type: "SUBMIT" });
           }}
         >
-          <Input
-            autoFocus
-            aria-label="Your spelling"
+          <SpellInput
             value={state.input}
-            onChange={(e) => send({ type: "TYPE", input: e.target.value })}
-            spellCheck={false}
-            autoCorrect="off"
-            autoCapitalize="none"
-            autoComplete="off"
-            className="h-12 font-mono text-xl"
+            onChange={(input) => send({ type: "TYPE", input })}
+            onReplay={() => send({ type: "REPLAY" })}
           />
+          <SpellInputHelp />
           {state.hintUsed && word && (
             <p className="text-sm text-muted-foreground">
               Hint: {word.definition}
