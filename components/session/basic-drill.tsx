@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useReducer } from "react";
 
 import { Button } from "@/components/ui/button";
+import { LetterDiff } from "@/components/session/letter-diff";
 import { SpellInput, SpellInputHelp } from "@/components/session/spell-input";
 import type { SeedWord } from "@/data/seed-words";
 import { initialSession, transition } from "@/lib/session/machine";
@@ -114,10 +115,7 @@ export function BasicDrill({ words }: { words: SeedWord[] }) {
                 : "Not quite."}
           </p>
           {!state.last.correct && (
-            <p>
-              The spelling is{" "}
-              <span className="font-mono font-semibold">{word.text}</span>.
-            </p>
+            <LetterDiff answer={state.last.answer} word={word.text} />
           )}
           <Button autoFocus onClick={() => send({ type: "NEXT" })}>
             Next
