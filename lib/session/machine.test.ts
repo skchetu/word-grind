@@ -29,6 +29,8 @@ describe("session machine", () => {
       words,
       index: 0,
       results: [],
+      input: "",
+      hintUsed: false,
     });
   });
 
@@ -67,6 +69,39 @@ describe("session machine", () => {
       { type: "REPLAY" },
     );
     expect(state).toMatchObject({ phase: "speaking", index: 0 });
+  });
+
+  it("keeps the typed answer and the hint across a replay", () => {
+    const state = run(
+      { type: "START", mode: "drill", words },
+      { type: "AUDIO_DONE" },
+      { type: "HINT" },
+      { type: "TYPE", input: "rhy" },
+      { type: "REPLAY" },
+      { type: "AUDIO_DONE" },
+      { type: "TYPE", input: "rhythm" },
+      { type: "SUBMIT" },
+    );
+    expect(state).toMatchObject({
+      phase: "feedback",
+      last: { answer: "rhythm", correct: true, hintUsed: true },
+    });
+  });
+
+  it("starts the next word with an empty answer and no hint", () => {
+    const state = run(
+      { type: "START", mode: "drill", words },
+      { type: "AUDIO_DONE" },
+      { type: "HINT" },
+      ...answer("rhythm"),
+      { type: "NEXT" },
+      { type: "AUDIO_DONE" },
+    );
+    expect(state).toMatchObject({
+      phase: "answering",
+      input: "",
+      hintUsed: false,
+    });
   });
 
   it("moves to the next word, then completes after the last", () => {
