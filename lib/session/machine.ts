@@ -22,7 +22,14 @@ type Base = { mode: Mode; words: WordCard[]; results: Result[] };
 // typed input outside `answering`.
 export type SessionState =
   | { phase: "idle" }
-  | (Base & { phase: "speaking"; index: number })
+  // `input` and `hintUsed` survive a replay, so hearing the word again
+  // neither wipes the answer nor hides that a hint was used.
+  | (Base & {
+      phase: "speaking";
+      index: number;
+      input: string;
+      hintUsed: boolean;
+    })
   | (Base & {
       phase: "answering";
       index: number;
@@ -44,6 +51,9 @@ export type SessionEvent =
 
 export const initialSession: SessionState = { phase: "idle" };
 
+// A word starts with an empty answer and no hint.
+const fresh = { input: "", hintUsed: false };
+
 function score(word: WordCard, answer: string, hintUsed: boolean): Result {
   return { wordId: word.id, answer, hintUsed, ...grade(answer, word.text) };
 }
@@ -52,7 +62,7 @@ function score(word: WordCard, answer: string, hintUsed: boolean): Result {
 function advance({ mode, words, results }: Base, index: number): SessionState {
   const next = index + 1;
   return next < words.length
-    ? { phase: "speaking", mode, words, results, index: next }
+    ? { ...fresh, phase: "speaking", mode, words, results, index: next }
     : { phase: "complete", mode, words, results };
 }
 
@@ -66,7 +76,7 @@ export function transition(
   if (state.phase === "idle") {
     if (event.type !== "START" || event.words.length === 0) return state;
     const { mode, words } = event;
-    return { phase: "speaking", mode, words, results: [], index: 0 };
+    return { ...fresh, phase: "speaking", mode, words, results: [], index: 0 };
   }
 
   // When a test's time runs out, the word on screen is graded as typed so
@@ -77,10 +87,9 @@ export function transition(
     (state.phase === "speaking" || state.phase === "answering")
   ) {
     const { mode, words, index } = state;
-    const typed = state.phase === "answering" ? state.input : "";
     const missed = words
       .slice(index)
-      .map((word, i) => score(word, i === 0 ? typed : "", false));
+      .map((word, i) => score(word, i === 0 ? state.input : "", false));
     return {
       phase: "complete",
       mode,
@@ -92,16 +101,7 @@ export function transition(
   switch (state.phase) {
     case "speaking": {
       if (event.type !== "AUDIO_DONE") return state;
-      const { mode, words, results, index } = state;
-      return {
-        phase: "answering",
-        mode,
-        words,
-        results,
-        index,
-        input: "",
-        hintUsed: false,
-      };
+      return { ...state, phase: "answering" };
     }
 
     case "answering": {
@@ -112,7 +112,7 @@ export function transition(
         case "HINT":
           return mode === "drill" ? { ...state, hintUsed: true } : state;
         case "REPLAY":
-          return { phase: "speaking", mode, words, results, index };
+          return { ...state, phase: "speaking" };
         case "SUBMIT": {
           const word = words[index];
           // An empty answer is almost always a stray Enter, so ignore it.
