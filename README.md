@@ -15,15 +15,15 @@ A spelling and vocabulary app for a two-person household. Each Monday, Claude wr
 
 ## Tech stack
 
-| Area           | Choice                                                                 |
-| -------------- | ---------------------------------------------------------------------- |
-| App            | Next.js 16 (App Router, Server Actions), React 19, TypeScript (strict) |
-| UI             | Tailwind CSS v4, shadcn/ui                                             |
-| Data and auth  | Supabase (Postgres with row-level security, magic-link sign-in)        |
-| AI             | Claude via the Anthropic SDK, with Zod-validated structured output     |
-| Speech         | Web Speech API (`speechSynthesis`)                                     |
-| Tests          | Vitest, fast-check, MSW (no real API calls in tests)                   |
-| Hosting and CI | Vercel, GitHub Actions                                                 |
+| Area           | Choice                                                                    |
+| -------------- | ------------------------------------------------------------------------- |
+| App            | Next.js 16 (App Router, Server Actions), React 19, TypeScript (strict)    |
+| UI             | Tailwind CSS v4, shadcn/ui                                                |
+| Data and auth  | Supabase (Postgres with row-level security, magic-link sign-in)           |
+| AI             | Claude via the Anthropic SDK, with Zod-validated structured output        |
+| Speech         | ElevenLabs clips, with the Web Speech API (`speechSynthesis`) as fallback |
+| Tests          | Vitest, fast-check, MSW (no real API calls in tests)                      |
+| Hosting and CI | Vercel, GitHub Actions                                                    |
 
 ## Algorithms
 
@@ -43,20 +43,20 @@ The interesting logic is plain TypeScript in `lib/`, with unit tests next to eac
 
 ## Tools and why
 
-| Tool                           | Why this one                                                                                                                                                                             |
-| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Next.js 16**                 | Server Actions keep the Anthropic key and database writes on the server without a separate API layer. Also deploys to Vercel with no setup.                                              |
-| **TypeScript (strict)**        | `noUncheckedIndexedAccess` catches off-by-one and missing-item bugs in the grading and drill code.                                                                                       |
-| **Zod**                        | One schema describes Claude's output, the database rows and the UI types, so they can't drift apart. Claude's replies are checked against it before anything is saved.                   |
-| **Supabase**                   | Postgres with row-level security and magic-link sign-in in one free service. RLS keeps each household's data private at the database level, not just in the app.                         |
-| **Claude (Anthropic SDK)**     | Structured output generates themed, difficulty-tuned lists with sentences and memory hints. Opus writes the weekly list, and the cheaper, faster Haiku writes the one-line mistake tips. |
-| **Tailwind CSS and shadcn/ui** | Accessible components as source code in the repo, easy to restyle, with no runtime styling library.                                                                                      |
-| **Web Speech API**             | Free and built into every browser, with no extra service. It reads every word today and becomes the fallback once ElevenLabs is added.                                                   |
-| **ElevenLabs** (**TBD**)       | Natural-sounding recorded audio for each word and sentence, made once when the list is generated and cached in Supabase Storage.                                                         |
-| **Vitest, fast-check and MSW** | Fast unit tests, property-based tests for the scheduling and difficulty rules, and a mocked Claude API, so tests never make real AI calls.                                               |
-| **Playwright** (**TBD**)       | End-to-end tests of the drill and the Sunday test on phone and laptop sizes.                                                                                                             |
-| **Vercel and GitHub Actions**  | Every PR gets lint, typecheck, tests, a build and a live preview link.                                                                                                                   |
-| **pnpm**                       | Fast installs and a strict dependency tree, so a package can't quietly use something it didn't declare.                                                                                  |
+| Tool                           | Why this one                                                                                                                                                                                                         |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Next.js 16**                 | Server Actions keep the Anthropic key and database writes on the server without a separate API layer. Also deploys to Vercel with no setup.                                                                          |
+| **TypeScript (strict)**        | `noUncheckedIndexedAccess` catches off-by-one and missing-item bugs in the grading and drill code.                                                                                                                   |
+| **Zod**                        | One schema describes Claude's output, the database rows and the UI types, so they can't drift apart. Claude's replies are checked against it before anything is saved.                                               |
+| **Supabase**                   | Postgres with row-level security and magic-link sign-in in one free service. RLS keeps each household's data private at the database level, not just in the app.                                                     |
+| **Claude (Anthropic SDK)**     | Structured output generates themed, difficulty-tuned lists with sentences and memory hints. Opus writes the weekly list, and the cheaper, faster Haiku writes the one-line mistake tips.                             |
+| **Tailwind CSS and shadcn/ui** | Accessible components as source code in the repo, easy to restyle, with no runtime styling library.                                                                                                                  |
+| **Web Speech API**             | Free and built into every browser, with no extra service. It reads any word that doesn't have a recorded clip yet.                                                                                                   |
+| **ElevenLabs**                 | Natural-sounding recorded audio for each word and sentence (Flash v2.5), made once when the list is generated and cached in Supabase Storage. The drill falls back to the browser voice for any word without a clip. |
+| **Vitest, fast-check and MSW** | Fast unit tests, property-based tests for the scheduling and difficulty rules, and a mocked Claude API, so tests never make real AI calls.                                                                           |
+| **Playwright** (**TBD**)       | End-to-end tests of the drill and the Sunday test on phone and laptop sizes.                                                                                                                                         |
+| **Vercel and GitHub Actions**  | Every PR gets lint, typecheck, tests, a build and a live preview link.                                                                                                                                               |
+| **pnpm**                       | Fast installs and a strict dependency tree, so a package can't quietly use something it didn't declare.                                                                                                              |
 
 ## Running it locally
 

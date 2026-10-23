@@ -6,13 +6,13 @@ import { useEffect, useReducer } from "react";
 import { Button } from "@/components/ui/button";
 import { LetterDiff } from "@/components/session/letter-diff";
 import { SpellInput, SpellInputHelp } from "@/components/session/spell-input";
-import type { SeedWord } from "@/data/seed-words";
+import type { DrillWord } from "@/data/seed-words";
 import { initialSession, transition } from "@/lib/session/machine";
-import { useSpeech } from "@/lib/speech/use-speech";
+import { unlockAudio, useSpeech } from "@/lib/speech/use-speech";
 
 // A bare-bones drill that runs the session machine end to end. The polished
 // drill screen (audio hook, letter diff, shortcuts) replaces it on Day 4.
-export function BasicDrill({ words }: { words: SeedWord[] }) {
+export function BasicDrill({ words }: { words: DrillWord[] }) {
   const [state, send] = useReducer(transition, initialSession);
   const word = "index" in state ? words[state.index] : undefined;
 
@@ -20,16 +20,23 @@ export function BasicDrill({ words }: { words: SeedWord[] }) {
   const { speak } = useSpeech();
   const speakingIndex = state.phase === "speaking" ? state.index : null;
   useEffect(() => {
-    const text =
-      speakingIndex === null ? undefined : words[speakingIndex]?.text;
-    if (text) speak([text], () => send({ type: "AUDIO_DONE" }));
+    const current = speakingIndex === null ? undefined : words[speakingIndex];
+    if (current) {
+      speak([{ text: current.text, audioUrl: current.audioUrl }], () =>
+        send({ type: "AUDIO_DONE" }),
+      );
+    }
   }, [speakingIndex, words, speak]);
+  const recorded = words.some((w) => w.audioUrl);
 
   if (state.phase === "idle") {
     return (
       <Button
         size="lg"
-        onClick={() => send({ type: "START", mode: "drill", words })}
+        onClick={() => {
+          unlockAudio();
+          send({ type: "START", mode: "drill", words });
+        }}
       >
         Start drill ({words.length} words)
       </Button>
@@ -121,6 +128,21 @@ export function BasicDrill({ words }: { words: SeedWord[] }) {
             Next
           </Button>
         </div>
+      )}
+
+      {recorded && (
+        // ElevenLabs' free plan asks for credit wherever its audio is used.
+        <p className="text-center text-xs text-muted-foreground">
+          Voice by{" "}
+          <a
+            href="https://elevenlabs.io"
+            className="underline underline-offset-2"
+            target="_blank"
+            rel="noreferrer"
+          >
+            elevenlabs.io
+          </a>
+        </p>
       )}
     </div>
   );
