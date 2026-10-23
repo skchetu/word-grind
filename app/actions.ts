@@ -2,12 +2,15 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { z } from "zod";
 
 import { canCallClaude, logClaudeCall } from "@/lib/ai/calls";
 import { generateTip, TIP_MODEL } from "@/lib/ai/generate-tip";
 import { generateWeek, WEEK_MODEL } from "@/lib/ai/generate-week";
 import { normalize } from "@/lib/grading/normalize";
+import { recordWeekAudio } from "@/lib/speech/clips";
+import { elevenLabsConfig } from "@/lib/speech/elevenlabs";
 import { createClient } from "@/lib/supabase/server";
 import { HOUSEHOLD_TIME_ZONE, todayIn, weekStart } from "@/lib/week/dates";
 import { toSavePayload } from "@/lib/week/save";
@@ -83,11 +86,23 @@ export async function generateThisWeek() {
     usage,
   });
 
-  const { error } = await supabase.rpc("save_week", {
+  const { data: weekId, error } = await supabase.rpc("save_week", {
     p_starts_on: startsOn,
     p_week: toSavePayload(week),
   });
   if (error) throw new Error(`Saving the week failed: ${error.message}`);
+
+  // Recorded audio is made after the response, so the new list shows up
+  // straight away. Until a clip exists, the drill uses the browser voice.
+  const voice = elevenLabsConfig();
+  if (voice) {
+    const savedWeekId = z.uuid().parse(weekId);
+    after(() =>
+      recordWeekAudio(supabase, savedWeekId, voice).catch((failure: unknown) =>
+        console.error("Recording audio failed:", failure),
+      ),
+    );
+  }
 
   revalidatePath("/");
 }
