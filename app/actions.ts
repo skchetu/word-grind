@@ -108,28 +108,32 @@ export async function generateThisWeek() {
 }
 
 // Records any missing clips for this week's words, such as words saved
-// before recording existed or clips that failed the first time.
-export async function recordThisWeekAudio() {
+// before recording existed or clips that failed the first time. Returns a
+// message to show when some clips couldn't be made.
+export async function recordThisWeekAudio(): Promise<string | null> {
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getClaims();
   if (!auth?.claims.sub) redirect("/login");
 
   const voice = elevenLabsConfig();
-  if (!voice) return;
+  if (!voice) return null;
 
   const { data: week } = await supabase
     .from("weeks")
     .select("id")
     .eq("starts_on", weekStart(todayIn(HOUSEHOLD_TIME_ZONE)))
     .maybeSingle();
-  if (!week) return;
+  if (!week) return null;
 
-  await recordWeekAudio(
+  const { made, firstError } = await recordWeekAudio(
     supabase,
     z.object({ id: z.uuid() }).parse(week).id,
     voice,
   );
   revalidatePath("/");
+  return firstError
+    ? `Recorded ${made} clips. Some failed: ${firstError}`
+    : null;
 }
 
 // A tip for one misspelling: from the cache when this exact mistake has

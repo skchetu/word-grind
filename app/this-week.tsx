@@ -4,9 +4,9 @@ import { elevenLabsConfig } from "@/lib/speech/elevenlabs";
 import { createClient } from "@/lib/supabase/server";
 import { HOUSEHOLD_TIME_ZONE, todayIn, weekStart } from "@/lib/week/dates";
 
-import { generateThisWeek, recordThisWeekAudio } from "./actions";
+import { generateThisWeek } from "./actions";
 import { GenerateWeekButton } from "./generate-week-button";
-import { RecordAudioButton } from "./record-audio-button";
+import { RecordAudio } from "./record-audio-button";
 
 const weekSchema = z.object({
   theme: z.string(),
@@ -59,9 +59,7 @@ export async function ThisWeek() {
         ))}
       </ol>
       {unrecorded > 0 && elevenLabsConfig() && (
-        <form action={recordThisWeekAudio} className="mt-4">
-          <RecordAudioButton count={unrecorded} />
-        </form>
+        <RecordAudio count={unrecorded} />
       )}
     </section>
   );
