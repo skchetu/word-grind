@@ -58,3 +58,6 @@ A tip is one sentence about one misspelling, so it uses Haiku 5.5 rather than Op
 
 ## Speech logic lives outside the React hook
 `createSpeaker` in `lib/speech/speaker.ts` wraps `speechSynthesis` as a small store: it queues the word and sentence with a pause, tracks `speaking`, filters to English voices and picks up voices that Chrome loads late. `useSpeech` only connects that store to React through `useSyncExternalStore`. The logic is tested in plain Node with a fake synth, so testing it needs no jsdom or React Testing Library. One speaker is shared per page, because the browser has a single speech queue.
+
+## Recorded clips live at fixed paths in a public bucket
+ElevenLabs clips are stored in the public `word-audio` bucket at `words/<id>.mp3` and `sentences/<id>.mp3`, and `audio_path` on each row says whether a clip exists. A check constraint ties `audio_path` to the row's own id, so it can only ever point at that row's clip, and signed-in members can set that one column and nothing else on the shared word bank. The bucket is public because the words aren't secret, which lets the drill play a plain URL with no signed-URL round trip. Members can add clips but not replace or delete them. As with weeks, this avoids handing the server a service-role key.
