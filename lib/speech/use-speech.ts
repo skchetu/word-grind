@@ -28,6 +28,18 @@ const playClip: AudioPlayer = (url, done) => {
   };
 };
 
+// A hundredth of a second of silence, played from a tap to unlock the element.
+const SILENCE =
+  "data:audio/wav;base64,UklGRnQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVAAAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==";
+
+// Call from a tap (like Start) so iOS lets later clips play without one.
+export function unlockAudio() {
+  if (typeof Audio === "undefined") return;
+  audio ??= new Audio();
+  audio.src = SILENCE;
+  audio.play().catch(() => {});
+}
+
 // One speaker per page, since the browser has one speech queue.
 let speaker: Speaker | null | undefined;
 function getSpeaker() {
