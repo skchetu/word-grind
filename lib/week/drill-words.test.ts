@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { toDrillWords } from "./drill-words";
+import { toDrillWords, toReviews } from "./drill-words";
 
 const row = (position: number, text: string, audio_path: string | null) => ({
   position,
@@ -27,6 +27,31 @@ describe("toDrillWords", () => {
         definition: "laconic means…",
         audioUrl: undefined,
       },
+    ]);
+  });
+});
+
+describe("toReviews", () => {
+  const review = (id: string, due_on: string) => ({
+    word_id: id,
+    due_on,
+    words: { id, text: id, definition: "", audio_path: null },
+  });
+
+  it("lists every reviewed word and the ones due by today", () => {
+    const { reviewed, due } = toReviews(
+      [
+        review("a", "2026-10-22"),
+        review("b", "2026-10-23"),
+        review("c", "2026-10-24"),
+      ],
+      "2026-10-23",
+      "https://abc.supabase.co",
+    );
+    expect([...reviewed]).toEqual(["a", "b", "c"]);
+    expect(due.map((d) => [d.word.id, d.dueOn])).toEqual([
+      ["a", "2026-10-22"],
+      ["b", "2026-10-23"],
     ]);
   });
 });
