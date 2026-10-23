@@ -107,6 +107,31 @@ export async function generateThisWeek() {
   revalidatePath("/");
 }
 
+// Records any missing clips for this week's words, such as words saved
+// before recording existed or clips that failed the first time.
+export async function recordThisWeekAudio() {
+  const supabase = await createClient();
+  const { data: auth } = await supabase.auth.getClaims();
+  if (!auth?.claims.sub) redirect("/login");
+
+  const voice = elevenLabsConfig();
+  if (!voice) return;
+
+  const { data: week } = await supabase
+    .from("weeks")
+    .select("id")
+    .eq("starts_on", weekStart(todayIn(HOUSEHOLD_TIME_ZONE)))
+    .maybeSingle();
+  if (!week) return;
+
+  await recordWeekAudio(
+    supabase,
+    z.object({ id: z.uuid() }).parse(week).id,
+    voice,
+  );
+  revalidatePath("/");
+}
+
 // A tip for one misspelling: from the cache when this exact mistake has
 // been seen before, otherwise from Claude (then cached). Falls back to the
 // word's mnemonic whenever Claude can't or shouldn't be called.

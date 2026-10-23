@@ -1,17 +1,23 @@
 import { z } from "zod";
 
+import { elevenLabsConfig } from "@/lib/speech/elevenlabs";
 import { createClient } from "@/lib/supabase/server";
 import { HOUSEHOLD_TIME_ZONE, todayIn, weekStart } from "@/lib/week/dates";
 
-import { generateThisWeek } from "./actions";
+import { generateThisWeek, recordThisWeekAudio } from "./actions";
 import { GenerateWeekButton } from "./generate-week-button";
+import { RecordAudioButton } from "./record-audio-button";
 
 const weekSchema = z.object({
   theme: z.string(),
   week_words: z.array(
     z.object({
       position: z.int(),
-      words: z.object({ text: z.string(), definition: z.string() }),
+      words: z.object({
+        text: z.string(),
+        definition: z.string(),
+        audio_path: z.string().nullable(),
+      }),
     }),
   ),
 });
@@ -22,7 +28,7 @@ export async function ThisWeek() {
   const supabase = await createClient();
   const { data } = await supabase
     .from("weeks")
-    .select("theme, week_words(position, words(text, definition))")
+    .select("theme, week_words(position, words(text, definition, audio_path))")
     .eq("starts_on", weekStart(todayIn(HOUSEHOLD_TIME_ZONE)))
     .maybeSingle();
 
@@ -36,6 +42,7 @@ export async function ThisWeek() {
 
   const week = weekSchema.parse(data);
   const words = week.week_words.toSorted((a, b) => a.position - b.position);
+  const unrecorded = words.filter(({ words: w }) => !w.audio_path).length;
 
   return (
     <section className="w-full text-left">
@@ -51,6 +58,11 @@ export async function ThisWeek() {
           </li>
         ))}
       </ol>
+      {unrecorded > 0 && elevenLabsConfig() && (
+        <form action={recordThisWeekAudio} className="mt-4">
+          <RecordAudioButton count={unrecorded} />
+        </form>
+      )}
     </section>
   );
 }
