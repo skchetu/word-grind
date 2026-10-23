@@ -132,3 +132,60 @@ describe("createSpeaker", () => {
     expect(speaker.getState().voices.map((v) => v.lang)).toEqual(["en-US"]);
   });
 });
+
+// Records each clip it's asked to play; the test decides how it ends.
+function fakePlayer() {
+  const clips: { url: string; done: (played: boolean) => void }[] = [];
+  const stop = vi.fn();
+  const player = vi.fn((url: string, done: (played: boolean) => void) => {
+    clips.push({ url, done });
+    return stop;
+  });
+  return { player, clips, stop };
+}
+
+describe("createSpeaker with recorded clips", () => {
+  it("plays the clip instead of the browser voice, then moves on", () => {
+    const fake = fakeSynth();
+    const clips = fakePlayer();
+    const onDone = vi.fn();
+    createSpeaker(fake.synth, clips.player).speak(
+      [{ text: "laconic", audioUrl: "/w.mp3" }, "A laconic reply."],
+      { onDone },
+    );
+    expect(clips.clips.map((c) => c.url)).toEqual(["/w.mp3"]);
+    expect(fake.spoken).toHaveLength(0);
+
+    clips.clips[0]?.done(true);
+    vi.advanceTimersByTime(PAUSE_MS);
+    expect(fake.spoken.map((u) => u.text)).toEqual(["A laconic reply."]);
+    fake.finish();
+    vi.runAllTimers();
+    expect(onDone).toHaveBeenCalledOnce();
+  });
+
+  it("falls back to the browser voice when a clip fails", () => {
+    const fake = fakeSynth();
+    const clips = fakePlayer();
+    createSpeaker(fake.synth, clips.player).speak([
+      { text: "laconic", audioUrl: "/w.mp3" },
+    ]);
+    clips.clips[0]?.done(false);
+    clips.clips[0]?.done(false); // a second error event is ignored
+    expect(fake.spoken.map((u) => u.text)).toEqual(["laconic"]);
+  });
+
+  it("stops the clip on cancel and ignores its late end", () => {
+    const fake = fakeSynth();
+    const clips = fakePlayer();
+    const onDone = vi.fn();
+    const speaker = createSpeaker(fake.synth, clips.player);
+    speaker.speak([{ text: "laconic", audioUrl: "/w.mp3" }], { onDone });
+
+    speaker.cancel();
+    clips.clips[0]?.done(true);
+    vi.runAllTimers();
+    expect(clips.stop).toHaveBeenCalled();
+    expect(onDone).not.toHaveBeenCalled();
+  });
+});
