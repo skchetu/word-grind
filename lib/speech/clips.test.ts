@@ -66,9 +66,9 @@ describe("makeClips", () => {
       store: vi.fn(async () => {}),
       link: vi.fn(async () => {}),
     };
-    const made = await makeClips([job("a"), job("b"), job("c")], steps);
+    const result = await makeClips([job("a"), job("b"), job("c")], steps);
 
-    expect(made).toBe(3);
+    expect(result).toEqual({ made: 3, failed: 0 });
     expect(steps.store).toHaveBeenCalledWith("words/a.mp3", mp3);
     expect(steps.link).toHaveBeenCalledTimes(3);
   });
@@ -83,9 +83,9 @@ describe("makeClips", () => {
       store: vi.fn(async () => {}),
       link: vi.fn(async () => {}),
     };
-    const made = await makeClips([job("a"), job("b"), job("c")], steps);
+    const result = await makeClips([job("a"), job("b"), job("c")], steps);
 
-    expect(made).toBe(2);
+    expect(result).toEqual({ made: 2, failed: 1 });
     expect(steps.link).not.toHaveBeenCalledWith(job("b"));
   });
 
