@@ -68,7 +68,7 @@ describe("makeClips", () => {
     };
     const result = await makeClips([job("a"), job("b"), job("c")], steps);
 
-    expect(result).toEqual({ made: 3, firstError: undefined });
+    expect(result).toEqual({ made: 3, failed: 0 });
     expect(steps.store).toHaveBeenCalledWith("words/a.mp3", mp3);
     expect(steps.link).toHaveBeenCalledTimes(3);
   });
@@ -85,7 +85,7 @@ describe("makeClips", () => {
     };
     const result = await makeClips([job("a"), job("b"), job("c")], steps);
 
-    expect(result).toEqual({ made: 2, firstError: "ElevenLabs 429" });
+    expect(result).toEqual({ made: 2, failed: 1 });
     expect(steps.link).not.toHaveBeenCalledWith(job("b"));
   });
 

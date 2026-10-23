@@ -38,7 +38,7 @@ function RecordAudioButton({
           : `${count} ${count === 1 ? "word doesn't" : "words don't"} have recorded audio yet.`}
       </p>
       {error && !pending && (
-        <p role="alert" className="text-sm break-words text-destructive">
+        <p role="alert" className="text-sm text-destructive">
           {error}
         </p>
       )}

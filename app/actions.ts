@@ -108,8 +108,8 @@ export async function generateThisWeek() {
 }
 
 // Records any missing clips for this week's words, such as words saved
-// before recording existed or clips that failed the first time. Returns a
-// message to show when some clips couldn't be made.
+// before recording existed or clips that failed the first time. Returns an
+// error message when any clip failed; the details are in the server logs.
 export async function recordThisWeekAudio(): Promise<string | null> {
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getClaims();
@@ -125,15 +125,13 @@ export async function recordThisWeekAudio(): Promise<string | null> {
     .maybeSingle();
   if (!week) return null;
 
-  const { made, firstError } = await recordWeekAudio(
+  const { failed } = await recordWeekAudio(
     supabase,
     z.object({ id: z.uuid() }).parse(week).id,
     voice,
   );
   revalidatePath("/");
-  return firstError
-    ? `Recorded ${made} clips. Some failed: ${firstError}`
-    : null;
+  return failed > 0 ? "Error: Please see logs for further details." : null;
 }
 
 // A tip for one misspelling: from the cache when this exact mistake has

@@ -62,16 +62,16 @@ export type ClipSteps = {
 };
 
 // Makes each clip, a few at a time. A clip that fails is skipped, and that
-// word or sentence keeps using the browser voice. Returns how many were made,
-// and the first error so the caller can say why the rest weren't.
+// word or sentence keeps using the browser voice. Returns how many were made
+// and how many failed; the reasons go to the server logs.
 export async function makeClips(
   jobs: ClipJob[],
   steps: ClipSteps,
   concurrency = 2,
-): Promise<{ made: number; firstError?: string }> {
+): Promise<{ made: number; failed: number }> {
   const queue = [...jobs];
   let made = 0;
-  let firstError: string | undefined;
+  let failed = 0;
   async function worker() {
     for (let job = queue.shift(); job; job = queue.shift()) {
       try {
@@ -80,12 +80,12 @@ export async function makeClips(
         made++;
       } catch (error) {
         console.error(`Clip for ${job.path} failed:`, error);
-        firstError ??= error instanceof Error ? error.message : String(error);
+        failed++;
       }
     }
   }
   await Promise.all(Array.from({ length: concurrency }, worker));
-  return { made, firstError };
+  return { made, failed };
 }
 
 // Records every missing clip for a week with ElevenLabs and saves it to
