@@ -61,3 +61,6 @@ A tip is one sentence about one misspelling, so it uses Haiku 5.5 rather than Op
 
 ## Recorded clips live at fixed paths in a public bucket
 ElevenLabs clips are stored in the public `word-audio` bucket at `words/<id>.mp3` and `sentences/<id>.mp3`, and `audio_path` on each row says whether a clip exists. A check constraint ties `audio_path` to the row's own id, so it can only ever point at that row's clip, and signed-in members can set that one column and nothing else on the shared word bank. The bucket is public because the words aren't secret, which lets the drill play a plain URL with no signed-URL round trip. Members can add clips but not replace or delete them. As with weeks, this avoids handing the server a service-role key.
+
+## ElevenLabs over plain fetch, not the SDK
+`lib/speech/elevenlabs.ts` makes one POST per clip with `fetch`, since text-to-speech is the only ElevenLabs endpoint the app uses. That avoids adding the SDK and its dependencies for a single call, and MSW can mock it like the Claude API. Flash v2.5 is the cheapest, fastest model and sounds natural for single words and short sentences. A missing key or voice ID returns null, and the app keeps using the browser voice, so ElevenLabs stays optional.
