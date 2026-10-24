@@ -56,14 +56,14 @@ describe("generateWeek", () => {
     expect(result.usage).toEqual({ inputTokens: 10, outputTokens: 10 });
   });
 
-  it("drops a bad word without another call when enough remain", async () => {
+  it("drops a bad word without another call when 15 good ones remain", async () => {
     vi.spyOn(console, "warn").mockImplementation(() => {});
-    const [first, ...rest] = goodWeek!.words;
+    const words = goodWeek!.words;
     const oneBad = {
       ...goodWeek,
       words: [
-        { ...first!, sentences: ["No word here.", "Nor here."] },
-        ...rest,
+        { ...words[0]!, sentences: ["No word here.", "Nor here."] },
+        ...words,
       ],
     };
     let calls = 0;
@@ -79,7 +79,7 @@ describe("generateWeek", () => {
     expect(calls).toBe(1);
     expect(result.source).toBe("claude");
     expect(result.week.words.map((c) => c.word)).toEqual(
-      rest.map((c) => c.word),
+      words.map((c) => c.word),
     );
   });
 
@@ -98,7 +98,7 @@ describe("generateWeek", () => {
     const result = await generateWeek(request, { client: testClient() });
 
     expect(bodies).toHaveLength(2);
-    expect(bodies[1]).toContain("Write 2 more words");
+    expect(bodies[1]).toContain("Write 5 more words");
     expect(bodies[1]).toContain(goodWeek!.theme);
     expect(result.source).toBe("claude");
     expect(result.week.words).toHaveLength(words.length);

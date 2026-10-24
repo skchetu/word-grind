@@ -20,12 +20,13 @@ export const wordCardSchema = z.object({
 });
 export type WordCardOutput = z.infer<typeof wordCardSchema>;
 
-export const MIN_WORDS = 12;
-export const MAX_WORDS = 15;
+// Every week has exactly this many words, so lists and tests are the same
+// size from week to week.
+export const WORDS_PER_WEEK = 15;
 
 export const weekSchema = z.object({
   theme: z.string().min(1), // e.g. "Tricky doubles"
-  words: z.array(wordCardSchema).min(MIN_WORDS).max(MAX_WORDS),
+  words: z.array(wordCardSchema).length(WORDS_PER_WEEK),
 });
 export type WeekOutput = z.infer<typeof weekSchema>;
 
