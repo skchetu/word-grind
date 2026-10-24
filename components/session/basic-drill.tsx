@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 
 import { saveDrill } from "@/app/actions";
 
@@ -8,22 +8,29 @@ import { Button } from "@/components/ui/button";
 import { LetterDiff } from "@/components/session/letter-diff";
 import { SessionResults } from "@/components/session/session-results";
 import { SpellInput, SpellInputHelp } from "@/components/session/spell-input";
+import { TestClock } from "@/components/session/test-clock";
 import type { DrillWord } from "@/data/seed-words";
-import { initialSession, transition } from "@/lib/session/machine";
+import { initialSession, transition, type Mode } from "@/lib/session/machine";
 import { unlockAudio, useSpeech } from "@/lib/speech/use-speech";
 
 // A bare-bones drill that runs the session machine end to end. The polished
 // drill screen (audio hook, letter diff, shortcuts) replaces it on Day 4.
 // Drills of this week's words are saved when they finish; the seed-word
-// drill has no `weekId` and isn't.
+// drill has no `weekId` and isn't. In test mode there are no hints or
+// feedback, and a one-hour clock ends the test.
 export function BasicDrill({
   words,
   weekId,
+  mode = "drill",
 }: {
   words: DrillWord[];
   weekId?: string;
+  mode?: Mode;
 }) {
   const [state, send] = useReducer(transition, initialSession);
+  const [startedAt, setStartedAt] = useState<number | null>(null);
+  // Stable, so the clock's interval isn't restarted on every keystroke.
+  const timeUp = useCallback(() => send({ type: "TIME_UP" }), []);
   const word = "index" in state ? words[state.index] : undefined;
 
   // Time from typing unlocking to submitting, per word. Replays don't reset it.
@@ -81,10 +88,13 @@ export function BasicDrill({
         size="lg"
         onClick={() => {
           unlockAudio();
-          send({ type: "START", mode: "drill", words });
+          setStartedAt(Date.now());
+          send({ type: "START", mode, words });
         }}
       >
-        Start drill ({words.length} words)
+        {mode === "test"
+          ? `Start test (${words.length} words, 1 hour)`
+          : `Start drill (${words.length} words)`}
       </Button>
     );
   }
@@ -101,9 +111,14 @@ export function BasicDrill({
 
   return (
     <div className="flex w-full flex-col gap-4">
-      <p className="text-sm text-muted-foreground">
-        Word {state.index + 1} of {state.words.length}
-      </p>
+      <div className="flex items-baseline justify-between">
+        <p className="text-sm text-muted-foreground">
+          Word {state.index + 1} of {state.words.length}
+        </p>
+        {mode === "test" && startedAt !== null && (
+          <TestClock startedAt={startedAt} onTimeUp={timeUp} />
+        )}
+      </div>
 
       {state.phase === "speaking" && (
         // Some browsers block speech or never fire `onend`, so the speller
@@ -140,13 +155,15 @@ export function BasicDrill({
             >
               Replay
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => send({ type: "HINT" })}
-            >
-              Hint
-            </Button>
+            {mode === "drill" && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => send({ type: "HINT" })}
+              >
+                Hint
+              </Button>
+            )}
             <Button type="submit" className="ml-auto">
               Submit
             </Button>
