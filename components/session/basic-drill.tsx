@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useReducer, useRef, useState } from "react";
 
 import { saveDrill } from "@/app/actions";
 
 import { Button } from "@/components/ui/button";
 import { LetterDiff } from "@/components/session/letter-diff";
+import { SessionResults } from "@/components/session/session-results";
 import { SpellInput, SpellInputHelp } from "@/components/session/spell-input";
 import type { DrillWord } from "@/data/seed-words";
 import { initialSession, transition } from "@/lib/session/machine";
@@ -90,21 +90,12 @@ export function BasicDrill({
   }
 
   if (state.phase === "complete") {
-    const correct = state.results.filter((r) => r.correct).length;
     return (
-      <div className="flex flex-col items-center gap-4">
-        <p className="text-2xl font-semibold">
-          {correct} / {state.results.length} correct
-        </p>
-        {saveFailed && (
-          <p role="alert" className="text-sm text-destructive">
-            Couldn&apos;t save this drill.
-          </p>
-        )}
-        <Button asChild variant="outline">
-          <Link href="/">Done</Link>
-        </Button>
-      </div>
+      <SessionResults
+        words={state.words}
+        results={state.results}
+        saveFailed={saveFailed}
+      />
     );
   }
 
