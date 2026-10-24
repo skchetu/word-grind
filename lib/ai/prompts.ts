@@ -1,3 +1,5 @@
+import { WORDS_PER_WEEK } from "./schemas";
+
 // Stable instructions, kept identical across requests so they can be cached.
 export const WEEK_SYSTEM_PROMPT = `You write weekly spelling and vocabulary lists for two adults studying GRE-level English.
 
@@ -17,7 +19,7 @@ export type WeekRequest = {
 
 export function buildWeekRequest({ difficulty, topics, avoid }: WeekRequest) {
   const lines = [
-    `Write this week's list of exactly 15 words, aiming for difficulty ${difficulty}.`,
+    `Write this week's list of exactly ${WORDS_PER_WEEK} words, aiming for difficulty ${difficulty}.`,
   ];
   if (topics.length > 0) {
     lines.push(`Set the example sentences around: ${topics.join(", ")}.`);

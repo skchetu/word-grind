@@ -10,6 +10,7 @@ import {
 } from "./prompts";
 import {
   checkCard,
+  fallbackPoolSchema,
   weekSchema,
   WORDS_PER_WEEK,
   wordCardSchema,
@@ -114,8 +115,19 @@ function keepGood(
   return kept.slice(0, WORDS_PER_WEEK - already.length);
 }
 
-// Rotates through the fallback weeks so two outages in a row differ.
+// Rotates through the fallback pools so two outages in a row differ. Each
+// pass through the pools starts WORDS_PER_WEEK words further into each one,
+// wrapping around, so every backup word gets used.
 export function fallbackWeek(weekNumber: number): WeekOutput {
-  const index = weekNumber % fallbackLists.length;
-  return weekSchema.parse(fallbackLists[index]);
+  const pool = fallbackPoolSchema.parse(
+    fallbackLists[weekNumber % fallbackLists.length],
+  );
+  const start =
+    (Math.floor(weekNumber / fallbackLists.length) * WORDS_PER_WEEK) %
+    pool.words.length;
+  const words = Array.from(
+    { length: WORDS_PER_WEEK },
+    (_, i) => pool.words[(start + i) % pool.words.length],
+  );
+  return weekSchema.parse({ theme: pool.theme, words });
 }

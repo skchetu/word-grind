@@ -27,7 +27,7 @@ function card(overrides: Partial<WordCardOutput> = {}): WordCardOutput {
 }
 
 // A valid week of n distinct words built from made-up letter strings.
-function week(n = 15): WeekOutput {
+function week(n = 10): WeekOutput {
   const words = Array.from({ length: n }, (_, i) => {
     const word = `word${"abcdefghijklmnop"[i]}`;
     return card({
@@ -67,13 +67,13 @@ describe("wordCardSchema", () => {
 });
 
 describe("weekSchema", () => {
-  it("accepts exactly 15 words", () => {
-    expect(weekSchema.safeParse(week(15)).success).toBe(true);
+  it("accepts exactly 10 words", () => {
+    expect(weekSchema.safeParse(week(10)).success).toBe(true);
   });
 
-  it("rejects 14 or 16 words", () => {
-    expect(weekSchema.safeParse(week(14)).success).toBe(false);
-    expect(weekSchema.safeParse(week(16)).success).toBe(false);
+  it("rejects 9 or 11 words", () => {
+    expect(weekSchema.safeParse(week(9)).success).toBe(false);
+    expect(weekSchema.safeParse(week(11)).success).toBe(false);
   });
 });
 

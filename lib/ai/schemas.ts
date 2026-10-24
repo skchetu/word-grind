@@ -22,13 +22,19 @@ export type WordCardOutput = z.infer<typeof wordCardSchema>;
 
 // Every week has exactly this many words, so lists and tests are the same
 // size from week to week.
-export const WORDS_PER_WEEK = 15;
+export const WORDS_PER_WEEK = 10;
 
 export const weekSchema = z.object({
   theme: z.string().min(1), // e.g. "Tricky doubles"
   words: z.array(wordCardSchema).length(WORDS_PER_WEEK),
 });
 export type WeekOutput = z.infer<typeof weekSchema>;
+
+// A fallback list is a themed pool with at least a week's worth of words.
+// Weeks are cut from it, so a longer pool repeats less often.
+export const fallbackPoolSchema = weekSchema.extend({
+  words: z.array(wordCardSchema).min(WORDS_PER_WEEK),
+});
 
 const BLANK = "______";
 

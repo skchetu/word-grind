@@ -1,6 +1,6 @@
 # Word Grind (in progress...)
 
-A spelling and vocabulary app for a two-person household. Each Monday, Claude writes a themed list of 15 GRE-style words at the household's difficulty level. Through the week, a short daily drill reads each word aloud and asks you to spell it, using spaced repetition. On Sunday, a timed test settles a head-to-head scoreboard.
+A spelling and vocabulary app for a two-person household. Each Monday, Claude writes a themed list of 10 GRE-style words at the household's difficulty level. Through the week, a short daily drill reads each word aloud and asks you to spell it, using spaced repetition. On Sunday, a timed test settles a head-to-head scoreboard.
 
 > Work in progress. Weekly lists, recorded audio, grading and the daily drill with spaced repetition work today. The Sunday test, scoreboard and settings are being built.
 
