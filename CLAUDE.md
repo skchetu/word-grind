@@ -28,7 +28,7 @@ CI (`.github/workflows/ci.yml`) runs lint, typecheck, test and build on every PR
 - Don't start work that depends on an unmerged PR unless asked.
 - CI must be green before asking for review.
 - PR titles use Conventional Commits (`feat:`, `fix:`, `chore:`).
-- PR description sections: What, Why, How to test, Screenshots, Out of scope.
+- PR description sections: What, Why, How to test, Out of scope.
   - **Why** explains the reasoning and the benefit (what it prevents, what it enables), not just which plan step it is.
   - **How to test** gives exact terminal steps a beginner can copy, plus the tests added.
   - The repo is public: no links to Claude sessions in PR descriptions or commit messages.
