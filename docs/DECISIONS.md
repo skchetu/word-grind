@@ -73,3 +73,6 @@ The drill screen grades each answer so it can show feedback right away, but it o
 
 ## Ten words a week, cut from larger fallback pools
 Every weekly list and Sunday test has exactly `WORDS_PER_WEEK` (10) words, so scores compare fairly across weeks and a test fits easily inside the hour. If Claude's list is short after dropping bad words, only the missing words are requested. Each fallback list is a themed pool of at least 10 words (currently 15). `fallbackWeek` rotates through the pools and starts 10 words further into a pool on each pass, wrapping around, so repeated outages don't serve the same 10 words.
+
+## A missed Sunday test stays open as a make-up
+A week's test opens on its Sunday and stays open until it's taken, using that week's words and the same one-hour clock. `pendingTests` in `lib/week/pending-tests.ts` works this out from the weeks and the tests already taken, so nothing has to run on a schedule to mark a test as missed. A partial unique index on `sessions (profile_id, week_id) where kind = 'test'` lets the database, not just the UI, enforce one test per person per week, so a second tab or a double submit can't add a second score.
