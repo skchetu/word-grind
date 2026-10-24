@@ -67,3 +67,6 @@ ElevenLabs clips are stored in the public `word-audio` bucket at `words/<id>.mp3
 
 ## Clips are recorded after the response, two at a time
 A new week has about 45 clips (each word plus its sentences). `generateThisWeek` saves the list, then hands the recording to Next's `after()`, so the list appears right away instead of after another 20 seconds. Two clips are made at once, half the free plan's limit of four for Flash, so a backfill or a second run can overlap without hitting rate limits. Speed hardly matters because nobody waits on it. A clip that fails is skipped, leaving that word on the browser voice. Clip calls aren't logged in `ai_calls`: they only happen when a week is made, which is already capped at three a day, and the API key has its own monthly credit limit.
+
+## Drill answers are graded again on the server
+The drill screen grades each answer so it can show feedback right away, but it only sends what was typed when saving. `drillRecords` in `lib/session/records.ts` grades every answer again against the stored word before writing the session, its attempts and each word's next Leitner box. A browser can't mark a misspelling as correct or move a word to a higher box than it earned, and the scoreboard depends on those numbers. Answer times are capped at an hour so a tab left open overnight doesn't distort the averages.
