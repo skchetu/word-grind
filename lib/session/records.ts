@@ -17,7 +17,23 @@ export type Answer = z.infer<typeof answerSchema>;
 // overnight doesn't skew "time to answer" stats.
 const MAX_MS = 60 * 60 * 1000;
 
-// The rows a finished drill writes: its score, one attempt per answer, and
+// A test is scored against its week's whole list, in list order. Answers
+// for other words are dropped, a repeated word keeps its first answer, and
+// a word with no answer counts as missed, so a short or padded submission
+// can't change the score. Tests have no hints.
+export function testAnswers(
+  answers: Answer[],
+  weekWordIds: readonly string[],
+): Answer[] {
+  const byWord = new Map<string, Answer>();
+  for (const a of answers) if (!byWord.has(a.wordId)) byWord.set(a.wordId, a);
+  return weekWordIds.map((wordId) => ({
+    ...(byWord.get(wordId) ?? { wordId, typed: "", ms: 0 }),
+    hintUsed: false,
+  }));
+}
+
+// The rows a finished drill or test writes: its score, one attempt per answer, and
 // each word's next Leitner box. Answers for words that aren't in `texts`
 // are dropped. `states` holds the speller's current review_state per word.
 export function drillRecords(

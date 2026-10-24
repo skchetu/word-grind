@@ -25,7 +25,7 @@ export function SessionResults({
       </p>
       {saveFailed && (
         <p role="alert" className="text-sm text-destructive">
-          Couldn&apos;t save this drill.
+          Couldn&apos;t save these results.
         </p>
       )}
       <ul className="w-full divide-y rounded-lg border">

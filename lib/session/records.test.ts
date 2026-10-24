@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { drillRecords, type Answer } from "./records";
+import { drillRecords, testAnswers, type Answer } from "./records";
 
 const today = "2026-10-23";
 const A = "00000000-0000-4000-8000-00000000000a";
@@ -69,5 +69,29 @@ describe("drillRecords", () => {
     );
     expect(r.total).toBe(1);
     expect(r.attempts[0]?.ms_to_answer).toBe(3_600_000);
+  });
+});
+
+describe("testAnswers", () => {
+  const C = "00000000-0000-4000-8000-00000000000c";
+
+  it("follows the week's list and counts a skipped word as missed", () => {
+    const r = testAnswers([answer(B, "ephemeral")], [A, B]);
+    expect(r).toEqual([
+      { wordId: A, typed: "", hintUsed: false, ms: 0 },
+      answer(B, "ephemeral"),
+    ]);
+  });
+
+  it("drops other words, repeats and hints", () => {
+    const r = testAnswers(
+      [
+        { ...answer(A, "lakonic"), hintUsed: true },
+        answer(A, "laconic"),
+        answer(C, "extra"),
+      ],
+      [A],
+    );
+    expect(r).toEqual([answer(A, "lakonic")]);
   });
 });
