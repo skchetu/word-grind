@@ -10,9 +10,9 @@ import {
 } from "./prompts";
 import {
   checkCard,
-  MAX_WORDS,
-  MIN_WORDS,
+  fallbackPoolSchema,
   weekSchema,
+  WORDS_PER_WEEK,
   wordCardSchema,
   type WeekOutput,
   type WordCardOutput,
@@ -40,7 +40,7 @@ const draftSchema = z.object({
 const topUpSchema = z.object({ words: cardsSchema });
 
 // Builds a week in up to three calls: a draft (retried once only if it has
-// no usable theme), then, if dropping bad words left fewer than MIN_WORDS, a
+// no usable theme), then, if dropping bad words left fewer than WORDS_PER_WEEK, a
 // top-up asking for just the missing ones. An API error, or still too few
 // words, means a fallback week.
 export async function generateWeek(
@@ -74,11 +74,11 @@ export async function generateWeek(
     if (!draft) throw new Error("no usable draft");
 
     const kept = keepGood(draft.words, request.avoid);
-    if (kept.length < MIN_WORDS) {
+    if (kept.length < WORDS_PER_WEEK) {
       const content = buildTopUpRequest(request, {
         theme: draft.theme,
         kept: kept.map((card) => card.word),
-        count: MIN_WORDS - kept.length,
+        count: WORDS_PER_WEEK - kept.length,
       });
       const extra = await ask(content, topUpSchema);
       kept.push(...keepGood(extra?.words ?? [], request.avoid, kept));
@@ -94,7 +94,7 @@ export async function generateWeek(
 }
 
 // The usable cards, in order: not null, not a repeat or an avoided word,
-// and passing checkCard. Stops at MAX_WORDS.
+// and passing checkCard. Stops at WORDS_PER_WEEK.
 function keepGood(
   cards: (WordCardOutput | null)[],
   avoid: string[],
@@ -112,11 +112,22 @@ function keepGood(
     taken.add(card.word);
     kept.push(card);
   }
-  return kept.slice(0, MAX_WORDS - already.length);
+  return kept.slice(0, WORDS_PER_WEEK - already.length);
 }
 
-// Rotates through the fallback weeks so two outages in a row differ.
+// Rotates through the fallback pools so two outages in a row differ. Each
+// pass through the pools starts WORDS_PER_WEEK words further into each one,
+// wrapping around, so every backup word gets used.
 export function fallbackWeek(weekNumber: number): WeekOutput {
-  const index = weekNumber % fallbackLists.length;
-  return weekSchema.parse(fallbackLists[index]);
+  const pool = fallbackPoolSchema.parse(
+    fallbackLists[weekNumber % fallbackLists.length],
+  );
+  const start =
+    (Math.floor(weekNumber / fallbackLists.length) * WORDS_PER_WEEK) %
+    pool.words.length;
+  const words = Array.from(
+    { length: WORDS_PER_WEEK },
+    (_, i) => pool.words[(start + i) % pool.words.length],
+  );
+  return weekSchema.parse({ theme: pool.theme, words });
 }

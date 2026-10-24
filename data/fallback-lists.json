@@ -59,6 +59,20 @@
         ]
       },
       {
+        "word": "bourgeois",
+        "partOfSpeech": "adjective",
+        "definition": "typical of the comfortable, conventional middle class",
+        "ipa": "/ˈbʊərʒwɑː/",
+        "syllables": ["bour", "geois"],
+        "origin": "French bourgeois, a town dweller, from bourg, market town",
+        "mnemonic": "Bour-ge-ois: the silent E and the O-I-S at the end are French leftovers.",
+        "difficulty": 4,
+        "sentences": [
+          "He mocked the bourgeois comforts he secretly enjoyed.",
+          "Their bourgeois neighbourhood had matching lawns and quiet streets."
+        ]
+      },
+      {
         "word": "capricious",
         "partOfSpeech": "adjective",
         "definition": "changing mood or behavior suddenly and without reason",
@@ -143,6 +157,20 @@
         ]
       },
       {
+        "word": "liaison",
+        "partOfSpeech": "noun",
+        "definition": "a person who keeps two groups in contact, or a working connection between them",
+        "ipa": "/liˈeɪzɒn/",
+        "syllables": ["li", "ai", "son"],
+        "origin": "French liaison, a binding, from Latin ligare, to bind",
+        "mnemonic": "Two I's hug the A: l-I-A-I-son.",
+        "difficulty": 3,
+        "sentences": [
+          "She acted as the liaison between the school and the parents.",
+          "A weekly call kept the liaison between the two teams strong."
+        ]
+      },
+      {
         "word": "mellifluous",
         "partOfSpeech": "adjective",
         "definition": "sweet and smooth to hear",
@@ -168,6 +196,20 @@
         "sentences": [
           "He took a surreptitious glance at his phone during the meeting.",
           "Their surreptitious snack run went unnoticed."
+        ]
+      },
+      {
+        "word": "sycophant",
+        "partOfSpeech": "noun",
+        "definition": "a person who flatters powerful people to gain an advantage",
+        "ipa": "/ˈsɪkəfænt/",
+        "syllables": ["sy", "co", "phant"],
+        "origin": "Greek sykophantes, an informer",
+        "mnemonic": "Y not I after the S, and PH not F: s-Y-co-PH-ant.",
+        "difficulty": 4,
+        "sentences": [
+          "The new manager saw through every sycophant in the office.",
+          "Only a sycophant would praise such a dull speech."
         ]
       }
     ]
@@ -316,6 +358,20 @@
         ]
       },
       {
+        "word": "pusillanimous",
+        "partOfSpeech": "adjective",
+        "definition": "lacking courage; timid",
+        "ipa": "/ˌpjuːsɪˈlænɪməs/",
+        "syllables": ["pu", "sil", "lan", "i", "mous"],
+        "origin": "Latin pusillus, very small, and animus, spirit",
+        "mnemonic": "One S but a double L: a pu-SIL-LAN-imous spirit is small and timid.",
+        "difficulty": 5,
+        "sentences": [
+          "The pusillanimous senator dodged every hard vote.",
+          "It was a pusillanimous reply to a brave question."
+        ]
+      },
+      {
         "word": "recalcitrant",
         "partOfSpeech": "adjective",
         "definition": "stubbornly refusing to obey or cooperate",
@@ -341,6 +397,20 @@
         "sentences": [
           "Putting pineapple on that pizza felt sacrilegious to the chef.",
           "Talking during the film was sacrilegious to my sister."
+        ]
+      },
+      {
+        "word": "vacillate",
+        "partOfSpeech": "verb",
+        "definition": "to keep changing your mind between choices",
+        "ipa": "/ˈvæsɪleɪt/",
+        "syllables": ["vac", "il", "late"],
+        "origin": "Latin vacillare, to sway",
+        "mnemonic": "One C, two L's: it sways back and forth like the double L.",
+        "difficulty": 4,
+        "sentences": [
+          "They would vacillate between the two cafes every Sunday.",
+          "Don't vacillate too long, or the tickets will sell out."
         ]
       },
       {

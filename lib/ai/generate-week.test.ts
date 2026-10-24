@@ -43,7 +43,7 @@ afterAll(() => server.close());
 // inside the SDK, so error cases don't wait on backoff.
 const testClient = () => new Anthropic({ apiKey: "test-key", maxRetries: 0 });
 const request = { difficulty: 3, topics: ["food"], avoid: [] };
-const goodWeek = fallbackLists[1];
+const goodWeek = fallbackWeek(1);
 
 describe("generateWeek", () => {
   it("returns Claude's week when it passes the checks", async () => {
@@ -52,18 +52,18 @@ describe("generateWeek", () => {
     const result = await generateWeek(request, { client: testClient() });
 
     expect(result.source).toBe("claude");
-    expect(result.week.theme).toBe(goodWeek?.theme);
+    expect(result.week.theme).toBe(goodWeek.theme);
     expect(result.usage).toEqual({ inputTokens: 10, outputTokens: 10 });
   });
 
-  it("drops a bad word without another call when enough remain", async () => {
+  it("drops a bad word without another call when 10 good ones remain", async () => {
     vi.spyOn(console, "warn").mockImplementation(() => {});
-    const [first, ...rest] = goodWeek!.words;
+    const words = goodWeek.words;
     const oneBad = {
       ...goodWeek,
       words: [
-        { ...first!, sentences: ["No word here.", "Nor here."] },
-        ...rest,
+        { ...words[0]!, sentences: ["No word here.", "Nor here."] },
+        ...words,
       ],
     };
     let calls = 0;
@@ -79,27 +79,27 @@ describe("generateWeek", () => {
     expect(calls).toBe(1);
     expect(result.source).toBe("claude");
     expect(result.week.words.map((c) => c.word)).toEqual(
-      rest.map((c) => c.word),
+      words.map((c) => c.word),
     );
   });
 
   it("asks only for the missing words when too few remain", async () => {
-    const words = goodWeek!.words;
+    const words = goodWeek.words;
     const bodies: string[] = [];
     server.use(
       http.post(MESSAGES_URL, async ({ request: req }) => {
         bodies.push(await req.text());
         return bodies.length === 1
-          ? messageWith({ ...goodWeek, words: words.slice(0, 10) })
-          : messageWith({ words: words.slice(10) });
+          ? messageWith({ ...goodWeek, words: words.slice(0, 6) })
+          : messageWith({ words: words.slice(6) });
       }),
     );
 
     const result = await generateWeek(request, { client: testClient() });
 
     expect(bodies).toHaveLength(2);
-    expect(bodies[1]).toContain("Write 2 more words");
-    expect(bodies[1]).toContain(goodWeek!.theme);
+    expect(bodies[1]).toContain("Write 4 more words");
+    expect(bodies[1]).toContain(goodWeek.theme);
     expect(result.source).toBe("claude");
     expect(result.week.words).toHaveLength(words.length);
     expect(result.usage).toEqual({ inputTokens: 20, outputTokens: 20 });
@@ -112,7 +112,7 @@ describe("generateWeek", () => {
       http.post(MESSAGES_URL, () => {
         calls++;
         return calls === 1
-          ? messageWith({ ...goodWeek, words: goodWeek!.words.slice(0, 10) })
+          ? messageWith({ ...goodWeek, words: goodWeek.words.slice(0, 6) })
           : messageWith({ words: [] });
       }),
     );
@@ -159,12 +159,12 @@ describe("generateWeek", () => {
 
 describe("generateWeek with a capitalised word", () => {
   it("accepts it lowercased instead of retrying", async () => {
-    const first = goodWeek!.words[0]!;
+    const first = goodWeek.words[0]!;
     const shouty = {
       ...goodWeek,
       words: [
         { ...first, word: first.word.toUpperCase() },
-        ...goodWeek!.words.slice(1),
+        ...goodWeek.words.slice(1),
       ],
     };
     let calls = 0;
@@ -188,5 +188,14 @@ describe("fallbackWeek", () => {
     expect(fallbackWeek(0).theme).toBe(fallbackLists[0]?.theme);
     expect(fallbackWeek(1).theme).toBe(fallbackLists[1]?.theme);
     expect(fallbackWeek(2).theme).toBe(fallbackLists[0]?.theme);
+  });
+
+  it("cuts a different week from the same list on the next pass", () => {
+    const pool = fallbackLists[0]!.words.map((c) => c.word);
+    const first = fallbackWeek(0).words.map((c) => c.word);
+    const second = fallbackWeek(2).words.map((c) => c.word);
+    expect(first).toEqual(pool.slice(0, 10));
+    // Starts at word 11 and wraps back to the start of the list.
+    expect(second).toEqual([...pool.slice(10), ...pool].slice(0, 10));
   });
 });
