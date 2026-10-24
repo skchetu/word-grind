@@ -9,7 +9,13 @@ import { canCallClaude, logClaudeCall } from "@/lib/ai/calls";
 import { generateTip, TIP_MODEL } from "@/lib/ai/generate-tip";
 import { generateWeek, WEEK_MODEL } from "@/lib/ai/generate-week";
 import { normalize } from "@/lib/grading/normalize";
-import { answerSchema, drillRecords, type Answer } from "@/lib/session/records";
+import type { Mode } from "@/lib/session/machine";
+import {
+  answerSchema,
+  drillRecords,
+  testAnswers,
+  type Answer,
+} from "@/lib/session/records";
 import { recordWeekAudio } from "@/lib/speech/clips";
 import { elevenLabsConfig } from "@/lib/speech/elevenlabs";
 import { DRILL_CAP } from "@/lib/srs/pick";
@@ -192,8 +198,9 @@ export async function getMistakeTip(wordId: string, answer: string) {
   return tip;
 }
 
-const drillInputSchema = z.object({
+const sessionInputSchema = z.object({
   weekId: z.uuid(),
+  kind: z.enum(["drill", "test"]),
   answers: z.array(answerSchema).min(1).max(DRILL_CAP),
 });
 const textRowsSchema = z.array(z.object({ id: z.string(), text: z.string() }));
@@ -221,18 +228,35 @@ const stateRowsSchema = z.array(
     ),
 );
 
-// Saves a finished drill: the session with its score, every attempt, and
-// each word's new Leitner box. Answers are graded again here against the
-// stored words. Returns false when anything failed to save.
-export async function saveDrill(input: {
+// Saves a finished drill or test: the session with its score, every
+// attempt, and each word's new Leitner box. Answers are graded again here
+// against the stored words, and a test is scored against its week's whole
+// list. Returns false when anything failed to save.
+export async function saveSession(input: {
   weekId: string;
+  kind: Mode;
   answers: Answer[];
 }): Promise<boolean> {
-  const { weekId, answers } = drillInputSchema.parse(input);
+  const { weekId, kind, ...parsed } = sessionInputSchema.parse(input);
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getClaims();
   const userId = auth?.claims.sub;
   if (!userId) redirect("/login");
+
+  let answers = parsed.answers;
+  if (kind === "test") {
+    // RLS limits this to the caller's household's weeks.
+    const { data: listed } = await supabase
+      .from("week_words")
+      .select("word_id")
+      .eq("week_id", weekId)
+      .order("position");
+    const ids = z.array(z.object({ word_id: z.string() })).parse(listed ?? []);
+    answers = testAnswers(
+      answers,
+      ids.map((row) => row.word_id),
+    );
+  }
 
   const wordIds = answers.map((a) => a.wordId);
   const [{ data: words }, { data: states }] = await Promise.all([
@@ -257,7 +281,7 @@ export async function saveDrill(input: {
     .insert({
       profile_id: userId,
       week_id: weekId,
-      kind: "drill",
+      kind,
       finished_at: new Date().toISOString(),
       score,
       total,
@@ -265,7 +289,7 @@ export async function saveDrill(input: {
     .select("id")
     .single();
   if (error) {
-    console.error("Saving the drill session failed:", error);
+    console.error(`Saving the ${kind} session failed:`, error);
     return false;
   }
   const sessionId = z.object({ id: z.uuid() }).parse(session).id;
@@ -279,7 +303,7 @@ export async function saveDrill(input: {
       .upsert(reviews.map((r) => ({ ...r, profile_id: userId }))),
   ]);
   for (const { error } of [saved, moved]) {
-    if (error) console.error("Saving the drill answers failed:", error);
+    if (error) console.error(`Saving the ${kind} answers failed:`, error);
   }
   return !saved.error && !moved.error;
 }

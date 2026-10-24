@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 
-import { saveDrill } from "@/app/actions";
+import { saveSession } from "@/app/actions";
 
 import { Button } from "@/components/ui/button";
 import { LetterDiff } from "@/components/session/letter-diff";
@@ -15,9 +15,9 @@ import { unlockAudio, useSpeech } from "@/lib/speech/use-speech";
 
 // A bare-bones drill that runs the session machine end to end. The polished
 // drill screen (audio hook, letter diff, shortcuts) replaces it on Day 4.
-// Drills of this week's words are saved when they finish; the seed-word
-// drill has no `weekId` and isn't. In test mode there are no hints or
-// feedback, and a one-hour clock ends the test.
+// Drills and tests of a week's words are saved when they finish; the
+// seed-word drill has no `weekId` and isn't. In test mode there are no
+// hints or feedback, and a one-hour clock ends the test.
 export function BasicDrill({
   words,
   weekId,
@@ -50,7 +50,7 @@ export function BasicDrill({
     send({ type: "SUBMIT" });
   }
 
-  // Saves once when the drill completes. The ref guards against effects
+  // Saves once when the session completes. The ref guards against effects
   // running twice in development.
   const [saveFailed, setSaveFailed] = useState(false);
   const saved = useRef(false);
@@ -64,10 +64,10 @@ export function BasicDrill({
       hintUsed: r.hintUsed,
       ms: answerMs.current[i] ?? 0,
     }));
-    saveDrill({ weekId, answers })
+    saveSession({ weekId, kind: mode, answers })
       .catch(() => false)
       .then((ok) => setSaveFailed(!ok));
-  }, [results, weekId]);
+  }, [results, weekId, mode]);
 
   // Read the word aloud on entering `speaking`; typing unlocks when it ends.
   const { speak } = useSpeech();

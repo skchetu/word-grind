@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { z } from "zod";
 
 import { BasicDrill } from "@/components/session/basic-drill";
 import { Button } from "@/components/ui/button";
@@ -6,13 +7,14 @@ import { createClient } from "@/lib/supabase/server";
 import { HOUSEHOLD_TIME_ZONE, todayIn, weekStart } from "@/lib/week/dates";
 import { DRILL_WORD_COLUMNS, toDrillWords } from "@/lib/week/drill-words";
 
-// The Sunday test: every word on this week's list, in list order. Results
-// aren't saved yet.
+// The Sunday test: every word on this week's list, in list order. The
+// results are saved to this week, and each answer moves its word's
+// Leitner box the same way a drill does.
 export async function WeekTest() {
   const supabase = await createClient();
   const { data: week } = await supabase
     .from("weeks")
-    .select(`week_words(position, words(${DRILL_WORD_COLUMNS}))`)
+    .select(`id, week_words(position, words(${DRILL_WORD_COLUMNS}))`)
     .eq("starts_on", weekStart(todayIn(HOUSEHOLD_TIME_ZONE)))
     .maybeSingle();
 
@@ -28,5 +30,11 @@ export async function WeekTest() {
       </div>
     );
   }
-  return <BasicDrill mode="test" words={toDrillWords(week.week_words)} />;
+  return (
+    <BasicDrill
+      mode="test"
+      weekId={z.uuid().parse(week.id)}
+      words={toDrillWords(week.week_words)}
+    />
+  );
 }
