@@ -9,8 +9,11 @@ import { canCallClaude, logClaudeCall } from "@/lib/ai/calls";
 import { generateTip, TIP_MODEL } from "@/lib/ai/generate-tip";
 import { generateWeek, WEEK_MODEL } from "@/lib/ai/generate-week";
 import { normalize } from "@/lib/grading/normalize";
+import { answerSchema, drillRecords, type Answer } from "@/lib/session/records";
 import { recordWeekAudio } from "@/lib/speech/clips";
 import { elevenLabsConfig } from "@/lib/speech/elevenlabs";
+import { DRILL_CAP } from "@/lib/srs/pick";
+import { reviewStateSchema } from "@/lib/srs/schedule";
 import { createClient } from "@/lib/supabase/server";
 import { HOUSEHOLD_TIME_ZONE, todayIn, weekStart } from "@/lib/week/dates";
 import { toSavePayload } from "@/lib/week/save";
@@ -187,4 +190,96 @@ export async function getMistakeTip(wordId: string, answer: string) {
       );
   }
   return tip;
+}
+
+const drillInputSchema = z.object({
+  weekId: z.uuid(),
+  answers: z.array(answerSchema).min(1).max(DRILL_CAP),
+});
+const textRowsSchema = z.array(z.object({ id: z.string(), text: z.string() }));
+// A review_state row as [word id, ReviewState], ready for a Map.
+const stateRowsSchema = z.array(
+  z
+    .object({
+      word_id: z.string(),
+      box: z.int(),
+      due_on: z.string(),
+      correct_streak: z.int(),
+      lapses: z.int(),
+    })
+    .transform(
+      (s) =>
+        [
+          s.word_id,
+          reviewStateSchema.parse({
+            box: s.box,
+            dueOn: s.due_on,
+            correctStreak: s.correct_streak,
+            lapses: s.lapses,
+          }),
+        ] as const,
+    ),
+);
+
+// Saves a finished drill: the session with its score, every attempt, and
+// each word's new Leitner box. Answers are graded again here against the
+// stored words. Returns false when anything failed to save.
+export async function saveDrill(input: {
+  weekId: string;
+  answers: Answer[];
+}): Promise<boolean> {
+  const { weekId, answers } = drillInputSchema.parse(input);
+  const supabase = await createClient();
+  const { data: auth } = await supabase.auth.getClaims();
+  const userId = auth?.claims.sub;
+  if (!userId) redirect("/login");
+
+  const wordIds = answers.map((a) => a.wordId);
+  const [{ data: words }, { data: states }] = await Promise.all([
+    supabase.from("words").select("id, text").in("id", wordIds),
+    supabase
+      .from("review_state")
+      .select("word_id, box, due_on, correct_streak, lapses")
+      .eq("profile_id", userId)
+      .in("word_id", wordIds),
+  ]);
+  const today = todayIn(HOUSEHOLD_TIME_ZONE);
+  const { score, total, attempts, reviews } = drillRecords(
+    answers,
+    new Map(textRowsSchema.parse(words ?? []).map((w) => [w.id, w.text])),
+    new Map(stateRowsSchema.parse(states ?? [])),
+    today,
+  );
+  if (total === 0) return false;
+
+  const { data: session, error } = await supabase
+    .from("sessions")
+    .insert({
+      profile_id: userId,
+      week_id: weekId,
+      kind: "drill",
+      finished_at: new Date().toISOString(),
+      score,
+      total,
+    })
+    .select("id")
+    .single();
+  if (error) {
+    console.error("Saving the drill session failed:", error);
+    return false;
+  }
+  const sessionId = z.object({ id: z.uuid() }).parse(session).id;
+
+  const [saved, moved] = await Promise.all([
+    supabase
+      .from("attempts")
+      .insert(attempts.map((a) => ({ ...a, session_id: sessionId }))),
+    supabase
+      .from("review_state")
+      .upsert(reviews.map((r) => ({ ...r, profile_id: userId }))),
+  ]);
+  for (const { error } of [saved, moved]) {
+    if (error) console.error("Saving the drill answers failed:", error);
+  }
+  return !saved.error && !moved.error;
 }

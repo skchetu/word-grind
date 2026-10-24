@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
+
+import { saveDrill } from "@/app/actions";
 
 import { Button } from "@/components/ui/button";
 import { LetterDiff } from "@/components/session/letter-diff";
@@ -12,9 +14,53 @@ import { unlockAudio, useSpeech } from "@/lib/speech/use-speech";
 
 // A bare-bones drill that runs the session machine end to end. The polished
 // drill screen (audio hook, letter diff, shortcuts) replaces it on Day 4.
-export function BasicDrill({ words }: { words: DrillWord[] }) {
+// Drills of this week's words are saved when they finish; the seed-word
+// drill has no `weekId` and isn't.
+export function BasicDrill({
+  words,
+  weekId,
+}: {
+  words: DrillWord[];
+  weekId?: string;
+}) {
   const [state, send] = useReducer(transition, initialSession);
   const word = "index" in state ? words[state.index] : undefined;
+
+  // Time from typing unlocking to submitting, per word. Replays don't reset it.
+  const shownAt = useRef<{ index: number; at: number } | null>(null);
+  const answerMs = useRef<number[]>([]);
+  const answeringIndex = state.phase === "answering" ? state.index : null;
+  useEffect(() => {
+    if (answeringIndex !== null && shownAt.current?.index !== answeringIndex) {
+      shownAt.current = { index: answeringIndex, at: performance.now() };
+    }
+  }, [answeringIndex]);
+  function submit() {
+    if (shownAt.current) {
+      const { index, at } = shownAt.current;
+      answerMs.current[index] = Math.round(performance.now() - at);
+    }
+    send({ type: "SUBMIT" });
+  }
+
+  // Saves once when the drill completes. The ref guards against effects
+  // running twice in development.
+  const [saveFailed, setSaveFailed] = useState(false);
+  const saved = useRef(false);
+  const results = state.phase === "complete" ? state.results : null;
+  useEffect(() => {
+    if (!results || !weekId || saved.current) return;
+    saved.current = true;
+    const answers = results.map((r, i) => ({
+      wordId: r.wordId,
+      typed: r.answer,
+      hintUsed: r.hintUsed,
+      ms: answerMs.current[i] ?? 0,
+    }));
+    saveDrill({ weekId, answers })
+      .catch(() => false)
+      .then((ok) => setSaveFailed(!ok));
+  }, [results, weekId]);
 
   // Read the word aloud on entering `speaking`; typing unlocks when it ends.
   const { speak } = useSpeech();
@@ -50,6 +96,11 @@ export function BasicDrill({ words }: { words: DrillWord[] }) {
         <p className="text-2xl font-semibold">
           {correct} / {state.results.length} correct
         </p>
+        {saveFailed && (
+          <p role="alert" className="text-sm text-destructive">
+            Couldn&apos;t save this drill.
+          </p>
+        )}
         <Button asChild variant="outline">
           <Link href="/">Done</Link>
         </Button>
@@ -76,7 +127,7 @@ export function BasicDrill({ words }: { words: DrillWord[] }) {
           className="flex flex-col gap-3"
           onSubmit={(e) => {
             e.preventDefault();
-            send({ type: "SUBMIT" });
+            submit();
           }}
         >
           <SpellInput
