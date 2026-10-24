@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { z } from "zod";
 
 import { BasicDrill } from "@/components/session/basic-drill";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,7 @@ export async function WeekDrill() {
   const [{ data: week }, { data: reviews }] = await Promise.all([
     supabase
       .from("weeks")
-      .select(`week_words(position, words(${DRILL_WORD_COLUMNS}))`)
+      .select(`id, week_words(position, words(${DRILL_WORD_COLUMNS}))`)
       .eq("starts_on", weekStart(today))
       .maybeSingle(),
     supabase
@@ -47,5 +48,5 @@ export async function WeekDrill() {
       </div>
     );
   }
-  return <BasicDrill words={words} />;
+  return <BasicDrill words={words} weekId={z.uuid().parse(week.id)} />;
 }
