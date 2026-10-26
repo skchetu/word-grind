@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { MAX_TOPICS, parseTopics, profileFormSchema } from "./profile";
+import {
+  householdFormSchema,
+  MAX_TOPICS,
+  parseTopics,
+  profileFormSchema,
+} from "./profile";
 
 describe("parseTopics", () => {
   it("trims, drops blanks and removes repeats ignoring case", () => {
@@ -25,5 +30,21 @@ describe("profileFormSchema", () => {
       topics: "",
     });
     expect(result.error?.issues[0]?.message).toBe("Enter a name.");
+  });
+});
+
+describe("householdFormSchema", () => {
+  it("trims the name and reads the level from the form", () => {
+    expect(
+      householdFormSchema.parse({ name: " East Howe ", difficulty: "4" }),
+    ).toEqual({ name: "East Howe", difficulty: 4 });
+  });
+
+  it("rejects a level outside 1 to 5", () => {
+    const result = householdFormSchema.safeParse({
+      name: "Home",
+      difficulty: "6",
+    });
+    expect(result.error?.issues[0]?.message).toBe("Pick a level from 1 to 5.");
   });
 });
