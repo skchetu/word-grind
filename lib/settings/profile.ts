@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { MAX_LEVEL, MIN_LEVEL } from "@/lib/difficulty/adapt";
+
 export const MAX_TOPICS = 8;
 
 // "food, Travel , food,," → ["food", "Travel"]: trimmed, blanks dropped,
@@ -29,4 +31,19 @@ export const profileFormSchema = z.object({
     .string()
     .transform(parseTopics)
     .pipe(z.array(z.string().max(40, "Keep each topic to 40 characters."))),
+});
+
+// The household form: the name both members see, and the shared difficulty
+// level Monday's list aims for.
+export const householdFormSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, "Enter a household name.")
+    .max(40, "Keep the household name to 40 characters."),
+  difficulty: z.coerce
+    .number()
+    .int()
+    .min(MIN_LEVEL, "Pick a level from 1 to 5.")
+    .max(MAX_LEVEL, "Pick a level from 1 to 5."),
 });
