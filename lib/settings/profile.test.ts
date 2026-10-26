@@ -36,8 +36,8 @@ describe("profileFormSchema", () => {
 describe("householdFormSchema", () => {
   it("trims the name and reads the level from the form", () => {
     expect(
-      householdFormSchema.parse({ name: " East Howe ", difficulty: "4" }),
-    ).toEqual({ name: "East Howe", difficulty: 4 });
+      householdFormSchema.parse({ name: " Home Team ", difficulty: "4" }),
+    ).toEqual({ name: "Home Team", difficulty: 4 });
   });
 
   it("rejects a level outside 1 to 5", () => {
