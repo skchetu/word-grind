@@ -18,6 +18,10 @@ const profileSchema = z.object({
   households: z.object({ name: z.string(), difficulty: z.int() }).nullable(),
 });
 
+const membersSchema = z.array(
+  z.object({ id: z.string(), display_name: z.string() }),
+);
+
 // Your own settings, then the ones you share with your household.
 async function SettingsForms() {
   const supabase = await createClient();
@@ -31,6 +35,13 @@ async function SettingsForms() {
     .eq("id", userId)
     .single();
   const profile = profileSchema.parse(data);
+  // RLS returns only profiles in your household.
+  const { data: memberRows } = await supabase
+    .from("profiles")
+    .select("id, display_name");
+  const members = membersSchema
+    .parse(memberRows ?? [])
+    .sort((a, b) => Number(b.id === userId) - Number(a.id === userId));
   return (
     <>
       <section aria-labelledby="you-heading" className="w-full">
@@ -47,6 +58,15 @@ async function SettingsForms() {
           <h2 id="household-heading" className="mb-3 text-lg font-semibold">
             Household
           </h2>
+          <h3 className="text-sm font-medium">Members</h3>
+          <ul className="mb-4 text-sm text-muted-foreground">
+            {members.map((member) => (
+              <li key={member.id}>
+                {member.display_name}
+                {member.id === userId && " (you)"}
+              </li>
+            ))}
+          </ul>
           <HouseholdForm
             name={profile.households.name}
             difficulty={profile.households.difficulty}
