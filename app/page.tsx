@@ -8,6 +8,7 @@ import { SignedInAs } from "./signed-in-as";
 import { TestCountdown } from "./test-countdown";
 import { ThisWeek } from "./this-week";
 import { TodaysDrillCard } from "./todays-drill-card";
+import { WeekProgress } from "./week-progress";
 
 export default function Home() {
   return (
@@ -24,6 +25,9 @@ export default function Home() {
       </Suspense>
       <Suspense>
         <TestCountdown />
+      </Suspense>
+      <Suspense>
+        <WeekProgress />
       </Suspense>
       <Button asChild variant="outline">
         <Link href="/scoreboard">Scoreboard</Link>
