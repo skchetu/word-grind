@@ -20,6 +20,9 @@ export default function Home() {
       <Button asChild size="lg">
         <Link href="/drill">Start a drill</Link>
       </Button>
+      <Button asChild variant="outline">
+        <Link href="/scoreboard">Scoreboard</Link>
+      </Button>
       <Suspense
         fallback={<p className="text-sm text-muted-foreground">Loading…</p>}
       >
