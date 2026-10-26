@@ -79,3 +79,6 @@ A week's test opens on its Sunday and stays open until it's taken, using that we
 
 ## Streaks count days of practice, not test weeks
 A streak is the number of days in a row (in the household's time zone) with at least one finished drill or test. A streak that reached yesterday stays alive until today ends, so it never shows as broken before you've had a chance to practise. Daily practice is where spaced repetition does its work, so that's the habit the streak rewards; the weekly test already has the scoreboard. `currentStreak` in `lib/scoreboard/streak.ts` works from finished sessions, so nothing has to run at midnight to reset it.
+
+## Most-missed words cover the last 30 days
+The scoreboard lists each person's three most-missed words, counting wrong answers from drills and tests in the last 30 days. A rolling window shows what's hard right now, so a word drops off once you've learned it instead of staying on the list for good. Only wrong answers are fetched, which keeps the query small and well under the Data API's row limit.
