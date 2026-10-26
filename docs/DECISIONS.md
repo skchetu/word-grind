@@ -76,3 +76,6 @@ Every weekly list and Sunday test has exactly `WORDS_PER_WEEK` (10) words, so sc
 
 ## A missed Sunday test stays open as a make-up
 A week's test opens on its Sunday and stays open until it's taken, using that week's words and the same one-hour clock. `pendingTests` in `lib/week/pending-tests.ts` works this out from the weeks and the tests already taken, so nothing has to run on a schedule to mark a test as missed. A partial unique index on `sessions (profile_id, week_id) where kind = 'test'` lets the database, not just the UI, enforce one test per person per week, so a second tab or a double submit can't add a second score.
+
+## Streaks count days of practice, not test weeks
+A streak is the number of days in a row (in the household's time zone) with at least one finished drill or test. A streak that reached yesterday stays alive until today ends, so it never shows as broken before you've had a chance to practise. Daily practice is where spaced repetition does its work, so that's the habit the streak rewards; the weekly test already has the scoreboard. `currentStreak` in `lib/scoreboard/streak.ts` works from finished sessions, so nothing has to run at midnight to reset it.
