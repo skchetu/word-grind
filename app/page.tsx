@@ -35,6 +35,9 @@ export default function Home() {
       <Button asChild variant="outline">
         <Link href="/words">Words</Link>
       </Button>
+      <Button asChild variant="outline">
+        <Link href="/settings">Settings</Link>
+      </Button>
       <Suspense
         fallback={<p className="text-sm text-muted-foreground">Loading…</p>}
       >
