@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 
 import { PendingTestsBanner } from "./pending-tests-banner";
 import { SignedInAs } from "./signed-in-as";
+import { TestCountdown } from "./test-countdown";
 import { ThisWeek } from "./this-week";
 import { TodaysDrillCard } from "./todays-drill-card";
 
@@ -20,6 +21,9 @@ export default function Home() {
       </Suspense>
       <Suspense>
         <TodaysDrillCard />
+      </Suspense>
+      <Suspense>
+        <TestCountdown />
       </Suspense>
       <Button asChild variant="outline">
         <Link href="/scoreboard">Scoreboard</Link>

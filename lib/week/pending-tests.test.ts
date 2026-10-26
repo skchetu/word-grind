@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { pendingTests, testDay } from "./pending-tests";
+import { pendingTests, testCountdown, testDay } from "./pending-tests";
 
 const w1 = { id: "w1", startsOn: "2026-10-12" }; // test on Oct 18
 const w2 = { id: "w2", startsOn: "2026-10-19" }; // test on Oct 25
@@ -25,5 +25,19 @@ describe("pendingTests", () => {
       w2,
       w3,
     ]);
+  });
+});
+
+describe("testCountdown", () => {
+  it("counts the days from Monday to Sunday", () => {
+    expect(testCountdown("2026-10-26")).toBe("Sunday test opens in 6 days");
+  });
+
+  it("says tomorrow on Saturday", () => {
+    expect(testCountdown("2026-10-31")).toBe("Sunday test opens tomorrow");
+  });
+
+  it("says nothing on Sunday, when the test is open", () => {
+    expect(testCountdown("2026-11-01")).toBeNull();
   });
 });

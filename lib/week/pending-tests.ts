@@ -1,5 +1,7 @@
 import { addDays } from "@/lib/srs/schedule";
 
+import { weekStart } from "./dates";
+
 export type WeekRef = { id: string; startsOn: string };
 
 // The Sunday a week's test opens: six days after its Monday.
@@ -19,4 +21,15 @@ export function pendingTests(
   return weeks
     .filter((w) => testDay(w.startsOn) <= today && !taken.has(w.id))
     .toSorted((a, b) => a.startsOn.localeCompare(b.startsOn));
+}
+
+// A note on when this week's test opens, or null on Sunday itself, when
+// the test is already open.
+export function testCountdown(today: string): string | null {
+  const days =
+    (Date.parse(testDay(weekStart(today))) - Date.parse(today)) / 86_400_000;
+  if (days === 0) return null;
+  return days === 1
+    ? "Sunday test opens tomorrow"
+    : `Sunday test opens in ${days} days`;
 }
