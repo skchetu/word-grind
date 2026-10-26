@@ -16,12 +16,13 @@ export function weekStart(date: string): string {
   return addDays(date, -((day + 6) % 7));
 }
 
-// A date ("2026-10-25") for display, such as "Sunday, Oct 25". Formatted in
+// A date ("2026-10-25") for display, such as "Sunday, Oct 25", or "Oct 25"
+// without the weekday. Formatted in
 // UTC so the calendar date never shifts.
-export function formatDay(date: string): string {
+export function formatDay(date: string, weekday = true): string {
   return new Intl.DateTimeFormat("en-US", {
     timeZone: "UTC",
-    weekday: "long",
+    weekday: weekday ? "long" : undefined,
     month: "short",
     day: "numeric",
   }).format(new Date(`${date}T00:00:00Z`));
