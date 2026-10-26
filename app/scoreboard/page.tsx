@@ -4,6 +4,7 @@ import { Suspense } from "react";
 
 import { Button } from "@/components/ui/button";
 
+import { MissedWords } from "./missed-words";
 import { Streaks } from "./streaks";
 import { WeeklyScores } from "./weekly-scores";
 
@@ -20,6 +21,9 @@ export default function ScoreboardPage() {
         fallback={<p className="text-sm text-muted-foreground">Loading…</p>}
       >
         <WeeklyScores />
+      </Suspense>
+      <Suspense>
+        <MissedWords />
       </Suspense>
       <Button asChild variant="outline">
         <Link href="/">Home</Link>
