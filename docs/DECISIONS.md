@@ -82,3 +82,6 @@ A streak is the number of days in a row (in the household's time zone) with at l
 
 ## Most-missed words cover the last 30 days
 The scoreboard lists each person's three most-missed words, counting wrong answers from drills and tests in the last 30 days. A rolling window shows what's hard right now, so a word drops off once you've learned it instead of staying on the list for good. Only wrong answers are fetched, which keeps the query small and well under the Data API's row limit.
+
+## A returning word gets a new sentence, and keeps only its newest three
+Each time a word comes back for review, the server asks Claude for a new example sentence (one call for all of the day's returning words), and the drill shows it. Only the three newest sentences per word are kept; older ones are deleted, along with their recorded clips, so the word bank doesn't grow with every review. A row-level security policy only allows deleting a sentence once its word has three newer ones, so the limit holds in the database and not just in the app. Newness comes from `created_at`, so no "last shown" column is needed: the newest sentence is always the one being shown.
