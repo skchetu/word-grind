@@ -15,3 +15,14 @@ export function weekStart(date: string): string {
   const day = new Date(`${date}T00:00:00Z`).getUTCDay(); // 0 is Sunday
   return addDays(date, -((day + 6) % 7));
 }
+
+// A date ("2026-10-25") for display, such as "Sunday, Oct 25". Formatted in
+// UTC so the calendar date never shifts.
+export function formatDay(date: string): string {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: "UTC",
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+  }).format(new Date(`${date}T00:00:00Z`));
+}
