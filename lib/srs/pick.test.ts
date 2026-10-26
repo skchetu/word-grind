@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { pickDrillWords } from "./pick";
+import { drillMinutes, pickDrillWords } from "./pick";
 
 const w = (id: string) => ({ id });
 
@@ -26,5 +26,16 @@ describe("pickDrillWords", () => {
     const week = Array.from({ length: 20 }, (_, i) => w(`w${i}`));
     expect(pickDrillWords([], week, new Set())).toHaveLength(15);
     expect(pickDrillWords([], week, new Set(), 3)).toHaveLength(3);
+  });
+});
+
+describe("drillMinutes", () => {
+  it("estimates about five minutes for a full drill", () => {
+    expect(drillMinutes(15)).toBe(5);
+  });
+
+  it("never says less than a minute", () => {
+    expect(drillMinutes(1)).toBe(1);
+    expect(drillMinutes(0)).toBe(1);
   });
 });

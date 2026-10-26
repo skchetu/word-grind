@@ -1,0 +1,47 @@
+import Link from "next/link";
+
+import { Button } from "@/components/ui/button";
+import { drillMinutes } from "@/lib/srs/pick";
+
+import { todaysDrill } from "./drill/todays-drill";
+
+// How many words today's drill holds and roughly how long it takes, with
+// the button to start it.
+export async function TodaysDrillCard() {
+  const drill = await todaysDrill();
+  const count = drill?.words.length;
+
+  return (
+    <section
+      aria-labelledby="drill-heading"
+      className="w-full rounded-lg border p-4 text-left"
+    >
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 id="drill-heading" className="font-semibold">
+          Today&apos;s drill
+        </h2>
+        {count !== undefined && (
+          <p className="text-sm text-muted-foreground">
+            {count === 1 ? "1 word due" : `${count} words due`}
+          </p>
+        )}
+      </div>
+      {count === 0 ? (
+        <p className="mt-3 text-sm text-muted-foreground">
+          All caught up. Come back tomorrow.
+        </p>
+      ) : (
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <p className="text-sm text-muted-foreground">
+            {count === undefined
+              ? "Practise with the starter words"
+              : `About ${drillMinutes(count)} min`}
+          </p>
+          <Button asChild>
+            <Link href="/drill">Start</Link>
+          </Button>
+        </div>
+      )}
+    </section>
+  );
+}
