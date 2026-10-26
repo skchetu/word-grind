@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { todayIn, weekStart } from "./dates";
+import { formatDay, todayIn, weekStart } from "./dates";
 
 describe("todayIn", () => {
   it("uses the time zone's calendar date", () => {
@@ -20,5 +20,12 @@ describe("weekStart", () => {
   it("crosses month and year boundaries", () => {
     expect(weekStart("2026-11-01")).toBe("2026-10-26");
     expect(weekStart("2027-01-01")).toBe("2026-12-28");
+  });
+});
+
+describe("formatDay", () => {
+  it("names the day without shifting the date", () => {
+    expect(formatDay("2026-10-25")).toBe("Sunday, Oct 25");
+    expect(formatDay("2027-01-03")).toBe("Sunday, Jan 3");
   });
 });
