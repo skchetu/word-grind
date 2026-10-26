@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import { chartWeeks } from "@/lib/scoreboard/chart";
 import { weeklyScores } from "@/lib/scoreboard/weekly";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -9,6 +10,8 @@ import {
   todayIn,
   weekStart,
 } from "@/lib/week/dates";
+
+import { ScoreChart } from "./score-chart";
 
 const weeksSchema = z.array(
   z
@@ -78,43 +81,55 @@ export async function WeeklyScores() {
     .toSorted((a, b) => Number(b.id === userId) - Number(a.id === userId));
 
   return (
-    <table className="w-full text-left text-sm">
-      <thead className="text-muted-foreground">
-        <tr className="border-b">
-          <th className="py-2 font-medium">Week of</th>
-          {members.map((m) => (
-            <th key={m.id} className="py-2 pl-4 text-right font-medium">
-              {m.id === userId ? "You" : m.display_name}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((week) => (
-          <tr key={week.id} className="border-b last:border-0">
-            <td className="py-3">{formatDay(week.startsOn, false)}</td>
-            {members.map((m) => {
-              const result = week.results[m.id];
-              return (
-                <td key={m.id} className="py-3 pl-4 text-right tabular-nums">
-                  {result ? (
-                    <>
-                      {result.score} / {result.total}
-                      {result.late && (
-                        <span className="ml-1 text-xs text-muted-foreground">
-                          (late)
-                        </span>
-                      )}
-                    </>
-                  ) : (
-                    <span className="text-muted-foreground">Not yet</span>
-                  )}
-                </td>
-              );
-            })}
+    <>
+      <ScoreChart
+        weeks={chartWeeks(
+          rows,
+          members.map((m) => m.id),
+        )}
+        members={members.map((m) => ({
+          id: m.id,
+          label: m.id === userId ? "You" : m.display_name,
+        }))}
+      />
+      <table className="w-full text-left text-sm">
+        <thead className="text-muted-foreground">
+          <tr className="border-b">
+            <th className="py-2 font-medium">Week of</th>
+            {members.map((m) => (
+              <th key={m.id} className="py-2 pl-4 text-right font-medium">
+                {m.id === userId ? "You" : m.display_name}
+              </th>
+            ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {rows.map((week) => (
+            <tr key={week.id} className="border-b last:border-0">
+              <td className="py-3">{formatDay(week.startsOn, false)}</td>
+              {members.map((m) => {
+                const result = week.results[m.id];
+                return (
+                  <td key={m.id} className="py-3 pl-4 text-right tabular-nums">
+                    {result ? (
+                      <>
+                        {result.score} / {result.total}
+                        {result.late && (
+                          <span className="ml-1 text-xs text-muted-foreground">
+                            (late)
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">Not yet</span>
+                    )}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
   );
 }
