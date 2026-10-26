@@ -3,6 +3,7 @@ import { Suspense } from "react";
 
 import { Button } from "@/components/ui/button";
 
+import { PendingTestsBanner } from "./pending-tests-banner";
 import { SignedInAs } from "./signed-in-as";
 import { ThisWeek } from "./this-week";
 
@@ -13,6 +14,9 @@ export default function Home() {
       <p className="text-muted-foreground">
         A weekly word list, a five-minute daily drill and a Sunday test.
       </p>
+      <Suspense>
+        <PendingTestsBanner />
+      </Suspense>
       <Button asChild size="lg">
         <Link href="/drill">Start a drill</Link>
       </Button>
