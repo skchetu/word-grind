@@ -27,5 +27,6 @@ describe("formatDay", () => {
   it("names the day without shifting the date", () => {
     expect(formatDay("2026-10-25")).toBe("Sunday, Oct 25");
     expect(formatDay("2027-01-03")).toBe("Sunday, Jan 3");
+    expect(formatDay("2026-10-19", false)).toBe("Oct 19");
   });
 });
