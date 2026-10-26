@@ -11,6 +11,7 @@ import { SpellInput, SpellInputHelp } from "@/components/session/spell-input";
 import { TestClock } from "@/components/session/test-clock";
 import type { DrillWord } from "@/data/seed-words";
 import { initialSession, transition, type Mode } from "@/lib/session/machine";
+import type { SpeechPart } from "@/lib/speech/speaker";
 import { unlockAudio, useSpeech } from "@/lib/speech/use-speech";
 
 // A bare-bones drill that runs the session machine end to end. The polished
@@ -69,15 +70,18 @@ export function BasicDrill({
       .then((ok) => setSaveFailed(!ok));
   }, [results, weekId, mode]);
 
-  // Read the word aloud on entering `speaking`; typing unlocks when it ends.
+  // Read the word, then its sentence, like a spelling bee, on entering
+  // `speaking`; typing unlocks when it ends.
   const { speak } = useSpeech();
   const speakingIndex = state.phase === "speaking" ? state.index : null;
   useEffect(() => {
     const current = speakingIndex === null ? undefined : words[speakingIndex];
     if (current) {
-      speak([{ text: current.text, audioUrl: current.audioUrl }], () =>
-        send({ type: "AUDIO_DONE" }),
-      );
+      const parts: SpeechPart[] = [
+        { text: current.text, audioUrl: current.audioUrl },
+      ];
+      if (current.sentence) parts.push(current.sentence);
+      speak(parts, () => send({ type: "AUDIO_DONE" }));
     }
   }, [speakingIndex, words, speak]);
   const recorded = words.some((w) => w.audioUrl);
@@ -136,6 +140,9 @@ export function BasicDrill({
             submit();
           }}
         >
+          {word?.sentence && (
+            <p className="text-sm">&ldquo;{word.sentence.cloze}&rdquo;</p>
+          )}
           <SpellInput
             value={state.input}
             onChange={(input) => send({ type: "TYPE", input })}

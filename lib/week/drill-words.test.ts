@@ -4,7 +4,13 @@ import { toDrillWords, toReviews } from "./drill-words";
 
 const row = (position: number, text: string, audio_path: string | null) => ({
   position,
-  words: { id: `id-${text}`, text, definition: `${text} means…`, audio_path },
+  words: {
+    id: `id-${text}`,
+    text,
+    definition: `${text} means…`,
+    audio_path,
+    word_sentences: [],
+  },
 });
 
 describe("toDrillWords", () => {
@@ -26,8 +32,43 @@ describe("toDrillWords", () => {
         text: "laconic",
         definition: "laconic means…",
         audioUrl: undefined,
+        sentence: undefined,
       },
     ]);
+  });
+
+  it("adds the word's newest sentence, with its clip URL", () => {
+    const sentence = (
+      text: string,
+      created_at: string,
+      audio_path: string | null,
+    ) => ({
+      id: text,
+      sentence: `A ${text} sentence.`,
+      cloze: "A ______ sentence.",
+      audio_path,
+      created_at,
+    });
+    const [word] = toDrillWords(
+      [
+        {
+          position: 1,
+          words: {
+            ...row(1, "laconic", null).words,
+            word_sentences: [
+              sentence("older", "2026-10-20T10:00:00Z", "sentences/s1.mp3"),
+              sentence("newer", "2026-10-26T10:00:00Z", null),
+            ],
+          },
+        },
+      ],
+      "https://abc.supabase.co",
+    );
+    expect(word?.sentence).toEqual({
+      text: "A newer sentence.",
+      cloze: "A ______ sentence.",
+      audioUrl: undefined,
+    });
   });
 });
 
@@ -35,7 +76,13 @@ describe("toReviews", () => {
   const review = (id: string, due_on: string) => ({
     word_id: id,
     due_on,
-    words: { id, text: id, definition: "", audio_path: null },
+    words: {
+      id,
+      text: id,
+      definition: "",
+      audio_path: null,
+      word_sentences: [],
+    },
   });
 
   it("lists every reviewed word and the ones due by today", () => {
