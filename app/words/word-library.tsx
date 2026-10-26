@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -83,7 +84,14 @@ export async function WordLibrary({ search }: { search: string }) {
           <tbody className="tabular-nums">
             {rows.map((row) => (
               <tr key={row.wordId} className="border-b last:border-0">
-                <td className="py-3 font-medium">{row.text}</td>
+                <td className="py-3 font-medium">
+                  <Link
+                    href={`/words/${encodeURIComponent(row.text)}`}
+                    className="underline-offset-4 hover:underline"
+                  >
+                    {row.text}
+                  </Link>
+                </td>
                 <td className="py-3 pl-3 text-right">{row.box} / 5</td>
                 <td className="py-3 pl-3 text-right">{row.misses}</td>
                 <td className="py-3 pl-3 text-right whitespace-nowrap">
