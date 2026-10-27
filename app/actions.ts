@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { z } from "zod";
 
+import { nextHouseholdLevel, saveHouseholdLevel } from "@/app/household-level";
 import { createWeekRecap } from "@/app/test/week-recap";
 import { canCallClaude, logClaudeCall } from "@/lib/ai/calls";
 import { generateTip, TIP_MODEL } from "@/lib/ai/generate-tip";
@@ -27,7 +28,6 @@ import { toSavePayload } from "@/lib/week/save";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
-const householdSchema = z.object({ difficulty: z.int() });
 const topicsSchema = z.array(z.object({ topics: z.array(z.string()) }));
 const recentWordsSchema = z.array(z.object({ text: z.string() }));
 const focusSchema = z
@@ -67,15 +67,15 @@ export async function generateThisWeek() {
     throw new Error("Daily limit for new lists reached. Try again tomorrow.");
   }
 
-  // The household shares one list, so it uses the household's level and
-  // everyone's topics. RLS limits both reads to the caller's household.
+  // The household shares one list, so it uses the household's level (nudged
+  // by last week's test) and everyone's topics. RLS limits both reads to the caller's household.
   const [
-    { data: household },
+    householdLevel,
     { data: members },
     { data: recent },
     { data: lastRecap },
   ] = await Promise.all([
-    supabase.from("households").select("difficulty").single(),
+    nextHouseholdLevel(supabase, startsOn),
     supabase.from("profiles").select("topics"),
     supabase
       .from("words")
@@ -91,7 +91,7 @@ export async function generateThisWeek() {
       .maybeSingle(),
   ]);
 
-  const { difficulty } = householdSchema.parse(household);
+  const difficulty = householdLevel.level;
   const topics = [
     ...new Set(topicsSchema.parse(members ?? []).flatMap((m) => m.topics)),
   ];
@@ -116,6 +116,7 @@ export async function generateThisWeek() {
     p_week: toSavePayload(week),
   });
   if (error) throw new Error(`Saving the week failed: ${error.message}`);
+  await saveHouseholdLevel(supabase, householdLevel);
 
   // Recorded audio is made after the response, so the new list shows up
   // straight away. Until a clip exists, the drill uses the browser voice.

@@ -85,3 +85,6 @@ The scoreboard lists each person's three most-missed words, counting wrong answe
 
 ## A returning word gets a new sentence, and keeps only its newest three
 Each time a word comes back for review, the server asks Claude for a new example sentence (one call for all of the day's returning words), and the drill shows it. Only the three newest sentences per word are kept; older ones are deleted, along with their recorded clips, so the word bank doesn't grow with every review. A row-level security policy only allows deleting a sentence once its word has three newer ones, so the limit holds in the database and not just in the app. Newness comes from `created_at`, so no "last shown" column is needed: the newest sentence is always the one being shown.
+
+## The level moves when Monday's list is made
+Adaptive difficulty runs as part of generating the week's list, not on a schedule or when a test finishes. `nextHouseholdLevel` in `app/household-level.ts` totals every answer from last week's Sunday tests (so one person skipping still counts the other's answers), and the new list is written for the adapted level. The new level is only saved after the list saves, so a failed save followed by a retry can't move the level twice. A test made up after Monday doesn't move that week's level.
