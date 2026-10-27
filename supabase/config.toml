@@ -1,0 +1,3 @@
+# Minimal Supabase CLI config. The CLI is only used to apply migrations
+# (.github/workflows/migrations.yml), not to run a local stack.
+project_id = "word-grind"

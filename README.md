@@ -62,7 +62,7 @@ The interesting logic is plain TypeScript in `lib/`, with unit tests next to eac
 | **ElevenLabs**                 | Natural-sounding recorded audio for each word and sentence (Flash v2.5), made once when the list is generated and cached in Supabase Storage. The drill falls back to the browser voice for any word without a clip. |
 | **Vitest, fast-check and MSW** | Fast unit tests, property-based tests for the scheduling and difficulty rules, and a mocked Claude API, so tests never make real AI calls.                                                                           |
 | **Playwright** (**TBD**)       | End-to-end tests of the drill and the Sunday test on phone and laptop sizes.                                                                                                                                         |
-| **Vercel and GitHub Actions**  | Every PR gets lint, typecheck, tests, a build and a live preview link.                                                                                                                                               |
+| **Vercel and GitHub Actions**  | Every PR gets lint, typecheck, tests, a build and a live preview link. Merged migrations are applied to the database automatically.                                                                                  |
 | **pnpm**                       | Fast installs and a strict dependency tree, so a package can't quietly use something it didn't declare.                                                                                                              |
 
 ## Running it locally
@@ -88,7 +88,7 @@ pnpm build
 pnpm eval:week   # generates 5 real lists and checks them (costs a few cents)
 ```
 
-The database schema lives in `supabase/migrations`.
+The database schema lives in `supabase/migrations`. A GitHub Action applies new migrations to the production database when they merge to `main`.
 
 ## Project layout
 

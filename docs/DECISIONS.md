@@ -88,3 +88,6 @@ Each time a word comes back for review, the server asks Claude for a new example
 
 ## The level moves when Monday's list is made
 Adaptive difficulty runs as part of generating the week's list, not on a schedule or when a test finishes. `nextHouseholdLevel` in `app/household-level.ts` totals every answer from last week's Sunday tests (so one person skipping still counts the other's answers), and the new list is written for the adapted level. The new level is only saved after the list saves, so a failed save followed by a retry can't move the level twice. A test made up after Monday doesn't move that week's level.
+
+## Migrations apply themselves on merge
+`.github/workflows/migrations.yml` runs `supabase db push` whenever a file in `supabase/migrations` reaches `main`. The CLI keeps a list of applied migrations in the database and only runs new ones, so the schema in the repo and the live database can't drift apart because someone forgot to paste a file. It runs only after merge, never on a PR, so an unreviewed migration never touches production. The CLI version is pinned so a CLI release can't change how migrations are applied without a PR.
