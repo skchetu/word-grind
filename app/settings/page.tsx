@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 
 import { HouseholdForm } from "./household-form";
 import { ProfileForm } from "./profile-form";
+import { ThemePicker } from "./theme-picker";
 
 export const metadata: Metadata = { title: "Settings · Word Grind" };
 
@@ -52,6 +53,12 @@ async function SettingsForms() {
           displayName={profile.display_name}
           topics={profile.topics}
         />
+      </section>
+      <section aria-labelledby="device-heading" className="w-full">
+        <h2 id="device-heading" className="mb-3 text-lg font-semibold">
+          This device
+        </h2>
+        <ThemePicker />
       </section>
       {profile.households && (
         <section aria-labelledby="household-heading" className="w-full">

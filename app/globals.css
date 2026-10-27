@@ -1,10 +1,20 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+/* Dark mode follows the system unless the html element has a "light" or
+   "dark" class, set from the theme picked in Settings (lib/theme.ts). */
+@custom-variant dark {
+  &:where(.dark, .dark *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:not(.light, .light *)) {
+      @slot;
+    }
+  }
+}
 
-/* Design tokens (shadcn neutral). Dark mode follows the system for now;
-   a manual toggle comes with the settings screen. */
+/* Design tokens (shadcn neutral). */
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -27,8 +37,8 @@
   --ring: oklch(0.708 0 0);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+:root {
+  @variant dark {
     --background: oklch(0.145 0 0);
     --foreground: oklch(0.985 0 0);
     --card: oklch(0.205 0 0);
