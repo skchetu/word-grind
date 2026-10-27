@@ -30,6 +30,9 @@ const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const householdSchema = z.object({ difficulty: z.int() });
 const topicsSchema = z.array(z.object({ topics: z.array(z.string()) }));
 const recentWordsSchema = z.array(z.object({ text: z.string() }));
+const focusSchema = z
+  .object({ next_week_focus: z.array(z.string()) })
+  .nullable();
 const tipInputSchema = z.object({
   wordId: z.uuid(),
   answer: z.string().max(60),
@@ -66,25 +69,37 @@ export async function generateThisWeek() {
 
   // The household shares one list, so it uses the household's level and
   // everyone's topics. RLS limits both reads to the caller's household.
-  const [{ data: household }, { data: members }, { data: recent }] =
-    await Promise.all([
-      supabase.from("households").select("difficulty").single(),
-      supabase.from("profiles").select("topics"),
-      supabase
-        .from("words")
-        .select("text")
-        .order("created_at", { ascending: false })
-        .limit(100),
-    ]);
+  const [
+    { data: household },
+    { data: members },
+    { data: recent },
+    { data: lastRecap },
+  ] = await Promise.all([
+    supabase.from("households").select("difficulty").single(),
+    supabase.from("profiles").select("topics"),
+    supabase
+      .from("words")
+      .select("text")
+      .order("created_at", { ascending: false })
+      .limit(100),
+    // Last week's recap, so the new list practises what we both missed.
+    supabase
+      .from("week_recaps")
+      .select("next_week_focus")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
 
   const { difficulty } = householdSchema.parse(household);
   const topics = [
     ...new Set(topicsSchema.parse(members ?? []).flatMap((m) => m.topics)),
   ];
   const avoid = recentWordsSchema.parse(recent ?? []).map((row) => row.text);
+  const focus = focusSchema.parse(lastRecap)?.next_week_focus ?? [];
 
   const { week, usage } = await generateWeek(
-    { difficulty, topics, avoid },
+    { difficulty, topics, avoid, focus },
     { weekNumber: Math.floor(Date.parse(startsOn) / WEEK_MS) },
   );
 
