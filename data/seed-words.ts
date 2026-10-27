@@ -1,7 +1,12 @@
 import type { WordCard } from "@/lib/session/machine";
 
 // A word in the drill. `audioUrl` is its recorded clip, when there is one.
-export type DrillWord = WordCard & { definition: string; audioUrl?: string };
+// `sentence` is the example read after the word, with `cloze` shown on screen.
+export type DrillWord = WordCard & {
+  definition: string;
+  audioUrl?: string;
+  sentence?: { text: string; cloze: string; audioUrl?: string };
+};
 
 // A fixed GRE-style list for trying the drill before Claude generates
 // weekly lists.
