@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { z } from "zod";
 
+import { createWeekRecap } from "@/app/test/week-recap";
 import { canCallClaude, logClaudeCall } from "@/lib/ai/calls";
 import { generateTip, TIP_MODEL } from "@/lib/ai/generate-tip";
 import { generateWeek, WEEK_MODEL } from "@/lib/ai/generate-week";
@@ -304,6 +305,15 @@ export async function saveSession(input: {
   ]);
   for (const { error } of [saved, moved]) {
     if (error) console.error(`Saving the ${kind} answers failed:`, error);
+  }
+
+  // The recap is written after the response, so the results show at once.
+  if (kind === "test" && !saved.error) {
+    after(() =>
+      createWeekRecap(supabase, userId, weekId).catch((failure: unknown) =>
+        console.error("Writing the recap failed:", failure),
+      ),
+    );
   }
   return !saved.error && !moved.error;
 }
