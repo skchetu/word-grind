@@ -116,13 +116,13 @@ export async function generateThisWeek() {
     p_week: toSavePayload(week),
   });
   if (error) throw new Error(`Saving the week failed: ${error.message}`);
-  await saveHouseholdLevel(supabase, householdLevel);
+  const savedWeekId = z.uuid().parse(weekId);
+  await saveHouseholdLevel(supabase, savedWeekId, householdLevel);
 
   // Recorded audio is made after the response, so the new list shows up
   // straight away. Until a clip exists, the drill uses the browser voice.
   const voice = elevenLabsConfig();
   if (voice) {
-    const savedWeekId = z.uuid().parse(weekId);
     after(() =>
       recordWeekAudio(supabase, savedWeekId, voice).catch((failure: unknown) =>
         console.error("Recording audio failed:", failure),
