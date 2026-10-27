@@ -7,9 +7,10 @@ import { seedWords } from "@/data/seed-words";
 import { todaysDrill } from "./todays-drill";
 
 // Today's drill. Uses the seed words until the household has a list.
+// Returning words get a fresh sentence first, which can take a moment.
 // Reads the session, so it renders per request behind a Suspense boundary.
 export async function WeekDrill() {
-  const drill = await todaysDrill();
+  const drill = await todaysDrill({ freshSentences: true });
   if (!drill) return <BasicDrill words={seedWords} />;
 
   if (drill.words.length === 0) {
