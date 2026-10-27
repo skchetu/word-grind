@@ -2,16 +2,20 @@
 
 A spelling and vocabulary app for a two-person household. Each Monday, Claude writes a themed list of 10 GRE-style words at the household's difficulty level. Through the week, a short daily drill reads each word aloud and asks you to spell it, using spaced repetition. On Sunday, a timed test settles a head-to-head scoreboard.
 
-> Work in progress. Weekly lists, recorded audio, grading and the daily drill with spaced repetition work today. The Sunday test, scoreboard and settings are being built.
+> Work in progress. Weekly lists, recorded audio, the daily drill with spaced repetition, fresh example sentences, the Sunday test, the scoreboard, the word library and settings work today. The weekly recap and adaptive difficulty are being built.
 
 ## What it does
 
 - **Weekly lists from Claude.** Each card has a definition, IPA pronunciation, syllables, origin, two example sentences and a memory hint. Every card is validated: bad cards are dropped and only the missing words are requested again, so the app never waits on a perfect reply. A curated list is the fallback if Claude can't be reached.
-- **A spelling-bee drill.** The app reads the word aloud, and you type the spelling into a box with autocorrect off. Space replays the word.
+- **A spelling-bee drill.** The app reads the word, pauses, then reads an example sentence, and you type the spelling into a box with autocorrect off. The sentence is shown with the word blanked out. Space replays both.
+- **Fresh example sentences.** When a word comes back for review, Claude Haiku writes it a new sentence (one call for all the day's returning words, at most once a day per word), so you learn the word rather than one sentence. Each word keeps only its three newest sentences.
 - **Letter-by-letter feedback.** A wrong answer is lined up against the correct spelling, showing missing, extra, wrong and swapped letters.
 - **Spaced repetition.** Each day's drill is the words due for review plus this week's new words, up to 15. Every finished drill is saved, and each word moves through five Leitner boxes (1, 2, 4, 7 and 14 days), so missed words come back sooner.
 - **Results at the end.** A finished drill lists every word, missed words first, next to what was typed.
 - **Mistake tips.** Claude Haiku writes a one-line tip for a specific misspelling. Tips are cached, so each one is only paid for once.
+- **A timed Sunday test.** The week's 10 words with a one-hour clock and no hints. A missed test stays open as a make-up, and each person can take it once.
+- **A head-to-head scoreboard.** Weekly scores side by side, daily practice streaks, a bar chart over time and each person's most-missed words.
+- **Word library and settings.** A searchable table of every word seen, with a detail page per word, plus settings for your name, topics, the household name and difficulty.
 - **Adaptive difficulty** (in progress). The household's level will go up or down by one after each Sunday test, based on everyone's accuracy.
 
 ## Tech stack
@@ -52,7 +56,7 @@ The interesting logic is plain TypeScript in `lib/`, with unit tests next to eac
 | **TypeScript (strict)**        | `noUncheckedIndexedAccess` catches off-by-one and missing-item bugs in the grading and drill code.                                                                                                                   |
 | **Zod**                        | One schema describes Claude's output, the database rows and the UI types, so they can't drift apart. Claude's replies are checked against it before anything is saved.                                               |
 | **Supabase**                   | Postgres with row-level security and magic-link sign-in in one free service. RLS keeps each household's data private at the database level, not just in the app.                                                     |
-| **Claude (Anthropic SDK)**     | Structured output generates themed, difficulty-tuned lists with sentences and memory hints. Opus writes the weekly list, and the cheaper, faster Haiku writes the one-line mistake tips.                             |
+| **Claude (Anthropic SDK)**     | Structured output generates themed, difficulty-tuned lists with sentences and memory hints. Opus writes the weekly list, and the cheaper, faster Haiku writes the one-line mistake tips and fresh example sentences. |
 | **Tailwind CSS and shadcn/ui** | Accessible components as source code in the repo, easy to restyle, with no runtime styling library.                                                                                                                  |
 | **Web Speech API**             | Free and built into every browser, with no extra service. It reads any word that doesn't have a recorded clip yet.                                                                                                   |
 | **ElevenLabs**                 | Natural-sounding recorded audio for each word and sentence (Flash v2.5), made once when the list is generated and cached in Supabase Storage. The drill falls back to the browser voice for any word without a clip. |
