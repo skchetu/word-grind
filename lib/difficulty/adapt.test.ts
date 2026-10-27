@@ -5,6 +5,7 @@ import {
   adaptDifficulty,
   clampLevel,
   householdTally,
+  levelChange,
   MAX_LEVEL,
   MIN_LEVEL,
 } from "./adapt";
@@ -75,5 +76,17 @@ describe("clampLevel", () => {
     expect(clampLevel(0)).toBe(MIN_LEVEL);
     expect(clampLevel(9)).toBe(MAX_LEVEL);
     expect(clampLevel(2.6)).toBe(3);
+  });
+});
+
+describe("levelChange", () => {
+  it("says which way the level moved", () => {
+    expect(levelChange(3, 4)).toBe("Next week: level 4 (up from 3)");
+    expect(levelChange(3, 2)).toBe("Next week: level 2 (down from 3)");
+    expect(levelChange(3, 3)).toBe("Next week: level 3 (no change)");
+  });
+
+  it("gives just the level when the previous one wasn't recorded", () => {
+    expect(levelChange(null, 4)).toBe("Next week: level 4");
   });
 });

@@ -40,15 +40,23 @@ export async function nextHouseholdLevel(
 }
 
 // Saves the new level once the week's list is saved, so a failed save
-// can't nudge the level twice.
+// can't nudge the level twice. The week keeps the level it was written for,
+// which the recap uses to show how the level moved.
 export async function saveHouseholdLevel(
   supabase: SupabaseClient,
+  weekId: string,
   { householdId, previous, level }: HouseholdLevel,
 ) {
-  if (level === previous) return;
-  const { error } = await supabase
-    .from("households")
-    .update({ difficulty: level })
-    .eq("id", householdId);
-  if (error) console.error("Saving the difficulty failed:", error.message);
+  const [week, household] = await Promise.all([
+    supabase.from("weeks").update({ difficulty: level }).eq("id", weekId),
+    level === previous
+      ? { error: null }
+      : supabase
+          .from("households")
+          .update({ difficulty: level })
+          .eq("id", householdId),
+  ]);
+  for (const { error } of [week, household]) {
+    if (error) console.error("Saving the difficulty failed:", error.message);
+  }
 }

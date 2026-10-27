@@ -37,3 +37,13 @@ export function householdTally(tallies: TestTally[]): TestTally {
 export function clampLevel(level: number): number {
   return Math.min(MAX_LEVEL, Math.max(MIN_LEVEL, Math.round(level)));
 }
+
+// How the level moved from one week to the next, for the recap. Weeks made
+// before levels were recorded have no previous level.
+export function levelChange(previous: number | null, next: number): string {
+  const label = `Next week: level ${next}`;
+  if (previous === null) return label;
+  if (next > previous) return `${label} (up from ${previous})`;
+  if (next < previous) return `${label} (down from ${previous})`;
+  return `${label} (no change)`;
+}
