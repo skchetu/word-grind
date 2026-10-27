@@ -56,3 +56,25 @@ Reply with the tip only: no greeting, no quotes, and don't repeat their misspell
 export function buildTipRequest(word: string, wrong: string) {
   return `Word: ${word}\nThey typed: ${wrong}`;
 }
+
+export const SENTENCES_SYSTEM_PROMPT = `You write example sentences for adults learning GRE-level English words.
+
+For each word, write one new sentence that uses the exact word, not another form of it, and makes its meaning clear from context.
+Keep each sentence under 25 words, and make it different from the sentences already listed for that word.`;
+
+export type SentenceRequest = {
+  words: { word: string; avoid: string[] }[]; // avoid: the word's saved sentences
+  topics: string[];
+};
+
+export function buildSentencesRequest({ words, topics }: SentenceRequest) {
+  const lines = words.map(({ word, avoid }) =>
+    avoid.length > 0
+      ? `- ${word} (already used: ${avoid.map((s) => `"${s}"`).join(" ")})`
+      : `- ${word}`,
+  );
+  if (topics.length > 0) {
+    lines.push(`Set the sentences around: ${topics.join(", ")}.`);
+  }
+  return `Write one new sentence for each word:\n${lines.join("\n")}`;
+}
