@@ -1,3 +1,5 @@
+import type { RecapPlayer } from "@/lib/recap/recap";
+
 import { WORDS_PER_WEEK } from "./schemas";
 
 // Stable instructions, kept identical across requests so they can be cached.
@@ -77,4 +79,22 @@ export function buildSentencesRequest({ words, topics }: SentenceRequest) {
     lines.push(`Set the sentences around: ${topics.join(", ")}.`);
   }
   return `Write one new sentence for each word:\n${lines.join("\n")}`;
+}
+
+export const RECAP_SYSTEM_PROMPT = `You write a short, friendly recap of a household's weekly spelling test.
+
+You get each person's score and their misspellings (the word and what they typed).
+- headline: one line saying who won and by how much, or that it was a tie. Light and encouraging, at most 120 characters.
+- sharedPatterns: up to 3 spelling patterns behind the misses, such as "doubled consonants" or "-ence vs -ance". Prefer patterns more than one person struggled with. Empty if there were no misses.
+- nextWeekFocus: up to 3 short patterns next week's list should practise.`;
+
+export function buildRecapRequest(players: RecapPlayer[]) {
+  return players
+    .map((p) => {
+      const misses = p.misses.length
+        ? p.misses.map((m) => `${m.word} (typed "${m.typed}")`).join(", ")
+        : "none";
+      return `${p.name}: ${p.score}/${p.total}. Misses: ${misses}`;
+    })
+    .join("\n");
 }
