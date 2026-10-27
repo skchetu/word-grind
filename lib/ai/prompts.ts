@@ -17,12 +17,23 @@ export type WeekRequest = {
   difficulty: number; // 1 to 5, the household's target
   topics: string[]; // used for example sentences
   avoid: string[]; // words from recent weeks
+  focus?: string[]; // spelling patterns from last week's recap
 };
 
-export function buildWeekRequest({ difficulty, topics, avoid }: WeekRequest) {
+export function buildWeekRequest({
+  difficulty,
+  topics,
+  avoid,
+  focus = [],
+}: WeekRequest) {
   const lines = [
     `Write this week's list of exactly ${WORDS_PER_WEEK} words, aiming for difficulty ${difficulty}.`,
   ];
+  if (focus.length > 0) {
+    lines.push(
+      `Include words that practise these patterns from last week's misses: ${focus.join("; ")}.`,
+    );
+  }
   if (topics.length > 0) {
     lines.push(`Set the example sentences around: ${topics.join(", ")}.`);
   }
