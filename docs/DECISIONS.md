@@ -94,3 +94,6 @@ Adaptive difficulty runs as part of generating the week's list, not on a schedul
 
 ## The theme is saved per device
 Light, dark or "match this device" is stored in `localStorage`, not on the profile, because the same person may want dark on their phone at night and light on a laptop. A tiny script in `<head>` adds the `light` or `dark` class before the page paints, so a saved theme never flashes the other one first. Tailwind's `dark:` variant and the colour tokens both follow that class, and fall back to the system setting when neither class is set.
+
+## The week's list is made on the first visit, not by a scheduled job
+When the home page finds no list for this week, it starts making one straight away and shows "Writing this week's list…" until it's ready. A scheduled job would have the list waiting before anyone opens the app, but it runs with no signed-in user, so it would need the Supabase service-role key (which skips row-level security) on the server, plus a separate save path for it. For two people, waiting about a minute once a week is a better trade than holding a key that can read every household. If both people open the app at the same moment, the unique `(household_id, starts_on)` on `weeks` keeps one list.

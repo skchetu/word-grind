@@ -4,8 +4,7 @@ import { elevenLabsConfig } from "@/lib/speech/elevenlabs";
 import { createClient } from "@/lib/supabase/server";
 import { HOUSEHOLD_TIME_ZONE, todayIn, weekStart } from "@/lib/week/dates";
 
-import { generateThisWeek } from "./actions";
-import { GenerateWeekButton } from "./generate-week-button";
+import { MakeThisWeek } from "./make-this-week";
 import { RecordAudio } from "./record-audio-button";
 
 const weekSchema = z.object({
@@ -22,7 +21,7 @@ const weekSchema = z.object({
   ),
 });
 
-// This week's list for the household, or a button to make it. Reads the
+// This week's list for the household, or a note while it's being made. Reads the
 // session, so it renders per request behind a Suspense boundary.
 export async function ThisWeek() {
   const supabase = await createClient();
@@ -32,13 +31,7 @@ export async function ThisWeek() {
     .eq("starts_on", weekStart(todayIn(HOUSEHOLD_TIME_ZONE)))
     .maybeSingle();
 
-  if (!data) {
-    return (
-      <form action={generateThisWeek}>
-        <GenerateWeekButton />
-      </form>
-    );
-  }
+  if (!data) return <MakeThisWeek />;
 
   const week = weekSchema.parse(data);
   const words = week.week_words.toSorted((a, b) => a.position - b.position);
