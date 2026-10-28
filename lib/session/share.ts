@@ -2,6 +2,9 @@ import type { Mode, Result } from "./machine";
 
 const SQUARES_PER_ROW = 5;
 
+// Two players and their spelling test.
+const HEADER = "Word Grind 🧍‍♀️📝🧍‍♂️";
+
 // "2026-10-27" as "10.27.2026".
 function shortDate(date: string) {
   const [year, month, day] = date.split("-");
@@ -28,10 +31,10 @@ export function shareText(mode: Mode, date: string, results: Result[]) {
   const title =
     mode === "test"
       ? `Sunday Test (week of ${shortDate(date)})`
-      : `Daily Grind (${shortDate(date)})`;
+      : `Daily Drill (${shortDate(date)})`;
   const correct = results.filter((r) => r.correct).length;
   return [
-    "Word Grind",
+    HEADER,
     title,
     ...squares(results),
     `${correct}/${results.length}`,

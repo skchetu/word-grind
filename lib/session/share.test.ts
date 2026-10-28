@@ -43,8 +43,8 @@ describe("shareText", () => {
   it("titles a drill with its day and ends with the score", () => {
     expect(shareText("drill", "2026-10-27", ten)).toBe(
       [
-        "Word Grind",
-        "Daily Grind (10.27.2026)",
+        "Word Grind 🧍‍♀️📝🧍‍♂️",
+        "Daily Drill (10.27.2026)",
         "🟩🟩🟨🟩🟥",
         "🟩🟩🟩🟥🟩",
         "7/10",
