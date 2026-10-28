@@ -22,10 +22,12 @@ import { unlockAudio, useSpeech } from "@/lib/speech/use-speech";
 export function BasicDrill({
   words,
   weekId,
+  weekStartsOn,
   mode = "drill",
 }: {
   words: DrillWord[];
   weekId?: string;
+  weekStartsOn?: string;
   mode?: Mode;
 }) {
   const [state, send] = useReducer(transition, initialSession);
@@ -109,6 +111,8 @@ export function BasicDrill({
         words={state.words}
         results={state.results}
         saveFailed={saveFailed}
+        mode={mode}
+        weekStartsOn={weekStartsOn}
       />
     );
   }

@@ -69,6 +69,7 @@ export async function WeekTest({ startsOn }: { startsOn?: string }) {
       <BasicDrill
         mode="test"
         weekId={weekId}
+        weekStartsOn={monday}
         words={toDrillWords(week.week_words)}
       />
     </div>
