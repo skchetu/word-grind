@@ -25,5 +25,11 @@ export async function WeekDrill() {
       </div>
     );
   }
-  return <BasicDrill words={drill.words} weekId={drill.weekId} />;
+  return (
+    <BasicDrill
+      words={drill.words}
+      weekId={drill.weekId}
+      lastDrillAt={drill.lastDrillAt}
+    />
+  );
 }

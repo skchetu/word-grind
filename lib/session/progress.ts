@@ -17,6 +17,7 @@ const resultSchema = z.object({
 
 const progressSchema = z.object({
   day: z.string(),
+  savedAt: z.string(),
   wordIds: z.array(z.string()),
   results: z.array(resultSchema),
   answerMs: z.array(z.number()),
@@ -25,11 +26,14 @@ const progressSchema = z.object({
 export type DrillProgress = z.infer<typeof progressSchema>;
 
 // The saved answers to carry on from, or null to start fresh: progress from
-// another day, or for a different set of words, doesn't apply.
+// another day, or for a different set of words, doesn't apply. Nor does
+// progress saved before `lastFinishedAt`, the person's latest finished
+// drill, since that drill was finished somewhere else (another device).
 export function savedProgress(
   raw: string | null,
   day: string,
   words: WordCard[],
+  lastFinishedAt: string | null = null,
 ): Pick<DrillProgress, "results" | "answerMs"> | null {
   if (!raw) return null;
   let parsed;
@@ -40,6 +44,8 @@ export function savedProgress(
   }
   if (!parsed.success) return null;
   const { data } = parsed;
+  if (lastFinishedAt && Date.parse(lastFinishedAt) >= Date.parse(data.savedAt))
+    return null;
   const sameWords =
     data.day === day &&
     data.wordIds.length === words.length &&

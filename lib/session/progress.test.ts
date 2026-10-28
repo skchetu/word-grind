@@ -18,6 +18,7 @@ const done = {
 const saved = (over: object = {}) =>
   JSON.stringify({
     day: "2026-10-28",
+    savedAt: "2026-10-28T09:00:00.000Z",
     wordIds: ["w1", "w2", "w3"],
     results: [done],
     answerMs: [4200],
@@ -41,6 +42,13 @@ describe("savedProgress", () => {
         words,
       ),
     ).toBeNull();
+  });
+
+  it("starts fresh when a drill was finished after it was saved", () => {
+    const later = "2026-10-28T09:30:00+00:00";
+    const earlier = "2026-10-27T18:00:00+00:00";
+    expect(savedProgress(saved(), "2026-10-28", words, later)).toBeNull();
+    expect(savedProgress(saved(), "2026-10-28", words, earlier)).not.toBeNull();
   });
 
   it("starts fresh when nothing usable was saved", () => {
