@@ -1,0 +1,34 @@
+name: Migrations
+
+# Applies new files in supabase/migrations to the production database once
+# they reach main. Migrations already applied are skipped, so a run with
+# nothing new does nothing.
+on:
+  push:
+    branches: [main]
+    paths: [supabase/migrations/**]
+  workflow_dispatch:
+
+# Never run two pushes at once, and never cancel one halfway through.
+concurrency:
+  group: migrations
+  cancel-in-progress: false
+
+jobs:
+  push:
+    name: Apply Supabase migrations
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.122.0
+
+      - run: supabase link --project-ref "$SUPABASE_PROJECT_ID"
+      - run: supabase db push
