@@ -103,3 +103,6 @@ Every signed-in page shares one header: "Word Grind" plus Home, Scoreboard, Word
 
 ## Shared results show squares, not words
 "Copy result" puts a short text on the clipboard: the app name, the day (or the test's week), one square per word in the order asked (🟩 right, 🟨 one letter off, 🟥 missed) and the score. It never includes the words or what was typed, so pasting it in a chat doesn't spoil the list for the other person before they've played. One square per word, rather than one per letter, keeps it to two lines and doesn't give away word lengths.
+
+## A drill left midway resumes from this device's storage
+Answers are saved to the database only when a drill finishes, so that a half-done drill never moves Leitner boxes. To let someone leave and come back, the answers given so far are kept in the browser's `localStorage`, tagged with the day and the drill's word ids in order. They're used only if both still match, so progress from yesterday, or from before the word list changed, is dropped instead of being applied to the wrong words. The cost is that resuming works on the same device only. Saving each answer to the database would allow cross-device resume, but it would need a table of unfinished sessions and a clean-up rule for drills that are never finished.

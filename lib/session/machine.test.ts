@@ -34,6 +34,23 @@ describe("session machine", () => {
     });
   });
 
+  it("resumes after the words already answered", () => {
+    const done = {
+      wordId: "w1",
+      answer: "rhythm",
+      correct: true,
+      distance: 0,
+      soClose: false,
+      hintUsed: false,
+    };
+    expect(
+      run({ type: "START", mode: "drill", words, results: [done] }),
+    ).toMatchObject({ phase: "speaking", index: 1, results: [done] });
+    expect(
+      run({ type: "START", mode: "drill", words, results: [done, done] }),
+    ).toMatchObject({ phase: "complete" });
+  });
+
   it("does not start without words", () => {
     expect(run({ type: "START", mode: "drill", words: [] })).toBe(
       initialSession,
