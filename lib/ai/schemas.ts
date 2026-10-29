@@ -26,6 +26,9 @@ export const WORDS_PER_WEEK = 10;
 
 export const weekSchema = z.object({
   theme: z.string().min(1), // e.g. "Tricky doubles"
+  // One plain sentence saying what the theme means, for when it's too clever
+  // to be obvious. Older weeks don't have one.
+  themeNote: z.string().min(1).optional(),
   words: z.array(wordCardSchema).length(WORDS_PER_WEEK),
 });
 export type WeekOutput = z.infer<typeof weekSchema>;

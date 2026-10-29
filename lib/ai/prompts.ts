@@ -11,7 +11,8 @@ Both example sentences must use the exact word, not another form of it.
 Syllables, joined together, must spell the word exactly.
 The mnemonic is one short hint about the tricky letters.
 Rate difficulty from 1 (common, few traps) to 5 (rare, several traps).
-Give the week a short, playful theme that ties the words together.`;
+Give the week a short, playful theme that ties the words together.
+Add a themeNote: one plain-English sentence saying what the theme means and what the words have in common.`;
 
 export type WeekRequest = {
   difficulty: number; // 1 to 5, the household's target

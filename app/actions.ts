@@ -118,6 +118,13 @@ export async function generateThisWeek() {
   if (error) throw new Error(`Saving the week failed: ${error.message}`);
   const savedWeekId = z.uuid().parse(weekId);
   await saveHouseholdLevel(supabase, savedWeekId, householdLevel);
+  if (week.themeNote) {
+    const { error: noteError } = await supabase
+      .from("weeks")
+      .update({ theme_note: week.themeNote })
+      .eq("id", savedWeekId);
+    if (noteError) console.error("Saving the theme note failed:", noteError);
+  }
 
   // Recorded audio is made after the response, so the new list shows up
   // straight away. Until a clip exists, the drill uses the browser voice.

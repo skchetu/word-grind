@@ -7,9 +7,11 @@ import { HOUSEHOLD_TIME_ZONE, todayIn, weekStart } from "@/lib/week/dates";
 
 import { MakeThisWeek } from "./make-this-week";
 import { RecordAudio } from "./record-audio-button";
+import { ThemeNote } from "./theme-note";
 
 const weekSchema = z.object({
   theme: z.string(),
+  theme_note: z.string().nullable(),
   week_words: z.array(
     z.object({
       position: z.int(),
@@ -28,7 +30,9 @@ export async function ThisWeek() {
   const supabase = await createClient();
   const { data } = await supabase
     .from("weeks")
-    .select("theme, week_words(position, words(text, definition, audio_path))")
+    .select(
+      "theme, theme_note, week_words(position, words(text, definition, audio_path))",
+    )
     .eq("starts_on", weekStart(todayIn(HOUSEHOLD_TIME_ZONE)))
     .maybeSingle();
 
@@ -48,7 +52,10 @@ export async function ThisWeek() {
             <h2 className="text-sm font-medium text-muted-foreground">
               This week · {words.length} words
             </h2>
-            <span className="block text-xl font-semibold">{week.theme}</span>
+            <span className="block text-xl font-semibold">
+              {week.theme}{" "}
+              {week.theme_note && <ThemeNote note={week.theme_note} />}
+            </span>
           </span>
           <ChevronDown
             aria-hidden

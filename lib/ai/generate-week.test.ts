@@ -53,7 +53,24 @@ describe("generateWeek", () => {
 
     expect(result.source).toBe("claude");
     expect(result.week.theme).toBe(goodWeek.theme);
+    expect(result.week.themeNote).toBe(goodWeek.themeNote);
     expect(result.usage).toEqual({ inputTokens: 10, outputTokens: 10 });
+  });
+
+  it("keeps a week whose theme note is missing, without a retry", async () => {
+    let calls = 0;
+    server.use(
+      http.post(MESSAGES_URL, () => {
+        calls++;
+        return messageWith({ ...goodWeek, themeNote: "" });
+      }),
+    );
+
+    const result = await generateWeek(request, { client: testClient() });
+
+    expect(result.source).toBe("claude");
+    expect(result.week.themeNote).toBeUndefined();
+    expect(calls).toBe(1);
   });
 
   it("drops a bad word without another call when 10 good ones remain", async () => {
