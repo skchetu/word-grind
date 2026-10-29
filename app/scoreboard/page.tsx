@@ -12,22 +12,31 @@ export const metadata: Metadata = { title: "Scoreboard · Word Grind" };
 
 export default function ScoreboardPage() {
   return (
-    <Page width="focus">
+    <Page width="wide">
       <h1 className="text-3xl font-semibold tracking-tight">Scoreboard</h1>
-      <Suspense>
-        <LatestRecap />
-      </Suspense>
-      <Suspense>
-        <Streaks />
-      </Suspense>
-      <Suspense
-        fallback={<p className="text-sm text-muted-foreground">Loading…</p>}
-      >
-        <WeeklyScores />
-      </Suspense>
-      <Suspense>
-        <MissedWords />
-      </Suspense>
+      {/* One column on phones and tablets. From lg, the recap and weekly
+          scores take the wider left column, streaks and most-missed words
+          the right. */}
+      <div className="grid w-full max-w-md gap-6 lg:max-w-none lg:grid-cols-[3fr_2fr] lg:items-start">
+        <div className="flex flex-col gap-6">
+          <Suspense>
+            <LatestRecap />
+          </Suspense>
+          <Suspense
+            fallback={<p className="text-sm text-muted-foreground">Loading…</p>}
+          >
+            <WeeklyScores />
+          </Suspense>
+        </div>
+        <div className="flex flex-col gap-6">
+          <Suspense>
+            <Streaks />
+          </Suspense>
+          <Suspense>
+            <MissedWords />
+          </Suspense>
+        </div>
+      </div>
     </Page>
   );
 }
