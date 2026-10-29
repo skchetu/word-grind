@@ -21,6 +21,8 @@ export type AudioPlayer = (
 export type SpeakOptions = {
   voice?: SpeechSynthesisVoice;
   rate?: number;
+  // Called as soon as the first part has been read, while the rest goes on.
+  onFirstDone?: () => void;
   onDone?: () => void;
 };
 
@@ -70,6 +72,7 @@ export function createSpeaker(synth: SpeechSynthesis, player?: AudioPlayer) {
     update({ speaking: true });
 
     const next = (i: number) => {
+      if (i === 0) options.onFirstDone?.();
       timer = setTimeout(() => say(i + 1), i + 1 < parts.length ? PAUSE_MS : 0);
     };
 

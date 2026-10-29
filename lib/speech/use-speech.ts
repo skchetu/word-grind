@@ -78,8 +78,10 @@ export function useSpeech({
   const voice = voices.find((v) => v.voiceURI === voiceURI);
 
   const speak = useCallback(
-    (parts: SpeechPart[], onDone?: SpeakOptions["onDone"]) =>
-      getSpeaker()?.speak(parts, { voice, rate, onDone }),
+    (
+      parts: SpeechPart[],
+      callbacks: Pick<SpeakOptions, "onFirstDone" | "onDone"> = {},
+    ) => getSpeaker()?.speak(parts, { voice, rate, ...callbacks }),
     [voice, rate],
   );
   const cancel = useCallback(() => getSpeaker()?.cancel(), []);
