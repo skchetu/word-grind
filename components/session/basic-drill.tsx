@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 
 import { saveSession } from "@/app/actions";
@@ -9,6 +10,7 @@ import { LetterDiff } from "@/components/session/letter-diff";
 import { SessionResults } from "@/components/session/session-results";
 import { SpellInput, SpellInputHelp } from "@/components/session/spell-input";
 import { TestClock } from "@/components/session/test-clock";
+import { useDrillProgress } from "@/components/session/use-drill-progress";
 import type { DrillWord } from "@/data/seed-words";
 import { initialSession, transition, type Mode } from "@/lib/session/machine";
 import type { SpeechPart } from "@/lib/speech/speaker";
@@ -23,11 +25,14 @@ export function BasicDrill({
   words,
   weekId,
   weekStartsOn,
+  lastDrillAt = null,
   mode = "drill",
 }: {
   words: DrillWord[];
   weekId?: string;
   weekStartsOn?: string;
+  // When the person last finished a drill, from any device.
+  lastDrillAt?: string | null;
   mode?: Mode;
 }) {
   const [state, send] = useReducer(transition, initialSession);
@@ -53,6 +58,22 @@ export function BasicDrill({
     send({ type: "SUBMIT" });
   }
 
+  // Drills of a week's words keep their answers as they go, so leaving
+  // midway and coming back resumes at the next word.
+  const progress = useDrillProgress(
+    mode === "drill" && !!weekId,
+    words,
+    lastDrillAt,
+  );
+  const { save: saveProgress, clear: clearProgress } = progress;
+  const partial =
+    state.phase === "feedback" || state.phase === "speaking"
+      ? state.results
+      : null;
+  useEffect(() => {
+    if (partial?.length) saveProgress(partial, answerMs.current);
+  }, [partial, saveProgress]);
+
   // Saves once when the session completes. The ref guards against effects
   // running twice in development.
   const [saveFailed, setSaveFailed] = useState(false);
@@ -69,8 +90,11 @@ export function BasicDrill({
     }));
     saveSession({ weekId, kind: mode, answers })
       .catch(() => false)
-      .then((ok) => setSaveFailed(!ok));
-  }, [results, weekId, mode]);
+      .then((ok) => {
+        setSaveFailed(!ok);
+        if (ok) clearProgress();
+      });
+  }, [results, weekId, mode, clearProgress]);
 
   // Read the word, then its sentence, like a spelling bee, on entering
   // `speaking`; typing unlocks when it ends.
@@ -87,6 +111,27 @@ export function BasicDrill({
     }
   }, [speakingIndex, words, speak]);
   const recorded = words.some((w) => w.audioUrl);
+
+  if (state.phase === "idle" && progress.saved) {
+    const { results: done, answerMs: times } = progress.saved;
+    return (
+      <div className="flex flex-col items-center gap-2">
+        <Button
+          size="lg"
+          onClick={() => {
+            unlockAudio();
+            answerMs.current = [...times];
+            send({ type: "START", mode, words, results: done });
+          }}
+        >
+          Resume drill (word {done.length + 1} of {words.length})
+        </Button>
+        <Button variant="ghost" size="sm" onClick={clearProgress}>
+          Start over
+        </Button>
+      </div>
+    );
+  }
 
   if (state.phase === "idle") {
     return (
@@ -125,6 +170,11 @@ export function BasicDrill({
         </p>
         {mode === "test" && startedAt !== null && (
           <TestClock startedAt={startedAt} onTimeUp={timeUp} />
+        )}
+        {mode === "drill" && weekId && (
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/">Exit (answers so far are saved)</Link>
+          </Button>
         )}
       </div>
 

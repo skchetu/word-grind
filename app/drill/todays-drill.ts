@@ -33,29 +33,44 @@ const reviewRowsSchema = z.array(
   }),
 );
 
+const lastDrillSchema = z.object({ finished_at: z.string() }).nullable();
+
 // The signed-in person's drill for today: words due for review plus this
-// week's new words. Null until the household has a list for this week.
+// week's new words, and when they last finished a drill (so a half-done
+// drill saved on another device isn't resumed after it). Null until the
+// household has a list for this week.
 // With `freshSentences`, each returning word first gets a new example
 // sentence; the home page's summary skips that so it never calls Claude.
 export async function todaysDrill({ freshSentences = false } = {}): Promise<{
   weekId: string;
   words: DrillWord[];
+  lastDrillAt: string | null;
 } | null> {
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getClaims();
   const today = todayIn(HOUSEHOLD_TIME_ZONE);
 
-  const [{ data: week }, { data: reviews }] = await Promise.all([
-    supabase
-      .from("weeks")
-      .select(`id, week_words(position, words(${DRILL_WORD_COLUMNS}))`)
-      .eq("starts_on", weekStart(today))
-      .maybeSingle(),
-    supabase
-      .from("review_state")
-      .select(`word_id, due_on, words(${DRILL_WORD_COLUMNS})`)
-      .eq("profile_id", auth?.claims.sub ?? ""),
-  ]);
+  const [{ data: week }, { data: reviews }, { data: lastDrill }] =
+    await Promise.all([
+      supabase
+        .from("weeks")
+        .select(`id, week_words(position, words(${DRILL_WORD_COLUMNS}))`)
+        .eq("starts_on", weekStart(today))
+        .maybeSingle(),
+      supabase
+        .from("review_state")
+        .select(`word_id, due_on, words(${DRILL_WORD_COLUMNS})`)
+        .eq("profile_id", auth?.claims.sub ?? ""),
+      supabase
+        .from("sessions")
+        .select("finished_at")
+        .eq("profile_id", auth?.claims.sub ?? "")
+        .eq("kind", "drill")
+        .not("finished_at", "is", null)
+        .order("finished_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
   if (!week) return null;
 
   const rows = reviewRowsSchema.parse(reviews ?? []);
@@ -75,5 +90,6 @@ export async function todaysDrill({ freshSentences = false } = {}): Promise<{
   return {
     weekId: z.uuid().parse(week.id),
     words: pickDrillWords(due, toDrillWords(week.week_words), reviewed),
+    lastDrillAt: lastDrillSchema.parse(lastDrill)?.finished_at ?? null,
   };
 }
