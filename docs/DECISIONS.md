@@ -109,3 +109,6 @@ Answers are saved to the database only when a drill finishes, so that a half-don
 
 ## Typing unlocks after the word, not after the sentence
 The drill reads the word, then an example sentence. Waiting for both before showing the answer box made every word feel slow, especially with a long sentence, so the box appears once the word has been said and the sentence keeps playing underneath. Submitting stops the voice, so the feedback isn't talked over. The speaker reports the end of the first part through `onFirstDone`, which keeps the word-then-sentence queue (and its pause) in one place instead of two separate `speak` calls.
+
+## This week's list starts closed
+The home page shows this week's theme with the word count, and the words open beneath it on a tap. With the list open, ten words and definitions pushed the rest of Today below the fold on a phone, and the list is reference rather than something needed every visit. It's a native `<details>`, so it opens with a tap, Enter or Space and is announced as expandable by screen readers with no extra script.
