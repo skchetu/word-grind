@@ -1,7 +1,8 @@
 import Link from "next/link";
 
+import { CopyResult } from "@/components/session/copy-result";
 import { Button } from "@/components/ui/button";
-import type { Result, WordCard } from "@/lib/session/machine";
+import type { Mode, Result, WordCard } from "@/lib/session/machine";
 import { summarize } from "@/lib/session/summary";
 import { cn } from "@/lib/utils";
 
@@ -11,10 +12,14 @@ export function SessionResults({
   words,
   results,
   saveFailed,
+  mode,
+  weekStartsOn,
 }: {
   words: WordCard[];
   results: Result[];
   saveFailed: boolean;
+  mode: Mode;
+  weekStartsOn?: string;
 }) {
   const { correct, total, rows } = summarize(results);
   const text = new Map(words.map((w) => [w.id, w.text]));
@@ -61,6 +66,7 @@ export function SessionResults({
           </li>
         ))}
       </ul>
+      <CopyResult mode={mode} weekStartsOn={weekStartsOn} results={results} />
       <Button asChild variant="outline">
         <Link href="/">Done</Link>
       </Button>

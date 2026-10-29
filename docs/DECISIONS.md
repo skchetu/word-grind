@@ -100,3 +100,6 @@ When the home page finds no list for this week, it starts making one straight aw
 
 ## Tabs on laptops, a floating menu button on phones
 Every signed-in page shares one header: "Word Grind" plus Home, Scoreboard, Words and Settings. On a laptop the tabs sit in the header. On a phone four tabs don't fit beside the name, so the name is centred and a round menu button floats at the bottom right, where a thumb reaches it without stretching to the top of the screen. On a laptop the tabs sit right after the name, so the eye reads one group instead of jumping across the screen. The drill and the test highlight Home, since that's where they start. The tab list and the rule for which tab is highlighted live in `lib/nav.ts` so they're unit tested.
+
+## Shared results show squares, not words
+"Copy result" puts a short text on the clipboard: the app name, the day (or the test's week), one square per word in the order asked (🟩 right, 🟨 one letter off, 🟥 missed) and the score. It never includes the words or what was typed, so pasting it in a chat doesn't spoil the list for the other person before they've played. One square per word, rather than one per letter, keeps it to two lines and doesn't give away word lengths.
