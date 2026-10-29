@@ -124,3 +124,6 @@ Each section of the home page is its own card and streams in on its own, so a sl
 
 ## Violet is the one brand colour
 The main buttons, the focus ring and the active nav tab use violet (`--primary` and `--ring`), and nothing else does. Green, amber and red already mean correct, so close and missed, and blue and orange mean the two players, so violet is the main hue left that can't be confused with any of them. Keeping it to the things you can press makes it point at the next action instead of decorating the page. Dark mode uses a lighter, softer violet with dark text on it, so button labels stay readable (about 6.6:1 in light mode and 7.5:1 in dark).
+
+## Headings balance, paragraphs avoid lone words
+`globals.css` sets `text-wrap: balance` on headings and `text-wrap: pretty` on paragraphs, list items, captions and labels, so a line like "…and a Sunday test." no longer leaves "test." alone on the last line. It's one CSS rule instead of `&nbsp;` tricks in each string, and browsers that don't support it simply wrap as before.
