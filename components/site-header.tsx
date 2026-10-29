@@ -34,7 +34,8 @@ export function SiteHeader() {
       onClick={() => setOpen(false)}
       className={cn(
         "rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
-        tab.href === current && "bg-accent text-foreground",
+        tab.href === current &&
+          "bg-primary/10 text-primary hover:bg-primary/10 hover:text-primary",
       )}
     >
       {tab.label}
