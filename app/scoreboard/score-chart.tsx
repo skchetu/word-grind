@@ -20,9 +20,13 @@ export function ScoreChart({
 }) {
   const groupW = W / weeks.length;
   const barW = Math.min(18, (groupW * 0.6) / members.length);
+  const noTests = weeks.every((w) => w.percents.every((p) => p === null));
   return (
     <figure className="flex w-full flex-col gap-2">
-      <figcaption className="flex justify-center gap-4 text-xs text-muted-foreground">
+      <figcaption className="text-center text-sm font-medium">
+        Sunday test score (%)
+      </figcaption>
+      <div className="flex justify-center gap-4 text-xs text-muted-foreground">
         {members.map((m, i) => (
           <span key={m.id} className="flex items-center gap-1.5">
             <svg width="10" height="10" aria-hidden="true">
@@ -31,7 +35,7 @@ export function ScoreChart({
             {m.label}
           </span>
         ))}
-      </figcaption>
+      </div>
       <svg
         viewBox={`0 -10 ${W} ${H + 28}`}
         className="w-full"
@@ -59,6 +63,16 @@ export function ScoreChart({
           </g>
         ))}
         <line x1="0" x2={W} y1={H} y2={H} className="stroke-border" />
+        {noTests && (
+          <text
+            x={W / 2}
+            y={H * 0.75}
+            textAnchor="middle"
+            className="fill-muted-foreground text-[10px]"
+          >
+            No tests yet
+          </text>
+        )}
         {weeks.map((week, g) => {
           const groupX =
             g * groupW + (groupW - members.length * (barW + BAR_GAP)) / 2;
