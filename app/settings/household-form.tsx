@@ -54,7 +54,7 @@ export function HouseholdForm({
         Shared by everyone in the household. Monday&apos;s list aims for this
         level.
       </p>
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" disabled={pending} className="md:self-start">
         {pending ? "Saving…" : "Save household"}
       </Button>
       <p
