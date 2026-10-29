@@ -6,12 +6,10 @@ const STAGGER_MS = 30;
 
 const style: Record<Tile["kind"], string> = {
   ok: "border-transparent",
-  wrong: "border-red-500 bg-red-500/10 text-red-700 dark:text-red-400",
-  missing:
-    "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
-  extra: "border-red-500/60 text-red-700/70 line-through dark:text-red-400/70",
-  swapped:
-    "border-amber-500 bg-amber-500/10 text-amber-700 dark:text-amber-400",
+  wrong: "border-danger bg-danger-subtle text-danger",
+  missing: "border-success bg-success-subtle text-success",
+  extra: "border-danger/60 text-danger/70 line-through",
+  swapped: "border-warning bg-warning-subtle text-warning",
 };
 
 // Tiles shrink to fit long words on a phone, so marks stay one character.
