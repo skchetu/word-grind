@@ -3,15 +3,17 @@
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 import { WIDE } from "@/components/page";
 import { activeTab, showsNav, TABS } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 
 // The app's name plus its tabs: a tab bar on laptops, and a floating menu
-// button at the bottom right on phones, where a thumb can reach it.
-export function SiteHeader() {
+// button at the bottom right on phones, where a thumb can reach it. The
+// signed-in account sits at the right of the bar, or at the bottom of the
+// phone menu.
+export function SiteHeader({ account }: { account: ReactNode }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -52,12 +54,16 @@ export function SiteHeader() {
             WIDE,
           )}
         >
-          <Link href="/" className="text-lg font-semibold tracking-tight">
+          <Link
+            href="/"
+            className="shrink-0 text-lg font-semibold tracking-tight whitespace-nowrap"
+          >
             Word Grind
           </Link>
           <nav aria-label="Main" className="hidden gap-1 md:flex">
             {links}
           </nav>
+          <div className="ml-auto hidden min-w-0 md:block">{account}</div>
         </div>
       </header>
 
@@ -66,9 +72,10 @@ export function SiteHeader() {
           <nav
             id="phone-menu"
             aria-label="Main"
-            className="flex w-44 flex-col gap-1 rounded-lg border bg-background p-2 shadow-lg"
+            className="flex w-56 flex-col gap-1 rounded-lg border bg-background p-2 shadow-lg"
           >
             {links}
+            <div className="mt-1 border-t px-3 pt-3 pb-1">{account}</div>
           </nav>
         )}
         <button
