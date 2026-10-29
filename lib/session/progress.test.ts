@@ -52,5 +52,9 @@ describe("savedProgress", () => {
     expect(
       savedProgress(saved({ results: "oops" }), "2026-10-28", words),
     ).toBeNull();
+    const finished = words.map((w) => ({ ...done, wordId: w.id }));
+    expect(
+      savedProgress(saved({ results: finished }), "2026-10-28", words),
+    ).toBeNull();
   });
 });
