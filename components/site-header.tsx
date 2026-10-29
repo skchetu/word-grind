@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { WIDE } from "@/components/page";
 import { activeTab, showsNav, TABS } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 
@@ -45,7 +46,12 @@ export function SiteHeader() {
   return (
     <>
       <header className="border-b">
-        <div className="mx-auto flex h-14 w-full max-w-4xl items-center justify-center px-4 md:justify-start md:gap-8">
+        <div
+          className={cn(
+            "mx-auto flex h-14 w-full items-center justify-center px-4 md:justify-start md:gap-8",
+            WIDE,
+          )}
+        >
           <Link href="/" className="text-lg font-semibold tracking-tight">
             Word Grind
           </Link>

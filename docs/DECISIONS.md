@@ -127,3 +127,6 @@ The main buttons, the focus ring and the active nav tab use violet (`--primary` 
 
 ## Headings balance, paragraphs avoid lone words
 `globals.css` sets `text-wrap: balance` on headings and `text-wrap: pretty` on paragraphs, list items, captions and labels, so a line like "…and a Sunday test." no longer leaves "test." alone on the last line. It's one CSS rule instead of `&nbsp;` tricks in each string, and browsers that don't support it simply wrap as before.
+
+## Three page widths, shared with the header
+`components/page.tsx` gives every signed-in page one of three widths: wide (64rem) for dashboards, reading (42rem) for lists and forms, and focus (28rem) for one task at a time, such as a drill or a test. The header uses the wide width with the same side padding, so on a big screen the logo lines up with the edge of the widest pages instead of floating on its own. A fixed set of named widths keeps pages consistent as they're added, rather than each one picking its own `max-w-*`. Home and Scoreboard stay at the focus width until they get their two-column layouts, so their cards don't stretch into one very wide column.
