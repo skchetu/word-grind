@@ -36,7 +36,9 @@ export function shareText(mode: Mode, date: string, results: Result[]) {
   return [
     HEADER,
     title,
+    "",
     ...squares(results),
+    "",
     `${correct}/${results.length}`,
   ].join("\n");
 }

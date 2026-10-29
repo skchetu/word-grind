@@ -45,8 +45,10 @@ describe("shareText", () => {
       [
         "Word Grind 🧍‍♀️📝🧍‍♂️",
         "Daily Drill (10.27.2026)",
+        "",
         "🟩🟩🟨🟩🟥",
         "🟩🟩🟩🟥🟩",
+        "",
         "7/10",
       ].join("\n"),
     );
