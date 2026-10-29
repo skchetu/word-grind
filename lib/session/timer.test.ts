@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { formatClock, msLeft, TEST_MS } from "./timer";
+import { formatClock, milestoneNote, msLeft, TEST_MS } from "./timer";
 
 describe("msLeft", () => {
   it("counts down from an hour and stops at zero", () => {
@@ -19,5 +19,22 @@ describe("formatClock", () => {
   it("rounds up, so it only reads 0:00 at the very end", () => {
     expect(formatClock(1)).toBe("0:01");
     expect(formatClock(0)).toBe("0:00");
+  });
+});
+
+describe("milestoneNote", () => {
+  const min = 60_000;
+
+  it("stays quiet with more than ten minutes left", () => {
+    expect(milestoneNote(TEST_MS)).toBeNull();
+    expect(milestoneNote(10 * min + 1)).toBeNull();
+  });
+
+  it("names the latest milestone passed", () => {
+    expect(milestoneNote(10 * min)).toBe("10 minutes left");
+    expect(milestoneNote(6 * min)).toBe("10 minutes left");
+    expect(milestoneNote(5 * min)).toBe("5 minutes left");
+    expect(milestoneNote(1 * min)).toBe("1 minute left");
+    expect(milestoneNote(0)).toBe("1 minute left");
   });
 });

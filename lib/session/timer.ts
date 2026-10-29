@@ -16,3 +16,14 @@ export function formatClock(ms: number) {
   const m = Math.floor(seconds / 60);
   return `${m}:${String(seconds % 60).padStart(2, "0")}`;
 }
+
+// Screen readers hear a heads-up at these points rather than every tick.
+const MILESTONE_MINUTES = [10, 5, 1];
+
+// The heads-up for the latest milestone passed, such as "5 minutes left", or
+// null with more than ten minutes to go.
+export function milestoneNote(ms: number): string | null {
+  const passed = MILESTONE_MINUTES.filter((m) => ms <= m * 60_000).at(-1);
+  if (passed === undefined) return null;
+  return passed === 1 ? "1 minute left" : `${passed} minutes left`;
+}
