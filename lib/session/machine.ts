@@ -40,7 +40,9 @@ export type SessionState =
   | (Base & { phase: "complete" });
 
 export type SessionEvent =
-  | { type: "START"; mode: Mode; words: WordCard[] }
+  // `results` resumes a drill left midway: it carries on after the words
+  // already answered.
+  | { type: "START"; mode: Mode; words: WordCard[]; results?: Result[] }
   | { type: "AUDIO_DONE" }
   | { type: "REPLAY" }
   | { type: "TYPE"; input: string }
@@ -75,8 +77,8 @@ export function transition(
 ): SessionState {
   if (state.phase === "idle") {
     if (event.type !== "START" || event.words.length === 0) return state;
-    const { mode, words } = event;
-    return { ...fresh, phase: "speaking", mode, words, results: [], index: 0 };
+    const { mode, words, results = [] } = event;
+    return advance({ mode, words, results }, results.length - 1);
   }
 
   // When a test's time runs out, the word on screen is graded as typed so
