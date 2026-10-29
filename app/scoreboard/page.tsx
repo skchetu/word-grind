@@ -22,11 +22,20 @@ export default function ScoreboardPage() {
           <Suspense>
             <LatestRecap />
           </Suspense>
-          <Suspense
-            fallback={<p className="text-sm text-muted-foreground">Loading…</p>}
+          {/* Boxed like the cards beside it, so the chart doesn't float
+              loose next to them. */}
+          <section
+            aria-label="Weekly scores"
+            className="flex w-full flex-col gap-6 rounded-lg border p-4"
           >
-            <WeeklyScores />
-          </Suspense>
+            <Suspense
+              fallback={
+                <p className="text-sm text-muted-foreground">Loading…</p>
+              }
+            >
+              <WeeklyScores />
+            </Suspense>
+          </section>
         </div>
         <div className="flex flex-col gap-6">
           <Suspense>
