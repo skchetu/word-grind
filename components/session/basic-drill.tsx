@@ -41,6 +41,8 @@ export function BasicDrill({
   const timeUp = useCallback(() => send({ type: "TIME_UP" }), []);
   const word = "index" in state ? words[state.index] : undefined;
 
+  const { speak, cancel } = useSpeech();
+
   // Time from typing unlocking to submitting, per word. Replays don't reset it.
   const shownAt = useRef<{ index: number; at: number } | null>(null);
   const answerMs = useRef<number[]>([]);
@@ -55,6 +57,8 @@ export function BasicDrill({
       const { index, at } = shownAt.current;
       answerMs.current[index] = Math.round(performance.now() - at);
     }
+    // Feedback shouldn't be talked over by the rest of the sentence.
+    cancel();
     send({ type: "SUBMIT" });
   }
 
@@ -97,8 +101,8 @@ export function BasicDrill({
   }, [results, weekId, mode, clearProgress]);
 
   // Read the word, then its sentence, like a spelling bee, on entering
-  // `speaking`; typing unlocks when it ends.
-  const { speak } = useSpeech();
+  // `speaking`. Typing unlocks once the word has been said, and the sentence
+  // goes on playing while the speller types.
   const speakingIndex = state.phase === "speaking" ? state.index : null;
   useEffect(() => {
     const current = speakingIndex === null ? undefined : words[speakingIndex];
@@ -107,7 +111,7 @@ export function BasicDrill({
         { text: current.text, audioUrl: current.audioUrl },
       ];
       if (current.sentence) parts.push(current.sentence);
-      speak(parts, () => send({ type: "AUDIO_DONE" }));
+      speak(parts, { onFirstDone: () => send({ type: "AUDIO_DONE" }) });
     }
   }, [speakingIndex, words, speak]);
   const recorded = words.some((w) => w.audioUrl);

@@ -84,6 +84,29 @@ describe("createSpeaker", () => {
     expect(speaker.getState().speaking).toBe(false);
   });
 
+  it("reports the first part as done while the sentence still plays", () => {
+    const fake = fakeSynth();
+    const onFirstDone = vi.fn();
+    const onDone = vi.fn();
+
+    createSpeaker(fake.synth).speak(["laconic", "Her laconic reply."], {
+      onFirstDone,
+      onDone,
+    });
+    expect(onFirstDone).not.toHaveBeenCalled();
+
+    fake.finish();
+    expect(onFirstDone).toHaveBeenCalledOnce();
+    vi.advanceTimersByTime(PAUSE_MS);
+    expect(fake.spoken[1]?.text).toBe("Her laconic reply.");
+    expect(onDone).not.toHaveBeenCalled();
+
+    fake.finish();
+    vi.runAllTimers();
+    expect(onFirstDone).toHaveBeenCalledOnce();
+    expect(onDone).toHaveBeenCalledOnce();
+  });
+
   it("uses the chosen voice and rate", () => {
     const fake = fakeSynth();
     const gb = voice("en-GB");
