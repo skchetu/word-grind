@@ -41,9 +41,13 @@ async function SettingsForms() {
   const members = membersSchema
     .parse(memberRows ?? [])
     .sort((a, b) => Number(b.id === userId) - Number(a.id === userId));
+  // Each section sits in its own card, like the boxes on Home.
   return (
     <>
-      <section aria-labelledby="you-heading" className="w-full">
+      <section
+        aria-labelledby="you-heading"
+        className="w-full rounded-lg border p-4"
+      >
         <h2 id="you-heading" className="mb-3 text-lg font-semibold">
           You
         </h2>
@@ -52,14 +56,20 @@ async function SettingsForms() {
           topics={profile.topics}
         />
       </section>
-      <section aria-labelledby="device-heading" className="w-full">
+      <section
+        aria-labelledby="device-heading"
+        className="w-full rounded-lg border p-4"
+      >
         <h2 id="device-heading" className="mb-3 text-lg font-semibold">
           This device
         </h2>
         <ThemePicker />
       </section>
       {profile.households && (
-        <section aria-labelledby="household-heading" className="w-full">
+        <section
+          aria-labelledby="household-heading"
+          className="w-full rounded-lg border p-4"
+        >
           <h2 id="household-heading" className="mb-3 text-lg font-semibold">
             Household
           </h2>
