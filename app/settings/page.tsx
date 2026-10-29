@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 
 import { HouseholdForm } from "./household-form";
@@ -93,9 +91,6 @@ export default function SettingsPage() {
       >
         <SettingsForms />
       </Suspense>
-      <Button asChild variant="outline">
-        <Link href="/">Home</Link>
-      </Button>
     </main>
   );
 }
