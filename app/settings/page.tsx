@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { z } from "zod";
 
+import { Page } from "@/components/page";
 import { createClient } from "@/lib/supabase/server";
 
 import { HouseholdForm } from "./household-form";
@@ -94,13 +95,13 @@ async function SettingsForms() {
 
 export default function SettingsPage() {
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center gap-6 px-4 pt-6 pb-8 md:pt-10">
+    <Page width="reading">
       <h1 className="text-3xl font-semibold tracking-tight">Settings</h1>
       <Suspense
         fallback={<p className="text-sm text-muted-foreground">Loading…</p>}
       >
         <SettingsForms />
       </Suspense>
-    </main>
+    </Page>
   );
 }
