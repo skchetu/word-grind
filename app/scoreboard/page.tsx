@@ -1,8 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Suspense } from "react";
-
-import { Button } from "@/components/ui/button";
 
 import { LatestRecap } from "./latest-recap";
 import { MissedWords } from "./missed-words";
@@ -29,9 +26,6 @@ export default function ScoreboardPage() {
       <Suspense>
         <MissedWords />
       </Suspense>
-      <Button asChild variant="outline">
-        <Link href="/">Home</Link>
-      </Button>
     </main>
   );
 }

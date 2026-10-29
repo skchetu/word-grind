@@ -1,8 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Suspense } from "react";
-
-import { Button } from "@/components/ui/button";
 
 import { WordLibrary } from "./word-library";
 
@@ -19,9 +16,6 @@ export default function WordsPage({ searchParams }: PageProps<"/words">) {
           <WordLibrary search={typeof q === "string" ? q : ""} />
         ))}
       </Suspense>
-      <Button asChild variant="outline">
-        <Link href="/">Home</Link>
-      </Button>
     </main>
   );
 }
