@@ -47,7 +47,7 @@ export function ProfileForm({
         Separate topics with commas. Claude uses them in next week&apos;s
         sentences.
       </p>
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" disabled={pending} className="md:self-start">
         {pending ? "Saving…" : "Save"}
       </Button>
       <p
