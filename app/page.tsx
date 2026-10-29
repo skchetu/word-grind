@@ -15,7 +15,7 @@ import { WeekProgress } from "./week-progress";
 
 export default function Home() {
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center gap-6 px-4 py-8 text-center">
+    <main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center gap-6 px-4 pt-6 pb-8 md:pt-10 text-center">
       <h1 className="sr-only">Today</h1>
       <p className="text-muted-foreground">
         A weekly word list, a five-minute daily drill and a Sunday test.

@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: "Word · Word Grind" };
 // One word's card and your answers for it: /words/rhythm.
 export default function WordPage({ params }: PageProps<"/words/[word]">) {
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 px-4 py-8">
+    <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 px-4 pt-6 pb-8 md:pt-10">
       <Suspense
         fallback={<p className="text-sm text-muted-foreground">Loading…</p>}
       >
