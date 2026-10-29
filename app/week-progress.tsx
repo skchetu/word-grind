@@ -53,38 +53,40 @@ export async function WeekProgress() {
     .toSorted((a, b) => Number(b.id === userId) - Number(a.id === userId));
 
   return (
-    <table className="w-full text-left text-sm">
-      <thead className="text-muted-foreground">
-        <tr className="border-b">
-          <th className="py-2 font-medium">This week</th>
-          {members.map((m) => (
-            <th key={m.id} className="py-2 pl-4 text-right font-medium">
-              {m.id === userId ? "You" : m.display_name}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody className="tabular-nums">
-        <tr className="border-b">
-          <th className="py-3 font-normal">Words mastered</th>
-          {members.map((m) => (
-            <td key={m.id} className="py-3 pl-4 text-right">
-              {mastered.get(m.id) ?? 0} / {wordIds.size}
-            </td>
-          ))}
-        </tr>
-        <tr>
-          <th className="py-3 font-normal">Streak</th>
-          {members.map((m) => {
-            const days = streaks.get(m.id) ?? 0;
-            return (
+    <div className="w-full rounded-lg border px-4 py-1">
+      <table className="w-full text-left text-sm">
+        <thead className="text-muted-foreground">
+          <tr className="border-b">
+            <th className="py-2 font-medium">This week</th>
+            {members.map((m) => (
+              <th key={m.id} className="py-2 pl-4 text-right font-medium">
+                {m.id === userId ? "You" : m.display_name}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="tabular-nums">
+          <tr className="border-b">
+            <th className="py-3 font-normal">Words mastered</th>
+            {members.map((m) => (
               <td key={m.id} className="py-3 pl-4 text-right">
-                {days === 1 ? "1 day" : `${days} days`}
+                {mastered.get(m.id) ?? 0} / {wordIds.size}
               </td>
-            );
-          })}
-        </tr>
-      </tbody>
-    </table>
+            ))}
+          </tr>
+          <tr>
+            <th className="py-3 font-normal">Streak</th>
+            {members.map((m) => {
+              const days = streaks.get(m.id) ?? 0;
+              return (
+                <td key={m.id} className="py-3 pl-4 text-right">
+                  {days === 1 ? "1 day" : `${days} days`}
+                </td>
+              );
+            })}
+          </tr>
+        </tbody>
+      </table>
+    </div>
   );
 }

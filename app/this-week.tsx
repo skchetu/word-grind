@@ -64,7 +64,7 @@ export async function ThisWeek() {
   const unrecorded = words.filter(({ words: w }) => !w.audio_path).length;
 
   return (
-    <section className="w-full text-left">
+    <section className="w-full rounded-lg border p-4 text-left">
       {/* Closed by default so the list doesn't push the rest of the page
           down; a native <details> opens with a tap, Enter or Space. */}
       <details className="group">
@@ -82,9 +82,9 @@ export async function ThisWeek() {
             className="mt-1 size-5 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
           />
         </summary>
-        <ol className="mt-3 divide-y rounded-lg border">
+        <ol className="mt-3 divide-y border-t">
           {words.map(({ words: word }) => (
-            <li key={word.text} className="px-4 py-3">
+            <li key={word.text} className="py-3">
               <span className="font-medium">{word.text}</span>
               <span className="block text-sm text-muted-foreground">
                 {word.definition}

@@ -1,5 +1,11 @@
 import { Suspense } from "react";
 
+import {
+  DrillCardSkeleton,
+  LineSkeleton,
+  ThisWeekSkeleton,
+  WeekProgressSkeleton,
+} from "./home-skeletons";
 import { PendingTestsBanner } from "./pending-tests-banner";
 import { SignedInAs } from "./signed-in-as";
 import { TestCountdown } from "./test-countdown";
@@ -17,18 +23,16 @@ export default function Home() {
       <Suspense>
         <PendingTestsBanner />
       </Suspense>
-      <Suspense>
+      <Suspense fallback={<DrillCardSkeleton />}>
         <TodaysDrillCard />
       </Suspense>
-      <Suspense>
+      <Suspense fallback={<LineSkeleton />}>
         <TestCountdown />
       </Suspense>
-      <Suspense>
+      <Suspense fallback={<WeekProgressSkeleton />}>
         <WeekProgress />
       </Suspense>
-      <Suspense
-        fallback={<p className="text-sm text-muted-foreground">Loading…</p>}
-      >
+      <Suspense fallback={<ThisWeekSkeleton />}>
         <ThisWeek />
       </Suspense>
       <Suspense>
