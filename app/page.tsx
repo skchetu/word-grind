@@ -9,7 +9,6 @@ import {
   WeekProgressSkeleton,
 } from "./home-skeletons";
 import { PendingTestsBanner } from "./pending-tests-banner";
-import { SignedInAs } from "./signed-in-as";
 import { TestCountdown } from "./test-countdown";
 import { ThisWeek } from "./this-week";
 import { TodaysDrillCard } from "./todays-drill-card";
@@ -48,9 +47,6 @@ export default function Home() {
           </Suspense>
         </div>
       </div>
-      <Suspense>
-        <SignedInAs />
-      </Suspense>
     </Page>
   );
 }

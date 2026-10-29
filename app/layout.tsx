@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { themeScript } from "@/lib/theme";
 
+import { Account } from "./account";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -37,7 +38,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col pb-20 md:pb-0">
         {/* The header reads the URL, which dynamic pages only know at request time. */}
         <Suspense fallback={<div className="h-14 border-b" />}>
-          <SiteHeader />
+          <SiteHeader
+            account={
+              <Suspense>
+                <Account />
+              </Suspense>
+            }
+          />
         </Suspense>
         {children}
       </body>
