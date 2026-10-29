@@ -27,9 +27,7 @@ export function TestClock({
     <p
       className={cn(
         "font-mono text-sm tabular-nums",
-        left <= LOW_MS
-          ? "text-red-700 dark:text-red-400"
-          : "text-muted-foreground",
+        left <= LOW_MS ? "text-danger" : "text-muted-foreground",
       )}
     >
       <span className="sr-only">Time left: </span>

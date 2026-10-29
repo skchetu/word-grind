@@ -3,10 +3,7 @@ import { formatDay } from "@/lib/week/dates";
 
 // Fixed series colors: the first member (you) is always blue and the second
 // orange, so a color never swaps meaning between visits.
-const SERIES = [
-  "fill-[#2a78d6] dark:fill-[#3987e5]",
-  "fill-[#eb6834] dark:fill-[#d95926]",
-];
+const SERIES = ["fill-player-1", "fill-player-2"];
 const W = 320;
 const H = 120; // plot height; labels sit below it
 const BAR_GAP = 2;

@@ -44,7 +44,7 @@ export function SessionResults({
               {!r.correct && (
                 <p className="text-sm break-words text-muted-foreground">
                   You typed{" "}
-                  <span className="font-mono text-red-700 dark:text-red-400">
+                  <span className="font-mono text-danger">
                     {r.answer || "(nothing)"}
                   </span>
                 </p>
@@ -54,10 +54,10 @@ export function SessionResults({
               className={cn(
                 "shrink-0 text-sm",
                 r.correct
-                  ? "text-emerald-700 dark:text-emerald-400"
+                  ? "text-success"
                   : r.soClose
-                    ? "text-amber-700 dark:text-amber-400"
-                    : "text-red-700 dark:text-red-400",
+                    ? "text-warning"
+                    : "text-danger",
               )}
             >
               {r.correct ? "Correct" : r.soClose ? "So close" : "Missed"}

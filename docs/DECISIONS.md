@@ -118,3 +118,6 @@ Claude's themes are playful ("Double Trouble: Letters That Love Company…") and
 
 ## Home sections load into their own boxes
 Each section of the home page is its own card and streams in on its own, so a slow query only holds up its box. While a box loads it shows a placeholder of the same size (grey bars from `components/ui/skeleton.tsx`, with a screen-reader "Loading…" label), instead of one "Loading…" line followed by everything popping in and pushing the page down. The placeholders live in `app/home-skeletons.tsx`, beside the page, and are kept roughly the height of the real box so the layout doesn't jump when it arrives.
+
+## Colours are named by meaning
+`globals.css` defines the app's colours as tokens named for what they mean: `success`, `warning` and `danger` for correct, so close and missed (each with a pale `-subtle` tile background), and `player-1` and `player-2` for you and your partner on the scoreboard. Components use `text-danger` or `fill-player-1` instead of Tailwind's `text-red-700 dark:text-red-400` or a hex value, so each colour has one meaning and one place to change it, and dark mode gets its own lighter, softer values rather than a flip. The values are OKLCH and were checked for WCAG AA contrast on the app's light and dark backgrounds (text 4.5:1, borders 3:1).
