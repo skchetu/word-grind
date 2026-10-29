@@ -121,3 +121,6 @@ Each section of the home page is its own card and streams in on its own, so a sl
 
 ## Colours are named by meaning
 `globals.css` defines the app's colours as tokens named for what they mean: `success`, `warning` and `danger` for correct, so close and missed (each with a pale `-subtle` tile background), and `player-1` and `player-2` for you and your partner on the scoreboard. Components use `text-danger` or `fill-player-1` instead of Tailwind's `text-red-700 dark:text-red-400` or a hex value, so each colour has one meaning and one place to change it, and dark mode gets its own lighter, softer values rather than a flip. The values are OKLCH and were checked for WCAG AA contrast on the app's light and dark backgrounds (text 4.5:1, borders 3:1).
+
+## Violet is the one brand colour
+The main buttons, the focus ring and the active nav tab use violet (`--primary` and `--ring`), and nothing else does. Green, amber and red already mean correct, so close and missed, and blue and orange mean the two players, so violet is the main hue left that can't be confused with any of them. Keeping it to the things you can press makes it point at the next action instead of decorating the page. Dark mode uses a lighter, softer violet with dark text on it, so button labels stay readable (about 6.6:1 in light mode and 7.5:1 in dark).

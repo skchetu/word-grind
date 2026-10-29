@@ -24,7 +24,8 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  /* Brand accent (violet): main buttons, links, focus ring, active tab. */
+  --primary: oklch(0.5 0.2 290);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -35,7 +36,7 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --ring: oklch(0.5 0.2 290);
   /* Answer states, used for nothing else: correct, so close, missed. */
   --success: oklch(0.52 0.13 150);
   --success-subtle: oklch(0.96 0.04 150);
@@ -56,7 +57,7 @@
     --card-foreground: oklch(0.985 0 0);
     --popover: oklch(0.205 0 0);
     --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
+    --primary: oklch(0.74 0.14 290);
     --primary-foreground: oklch(0.205 0 0);
     --secondary: oklch(0.269 0 0);
     --secondary-foreground: oklch(0.985 0 0);
@@ -67,7 +68,7 @@
     --destructive: oklch(0.704 0.191 22.216);
     --border: oklch(1 0 0 / 10%);
     --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
+    --ring: oklch(0.74 0.14 290);
     --success: oklch(0.78 0.13 150);
     --success-subtle: oklch(0.78 0.13 150 / 15%);
     --warning: oklch(0.83 0.12 80);
