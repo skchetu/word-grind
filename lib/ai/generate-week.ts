@@ -35,6 +35,8 @@ export type WeekResult = {
 const cardsSchema = z.array(wordCardSchema.nullable().catch(null));
 const draftSchema = z.object({
   theme: z.string().trim().min(1),
+  // A missing or empty note shouldn't cost a retry; the theme still shows.
+  themeNote: z.string().trim().min(1).optional().catch(undefined),
   words: cardsSchema,
 });
 const topUpSchema = z.object({ words: cardsSchema });
@@ -84,7 +86,11 @@ export async function generateWeek(
       kept.push(...keepGood(extra?.words ?? [], request.avoid, kept));
     }
 
-    const week = weekSchema.safeParse({ theme: draft.theme, words: kept });
+    const week = weekSchema.safeParse({
+      theme: draft.theme,
+      themeNote: draft.themeNote,
+      words: kept,
+    });
     if (week.success) return { week: week.data, source: "claude", usage };
     console.warn(`Week still short after top-up: ${kept.length} words`);
   } catch (error) {
@@ -129,5 +135,9 @@ export function fallbackWeek(weekNumber: number): WeekOutput {
     { length: WORDS_PER_WEEK },
     (_, i) => pool.words[(start + i) % pool.words.length],
   );
-  return weekSchema.parse({ theme: pool.theme, words });
+  return weekSchema.parse({
+    theme: pool.theme,
+    themeNote: pool.themeNote,
+    words,
+  });
 }

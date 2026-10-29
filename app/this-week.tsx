@@ -7,6 +7,7 @@ import { HOUSEHOLD_TIME_ZONE, todayIn, weekStart } from "@/lib/week/dates";
 
 import { MakeThisWeek } from "./make-this-week";
 import { RecordAudio } from "./record-audio-button";
+import { ThemeNote } from "./theme-note";
 
 const weekSchema = z.object({
   theme: z.string(),
@@ -22,19 +23,43 @@ const weekSchema = z.object({
   ),
 });
 
+const noteSchema = z.object({ theme_note: z.string().nullable() });
+
 // This week's list for the household, or a note while it's being made. Reads the
 // session, so it renders per request behind a Suspense boundary.
 export async function ThisWeek() {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("weeks")
-    .select("theme, week_words(position, words(text, definition, audio_path))")
-    .eq("starts_on", weekStart(todayIn(HOUSEHOLD_TIME_ZONE)))
-    .maybeSingle();
+  const startsOn = weekStart(todayIn(HOUSEHOLD_TIME_ZONE));
+  const [{ data, error }, { data: note }] = await Promise.all([
+    supabase
+      .from("weeks")
+      .select(
+        "theme, week_words(position, words(text, definition, audio_path))",
+      )
+      .eq("starts_on", startsOn)
+      .maybeSingle(),
+    // Asked for on its own, so the list still shows if the column isn't
+    // there yet (a preview or deploy that runs before its migration).
+    supabase
+      .from("weeks")
+      .select("theme_note")
+      .eq("starts_on", startsOn)
+      .maybeSingle(),
+  ]);
 
+  // A failed read isn't a missing list: making one would only fail to save.
+  if (error) {
+    console.error("Loading this week failed:", error.message);
+    return (
+      <p className="text-sm text-muted-foreground">
+        This week&apos;s list couldn&apos;t be loaded. Try refreshing.
+      </p>
+    );
+  }
   if (!data) return <MakeThisWeek />;
 
   const week = weekSchema.parse(data);
+  const themeNote = noteSchema.safeParse(note).data?.theme_note ?? null;
   const words = week.week_words.toSorted((a, b) => a.position - b.position);
   const unrecorded = words.filter(({ words: w }) => !w.audio_path).length;
 
@@ -48,7 +73,9 @@ export async function ThisWeek() {
             <h2 className="text-sm font-medium text-muted-foreground">
               This week · {words.length} words
             </h2>
-            <span className="block text-xl font-semibold">{week.theme}</span>
+            <span className="block text-xl font-semibold">
+              {week.theme} {themeNote && <ThemeNote note={themeNote} />}
+            </span>
           </span>
           <ChevronDown
             aria-hidden

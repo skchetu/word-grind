@@ -1,6 +1,7 @@
 [
   {
     "theme": "GRE classics with sneaky letters",
+    "themeNote": "Well-known GRE words whose spelling hides a trap, like a silent letter or an unexpected vowel.",
     "words": [
       {
         "word": "acquiesce",
@@ -216,6 +217,7 @@
   },
   {
     "theme": "Doubled, dropped and swapped letters",
+    "themeNote": "Words people misspell by doubling the wrong letter, leaving one out, or swapping two around.",
     "words": [
       {
         "word": "abstemious",

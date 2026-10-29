@@ -112,3 +112,6 @@ The drill reads the word, then an example sentence. Waiting for both before show
 
 ## This week's list starts closed
 The home page shows this week's theme with the word count, and the words open beneath it on a tap. With the list open, ten words and definitions pushed the rest of Today below the fold on a phone, and the list is reference rather than something needed every visit. It's a native `<details>`, so it opens with a tap, Enter or Space and is announced as expandable by screen readers with no extra script.
+
+## Each week's theme comes with a plain-English note
+Claude's themes are playful ("Double Trouble: Letters That Love Company…") and sometimes too clever to be obvious, so the week's list now also asks for a `themeNote`: one plain sentence on what the theme means. An ⓘ beside the theme shows it, on hover with a mouse and on a tap on phones, which have no hover. A missing note doesn't fail the draft or cost a retry, since the theme still works without it, and weeks made before this show no ⓘ. The note is saved after `save_week`, like the week's difficulty, so the save function didn't need rewriting. Home reads the note in its own query, so a preview or a deploy that runs before the migration still shows the list, just without the ⓘ.
