@@ -3,8 +3,8 @@
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import type { Mode, Result } from "@/lib/session/machine";
-import { shareText } from "@/lib/session/share";
+import type { Mode } from "@/lib/session/machine";
+import { type Mark, shareText } from "@/lib/session/share";
 import { HOUSEHOLD_TIME_ZONE, todayIn } from "@/lib/week/dates";
 
 // Copies a spoiler-free summary of the session to paste into a chat. A test
@@ -13,10 +13,12 @@ export function CopyResult({
   mode,
   weekStartsOn,
   results,
+  size,
 }: {
   mode: Mode;
   weekStartsOn?: string;
-  results: Result[];
+  results: Mark[];
+  size?: "sm";
 }) {
   const [status, setStatus] = useState<"idle" | "copied" | "failed">("idle");
 
@@ -35,7 +37,7 @@ export function CopyResult({
 
   return (
     <div className="flex flex-col items-center gap-1">
-      <Button onClick={copy}>
+      <Button onClick={copy} size={size}>
         {status === "copied" ? "Copied!" : "Copy result"}
       </Button>
       <p aria-live="polite" className="text-sm text-muted-foreground">
