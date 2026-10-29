@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import type { DrillWord } from "@/data/seed-words";
+import { type Mark, todaysDrillMarks } from "@/lib/session/share";
 import { pickDrillWords } from "@/lib/srs/pick";
 import type { WordWithSentences } from "@/lib/sentences/refresh";
 import { createClient } from "@/lib/supabase/server";
@@ -33,18 +34,32 @@ const reviewRowsSchema = z.array(
   }),
 );
 
-const lastDrillSchema = z.object({ finished_at: z.string() }).nullable();
+const lastDrillSchema = z
+  .object({
+    finished_at: z.string(),
+    attempts: z.array(
+      z
+        .object({ correct: z.boolean(), edit_distance: z.int() })
+        .transform((a) => ({
+          correct: a.correct,
+          editDistance: a.edit_distance,
+        })),
+    ),
+  })
+  .nullable();
 
 // The signed-in person's drill for today: words due for review plus this
 // week's new words, and when they last finished a drill (so a half-done
-// drill saved on another device isn't resumed after it). Null until the
-// household has a list for this week.
+// drill saved on another device isn't resumed after it), plus that drill's
+// marks if it finished today. Null until the household has a list for this
+// week.
 // With `freshSentences`, each returning word first gets a new example
 // sentence; the home page's summary skips that so it never calls Claude.
 export async function todaysDrill({ freshSentences = false } = {}): Promise<{
   weekId: string;
   words: DrillWord[];
   lastDrillAt: string | null;
+  todaysMarks: Mark[] | null;
 } | null> {
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getClaims();
@@ -63,7 +78,7 @@ export async function todaysDrill({ freshSentences = false } = {}): Promise<{
         .eq("profile_id", auth?.claims.sub ?? ""),
       supabase
         .from("sessions")
-        .select("finished_at")
+        .select("finished_at, attempts(correct, edit_distance)")
         .eq("profile_id", auth?.claims.sub ?? "")
         .eq("kind", "drill")
         .not("finished_at", "is", null)
@@ -87,9 +102,15 @@ export async function todaysDrill({ freshSentences = false } = {}): Promise<{
   }
 
   const { due, reviewed } = toReviews(rows, today);
+  const last = lastDrillSchema.parse(lastDrill);
   return {
     weekId: z.uuid().parse(week.id),
     words: pickDrillWords(due, toDrillWords(week.week_words), reviewed),
-    lastDrillAt: lastDrillSchema.parse(lastDrill)?.finished_at ?? null,
+    lastDrillAt: last?.finished_at ?? null,
+    todaysMarks: todaysDrillMarks(
+      last && { finishedAt: last.finished_at, attempts: last.attempts },
+      today,
+      HOUSEHOLD_TIME_ZONE,
+    ),
   };
 }

@@ -1,4 +1,9 @@
+import { todayIn } from "@/lib/week/dates";
+
 import type { Mode, Result } from "./machine";
+
+// All a shared result needs from each answer.
+export type Mark = Pick<Result, "correct" | "soClose">;
 
 const SQUARES_PER_ROW = 5;
 
@@ -14,7 +19,7 @@ function shortDate(date: string) {
 // One square per word, in the order asked: green for right, yellow for one
 // letter off, red for missed. Never the words themselves, so a result can be
 // pasted into a chat without spoiling the list.
-export function squares(results: Result[]) {
+export function squares(results: Mark[]) {
   const marks = results.map((r) =>
     r.correct ? "🟩" : r.soClose ? "🟨" : "🟥",
   );
@@ -27,7 +32,7 @@ export function squares(results: Result[]) {
 
 // The text "Copy result" puts on the clipboard. `date` is the day of a drill,
 // or the Monday of a test's week.
-export function shareText(mode: Mode, date: string, results: Result[]) {
+export function shareText(mode: Mode, date: string, results: Mark[]) {
   const title =
     mode === "test"
       ? `Sunday Test (week of ${shortDate(date)})`
@@ -41,4 +46,23 @@ export function shareText(mode: Mode, date: string, results: Result[]) {
     "",
     `${correct}/${results.length}`,
   ].join("\n");
+}
+
+// The marks from someone's latest finished drill, if it finished today in the
+// household's time zone, so Home can still offer to copy today's result.
+// One letter off counts as so close, as when grading.
+export function todaysDrillMarks(
+  drill: {
+    finishedAt: string;
+    attempts: { correct: boolean; editDistance: number }[];
+  } | null,
+  today: string,
+  timeZone: string,
+): Mark[] | null {
+  if (!drill || drill.attempts.length === 0) return null;
+  if (todayIn(timeZone, new Date(drill.finishedAt)) !== today) return null;
+  return drill.attempts.map((a) => ({
+    correct: a.correct,
+    soClose: !a.correct && a.editDistance === 1,
+  }));
 }

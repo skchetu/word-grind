@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { Result } from "./machine";
-import { shareText, squares } from "./share";
+import { shareText, squares, todaysDrillMarks } from "./share";
 
 const result = (
   wordId: string,
@@ -59,5 +59,35 @@ describe("shareText", () => {
     expect(text.split("\n")[1]).toBe("Sunday Test (week of 10.26.2026)");
     expect(text).not.toContain("w0");
     expect(text).not.toContain("typed");
+  });
+});
+
+describe("todaysDrillMarks", () => {
+  const tz = "America/Los_Angeles";
+  const attempts = [
+    { correct: true, editDistance: 0 },
+    { correct: false, editDistance: 1 },
+    { correct: false, editDistance: 3 },
+  ];
+
+  it("marks a drill finished today, with one letter off as so close", () => {
+    // 8 pm on Oct 29 in Los Angeles is already Oct 30 in UTC.
+    const drill = { finishedAt: "2026-10-30T03:00:00Z", attempts };
+    expect(todaysDrillMarks(drill, "2026-10-29", tz)).toEqual([
+      { correct: true, soClose: false },
+      { correct: false, soClose: true },
+      { correct: false, soClose: false },
+    ]);
+  });
+
+  it("is null for a drill from an earlier day", () => {
+    const drill = { finishedAt: "2026-10-29T03:00:00Z", attempts };
+    expect(todaysDrillMarks(drill, "2026-10-29", tz)).toBeNull();
+  });
+
+  it("is null with no drill or no answers", () => {
+    expect(todaysDrillMarks(null, "2026-10-29", tz)).toBeNull();
+    const empty = { finishedAt: "2026-10-29T18:00:00Z", attempts: [] };
+    expect(todaysDrillMarks(empty, "2026-10-29", tz)).toBeNull();
   });
 });
