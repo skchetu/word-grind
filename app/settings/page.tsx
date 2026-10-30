@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 
 import { HouseholdForm } from "./household-form";
 import { ProfileForm } from "./profile-form";
+import { SettingsSkeleton } from "./settings-skeleton";
 import { ThemePicker } from "./theme-picker";
 
 export const metadata: Metadata = { title: "Settings · Word Grind" };
@@ -97,9 +98,7 @@ export default function SettingsPage() {
   return (
     <Page width="reading">
       <h1 className="text-3xl font-semibold tracking-tight">Settings</h1>
-      <Suspense
-        fallback={<p className="text-sm text-muted-foreground">Loading…</p>}
-      >
+      <Suspense fallback={<SettingsSkeleton />}>
         <SettingsForms />
       </Suspense>
     </Page>
