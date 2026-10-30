@@ -4,7 +4,12 @@ import type { ReactNode } from "react";
 import { z } from "zod";
 
 import { BasicDrill } from "@/components/session/basic-drill";
+import { SessionResults } from "@/components/session/session-results";
 import { Button } from "@/components/ui/button";
+import {
+  ATTEMPT_COLUMNS,
+  savedAttemptsSchema,
+} from "@/lib/session/saved-results";
 import { createClient } from "@/lib/supabase/server";
 import {
   formatDay,
@@ -15,11 +20,17 @@ import {
 import { DRILL_WORD_COLUMNS, toDrillWords } from "@/lib/week/drill-words";
 import { testDay } from "@/lib/week/pending-tests";
 
-const takenSchema = z.object({ score: z.int(), total: z.int() }).nullable();
+const takenSchema = z
+  .object({
+    finished_at: z.string().nullable(),
+    attempts: savedAttemptsSchema,
+  })
+  .nullable();
 
 // One week's test: every word on that week's list, in list order. With no
 // `startsOn` it's this week's. A test opens on its week's Sunday and stays
-// open as a make-up until it's taken; each person takes it once.
+// open as a make-up until it's taken; each person takes it once. Once
+// taken, the page shows that test's full results.
 export async function WeekTest({ startsOn }: { startsOn?: string }) {
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getClaims();
@@ -46,7 +57,7 @@ export async function WeekTest({ startsOn }: { startsOn?: string }) {
   const weekId = z.uuid().parse(week.id);
   const { data: session } = await supabase
     .from("sessions")
-    .select("score, total")
+    .select(`finished_at, attempts(${ATTEMPT_COLUMNS})`)
     .eq("profile_id", userId)
     .eq("week_id", weekId)
     .eq("kind", "test")
@@ -54,9 +65,20 @@ export async function WeekTest({ startsOn }: { startsOn?: string }) {
   const taken = takenSchema.parse(session);
   if (taken) {
     return (
-      <Notice>
-        You&apos;ve taken this test: {taken.score} / {taken.total} correct.
-      </Notice>
+      <div className="flex w-full flex-col items-center gap-4">
+        <p className="text-sm text-muted-foreground">
+          Test for the week of {formatDay(monday)}
+          {taken.finished_at &&
+            `, taken ${formatDay(todayIn(HOUSEHOLD_TIME_ZONE, new Date(taken.finished_at)))}`}
+        </p>
+        <SessionResults
+          words={taken.attempts.words}
+          results={taken.attempts.results}
+          saveFailed={false}
+          mode="test"
+          weekStartsOn={monday}
+        />
+      </div>
     );
   }
 

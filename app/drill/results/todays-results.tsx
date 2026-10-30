@@ -4,34 +4,15 @@ import { z } from "zod";
 
 import { SessionResults } from "@/components/session/session-results";
 import { Button } from "@/components/ui/button";
+import {
+  ATTEMPT_COLUMNS,
+  savedAttemptsSchema,
+} from "@/lib/session/saved-results";
 import { createClient } from "@/lib/supabase/server";
 import { HOUSEHOLD_TIME_ZONE, todayIn } from "@/lib/week/dates";
 
-// A saved answer as the results screen shows it. One letter off counts as
-// so close, as when grading.
-const attemptSchema = z
-  .object({
-    word_id: z.string(),
-    typed: z.string(),
-    correct: z.boolean(),
-    edit_distance: z.int(),
-    used_hint: z.boolean(),
-    words: z.object({ text: z.string() }),
-  })
-  .transform((a) => ({
-    word: { id: a.word_id, text: a.words.text },
-    result: {
-      wordId: a.word_id,
-      answer: a.typed,
-      correct: a.correct,
-      distance: a.edit_distance,
-      soClose: !a.correct && a.edit_distance === 1,
-      hintUsed: a.used_hint,
-    },
-  }));
-
 const lastDrillSchema = z
-  .object({ finished_at: z.string(), attempts: z.array(attemptSchema) })
+  .object({ finished_at: z.string(), attempts: savedAttemptsSchema })
   .nullable();
 
 // The full results of the signed-in person's drill, if they finished one
@@ -44,9 +25,7 @@ export async function TodaysResults() {
 
   const { data } = await supabase
     .from("sessions")
-    .select(
-      "finished_at, attempts(word_id, typed, correct, edit_distance, used_hint, words(text))",
-    )
+    .select(`finished_at, attempts(${ATTEMPT_COLUMNS})`)
     .eq("profile_id", userId)
     .eq("kind", "drill")
     .not("finished_at", "is", null)
@@ -58,7 +37,7 @@ export async function TodaysResults() {
 
   if (
     !drill ||
-    drill.attempts.length === 0 ||
+    drill.attempts.results.length === 0 ||
     todayIn(HOUSEHOLD_TIME_ZONE, new Date(drill.finished_at)) !== today
   ) {
     return (
@@ -75,8 +54,8 @@ export async function TodaysResults() {
 
   return (
     <SessionResults
-      words={drill.attempts.map((a) => a.word)}
-      results={drill.attempts.map((a) => a.result)}
+      words={drill.attempts.words}
+      results={drill.attempts.results}
       saveFailed={false}
       mode="drill"
     />
