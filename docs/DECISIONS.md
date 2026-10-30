@@ -139,3 +139,6 @@ Green, amber and red are hard to tell apart with colour blindness, so every outc
 
 ## The keyboard shrinks the page on Android
 The root layout sets `interactive-widget=resizes-content` in the viewport tag, so on Android the on-screen keyboard shrinks the page rather than sliding over it, and the answer box and Submit stay visible while typing. iOS Safari ignores the setting and scrolls the focused box into view on its own. Because the page is shorter while the keyboard is open, the floating menu button would ride up on top of it, so it hides while any input has focus (`body:has(input:focus)`). Pages size themselves with `min-h-full` and `flex-1` rather than `100vh`, so nothing else needs `dvh`.
+
+## Sentry only runs on Vercel, and browser reports go through our own domain
+Sentry is turned on only when Vercel's environment variable is set, so `pnpm dev` and tests never send events or use up the free plan's monthly quota. Browser reports go to `/monitoring` on the app's own domain, which forwards them to Sentry, because ad blockers often block requests to sentry.io directly. The proxy skips that path so a signed-out visitor's errors still get through. Events carry the user's id but never the email or IP address.
