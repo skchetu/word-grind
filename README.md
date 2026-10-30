@@ -29,6 +29,7 @@ A spelling and vocabulary app for a two-person household. Each Monday, Claude wr
 | Speech         | ElevenLabs clips, with the Web Speech API (`speechSynthesis`) as fallback |
 | Tests          | Vitest, fast-check, MSW (no real API calls in tests)                      |
 | Hosting and CI | Vercel, GitHub Actions                                                    |
+| Monitoring     | Sentry (errors from the server and the browser)                           |
 
 ## Algorithms
 
@@ -62,6 +63,7 @@ The interesting logic is plain TypeScript in `lib/`, with unit tests next to eac
 | **ElevenLabs**                 | Natural-sounding recorded audio for each word and sentence (Flash v2.5), made once when the list is generated and cached in Supabase Storage. The drill falls back to the browser voice for any word without a clip. |
 | **Vitest, fast-check and MSW** | Fast unit tests, property-based tests for the scheduling and difficulty rules, and a mocked Claude API, so tests never make real AI calls.                                                                           |
 | **Playwright** (**TBD**)       | End-to-end tests of the drill and the Sunday test on phone and laptop sizes.                                                                                                                                         |
+| **Sentry**                     | One place to see errors from the server and the browser, with readable stack traces. The free plan covers two users, and it only runs on Vercel, so local runs and tests send nothing.                               |
 | **Vercel and GitHub Actions**  | Every PR gets lint, typecheck, tests, a build and a live preview link. Merged migrations are applied to the database automatically.                                                                                  |
 | **pnpm**                       | Fast installs and a strict dependency tree, so a package can't quietly use something it didn't declare.                                                                                                              |
 
