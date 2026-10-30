@@ -11,6 +11,8 @@ import {
 } from "@/lib/week/dates";
 import { pendingTests, testDay } from "@/lib/week/pending-tests";
 
+import { LastTestCard } from "./last-test-card";
+
 const weeksSchema = z.array(
   z
     .object({ id: z.string(), starts_on: z.string() })
@@ -19,7 +21,7 @@ const weeksSchema = z.array(
 const takenSchema = z.array(z.object({ week_id: z.string() }));
 
 // Every test the signed-in person can take now: today's on a Sunday, plus
-// any missed ones as make-ups. Renders nothing when none are waiting.
+// any missed ones as make-ups. When none are waiting, the last test taken.
 export async function PendingTestsBanner() {
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getClaims();
@@ -44,7 +46,7 @@ export async function PendingTestsBanner() {
     new Set(takenSchema.parse(taken ?? []).map((s) => s.week_id)),
     today,
   );
-  if (pending.length === 0) return null;
+  if (pending.length === 0) return <LastTestCard userId={userId} />;
 
   return (
     <section
