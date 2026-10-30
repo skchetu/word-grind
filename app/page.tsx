@@ -2,12 +2,8 @@ import { Suspense } from "react";
 
 import { Page } from "@/components/page";
 
-import {
-  DrillCardSkeleton,
-  LineSkeleton,
-  ThisWeekSkeleton,
-  WeekProgressSkeleton,
-} from "./home-skeletons";
+import { HomeColumns } from "./home-columns";
+import { HomeSkeleton } from "./home-skeletons";
 import { PendingTestsBanner } from "./pending-tests-banner";
 import { PracticeCard } from "./practice-card";
 import { TestCountdown } from "./test-countdown";
@@ -24,31 +20,25 @@ export default function Home() {
           A weekly word list, a five-minute daily drill and a Sunday test.
         </p>
       </div>
-      {/* One column on phones and tablets, in the same order as before. From
-          lg, today's tasks sit on the left and the week's progress on the
-          right. */}
-      <div className="grid w-full max-w-md gap-6 lg:max-w-none lg:grid-cols-2 lg:items-start">
-        <div className="flex flex-col items-center gap-6 lg:items-start">
-          <Suspense>
-            <PendingTestsBanner />
-          </Suspense>
-          <Suspense fallback={<DrillCardSkeleton />}>
-            <TodaysDrillCard />
-          </Suspense>
-          <PracticeCard />
-          <Suspense fallback={<LineSkeleton />}>
-            <TestCountdown />
-          </Suspense>
-        </div>
-        <div className="flex flex-col gap-6">
-          <Suspense fallback={<WeekProgressSkeleton />}>
-            <WeekProgress />
-          </Suspense>
-          <Suspense fallback={<ThisWeekSkeleton />}>
-            <ThisWeek />
-          </Suspense>
-        </div>
-      </div>
+      {/* One boundary for every box, so they all appear together. */}
+      <Suspense fallback={<HomeSkeleton />}>
+        <HomeColumns
+          left={
+            <>
+              <PendingTestsBanner />
+              <TodaysDrillCard />
+              <PracticeCard />
+              <TestCountdown />
+            </>
+          }
+          right={
+            <>
+              <WeekProgress />
+              <ThisWeek />
+            </>
+          }
+        />
+      </Suspense>
     </Page>
   );
 }
