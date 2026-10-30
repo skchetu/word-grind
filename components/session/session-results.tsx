@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { CopyResult } from "@/components/session/copy-result";
+import { ResultIcon } from "@/components/session/result-icon";
 import { Button } from "@/components/ui/button";
 import type { Mode, Result, WordCard } from "@/lib/session/machine";
 import { summarize } from "@/lib/session/summary";
@@ -52,7 +53,7 @@ export function SessionResults({
             </div>
             <p
               className={cn(
-                "shrink-0 text-sm",
+                "flex shrink-0 items-center gap-1.5 text-sm",
                 r.correct
                   ? "text-success"
                   : r.soClose
@@ -60,6 +61,7 @@ export function SessionResults({
                     : "text-danger",
               )}
             >
+              <ResultIcon mark={r} />
               {r.correct ? "Correct" : r.soClose ? "So close" : "Missed"}
               {r.hintUsed && " · hint"}
             </p>
