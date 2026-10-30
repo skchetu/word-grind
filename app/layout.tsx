@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Suspense } from "react";
 
@@ -22,6 +22,11 @@ export const metadata: Metadata = {
   title: "Word Grind",
   description: "Weekly spelling and vocab practice for two.",
 };
+
+// On Android, the on-screen keyboard shrinks the page instead of covering
+// it, so the answer box and Submit stay in view while typing. iOS ignores
+// this and scrolls the focused box into view itself.
+export const viewport: Viewport = { interactiveWidget: "resizes-content" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
