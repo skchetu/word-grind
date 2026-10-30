@@ -7,12 +7,21 @@ export type Tile = {
   kind: "ok" | "wrong" | "gap" | "extra" | "swapped" | "fix";
 };
 
-// One column of the two-row diff: what was typed above the correct spelling.
-// A row is null where it has no letter, such as the correct row under an
-// extra letter.
-export type Column = { typed: Tile | null; correct: Tile | null };
+// One step of the diff as a typed tile above a correct one. An extra letter
+// has no correct tile.
+type Column = { typed: Tile; correct: Tile | null };
 
-export function toColumns(steps: AlignStep[]): Column[] {
+// The two rows of the diff: what was typed, then the correct spelling. The
+// correct row skips extra letters, so it reads as the plain word.
+export function toRows(steps: AlignStep[]) {
+  const columns = toColumns(steps);
+  return {
+    typed: columns.map((c) => c.typed),
+    correct: columns.flatMap((c) => (c.correct ? [c.correct] : [])),
+  };
+}
+
+function toColumns(steps: AlignStep[]): Column[] {
   return steps.flatMap((step): Column[] => {
     switch (step.op) {
       case "keep": {

@@ -1,25 +1,19 @@
 import { describe, expect, it } from "vitest";
 
 import { align } from "./align";
-import { type Tile, toColumns } from "./tiles";
+import { type Tile, toRows } from "./tiles";
 
-// Writes a row as text: plain letters as is, marked ones as [kind:letter]
-// and an empty cell as _.
-const show = (tile: Tile | null) =>
-  !tile
-    ? "_"
-    : tile.kind === "ok"
-      ? tile.letter
-      : `[${tile.kind}:${tile.letter}]`;
+// Writes a row as text: plain letters as is, marked ones as [kind:letter].
+const show = (tiles: Tile[]) =>
+  tiles
+    .map((t) => (t.kind === "ok" ? t.letter : `[${t.kind}:${t.letter}]`))
+    .join("");
 const rows = (answer: string, word: string) => {
-  const columns = toColumns(align(answer, word));
-  return {
-    typed: columns.map((c) => show(c.typed)).join(""),
-    correct: columns.map((c) => show(c.correct)).join(""),
-  };
+  const { typed, correct } = toRows(align(answer, word));
+  return { typed: show(typed), correct: show(correct) };
 };
 
-describe("toColumns", () => {
+describe("toRows", () => {
   it("shows the same plain word twice for a correct answer", () => {
     expect(rows("rhythm", "rhythm")).toEqual({
       typed: "rhythm",
@@ -41,10 +35,10 @@ describe("toColumns", () => {
     });
   });
 
-  it("leaves the correct row empty under an extra letter", () => {
-    expect(rows("pharaohh", "pharaoh")).toEqual({
-      typed: "pharao[extra:h]h",
-      correct: "pharao_h",
+  it("leaves extra letters out of the correct row", () => {
+    expect(rows("pharaoahs", "pharaoh")).toEqual({
+      typed: "pharao[extra:a]h[extra:s]",
+      correct: "pharaoh",
     });
   });
 

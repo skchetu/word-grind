@@ -1,5 +1,5 @@
 import { align } from "@/lib/grading/align";
-import { type Tile, toColumns } from "@/lib/grading/tiles";
+import { type Tile, toRows } from "@/lib/grading/tiles";
 import { cn } from "@/lib/utils";
 
 const STAGGER_MS = 30;
@@ -13,15 +13,16 @@ const style: Record<Tile["kind"], string> = {
   fix: "border-success bg-success-subtle text-success",
 };
 
-// The answer above the correct spelling, lined up letter by letter. Each
+// The answer above the correct spelling. Both rows start at the same place,
+// and the correct row leaves out extra letters, so it reads as the word. Each
 // row can be read on its own, so colour is never the only clue. Tiles flip
 // in one after another unless the user prefers reduced motion. Screen
 // readers get the spelling letter by letter instead of the tiles.
 export function LetterDiff({ answer, word }: { answer: string; word: string }) {
-  const columns = toColumns(align(answer, word));
+  const { typed, correct } = toRows(align(answer, word));
   const rows = [
-    { label: "You typed", tiles: columns.map((c) => c.typed) },
-    { label: "Correct spelling", tiles: columns.map((c) => c.correct) },
+    { label: "You typed", tiles: typed },
+    { label: "Correct spelling", tiles: correct },
   ];
   return (
     <div>
@@ -32,7 +33,7 @@ export function LetterDiff({ answer, word }: { answer: string; word: string }) {
         aria-hidden
         className="grid items-center justify-center gap-x-0.5 gap-y-1 font-mono text-[clamp(1rem,5vw,1.5rem)]"
         style={{
-          gridTemplateColumns: `auto repeat(${columns.length}, minmax(0, 2rem))`,
+          gridTemplateColumns: `auto repeat(${typed.length}, minmax(0, 2rem))`,
         }}
       >
         {rows.map((row, r) => [
@@ -47,12 +48,12 @@ export function LetterDiff({ answer, word }: { answer: string; word: string }) {
               key={`${r}-${i}`}
               className={cn(
                 "flex aspect-[4/5] w-full items-center justify-center rounded-md border-2 motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in-50 motion-safe:fill-mode-both",
-                tile ? style[tile.kind] : "border-transparent",
+                style[tile.kind],
               )}
               style={{ animationDelay: `${i * STAGGER_MS}ms` }}
             >
               {/* An empty tile still gets a line of text, so it's as tall as the rest. */}
-              {tile?.letter || "\u00a0"}
+              {tile.letter || "\u00a0"}
             </span>
           )),
         ])}
