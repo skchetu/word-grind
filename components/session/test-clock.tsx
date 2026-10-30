@@ -1,5 +1,6 @@
 "use client";
 
+import { AlarmClock } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import {
@@ -30,15 +31,19 @@ export function TestClock({
     return () => clearInterval(id);
   }, [startedAt, onTimeUp]);
 
+  // The last five minutes turn red, bold and gain an alarm icon, so the
+  // change shows without relying on colour.
+  const low = left <= LOW_MS;
   return (
     <>
       <p
         role="timer"
         className={cn(
-          "font-mono text-sm tabular-nums",
-          left <= LOW_MS ? "text-danger" : "text-muted-foreground",
+          "flex items-center gap-1 font-mono text-sm tabular-nums",
+          low ? "font-semibold text-danger" : "text-muted-foreground",
         )}
       >
+        {low && <AlarmClock aria-hidden className="size-4" />}
         <span className="sr-only">Time left: </span>
         {formatClock(left)}
       </p>

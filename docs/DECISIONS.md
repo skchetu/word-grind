@@ -133,3 +133,6 @@ The main buttons, the focus ring and the active nav tab use violet (`--primary` 
 
 ## Motion respects Reduce motion
 Movement is opt-in with Tailwind's `motion-safe:` prefix: the letter diff's pop-in, the loading pulse and the week list's chevron only animate when the device hasn't asked to reduce motion. `globals.css` also has a catch-all for `prefers-reduced-motion: reduce` that finishes any other animation or transition at once, so a shadcn component or a future class without the prefix can't slip through. It shortens them to almost nothing rather than `none`, so anything waiting on an `animationend` or `transitionend` event still gets it. Hover colour fades become instant too, which loses nothing.
+
+## Results never rely on colour alone
+Green, amber and red are hard to tell apart with colour blindness, so every outcome also has a shape and a word: a tick for correct, an alert for so close and a cross for missed, next to the label, on the results list and on the drill's feedback. The letter diff already marks tiles with +, × and ⇄, and the test clock's last five minutes turn bold with an alarm icon as well as red. The icons are hidden from screen readers because the label next to them already says it. The copy-result squares stay plain emoji, the format people know from Wordle.

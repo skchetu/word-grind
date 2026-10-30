@@ -7,6 +7,7 @@ import { saveSession } from "@/app/actions";
 
 import { Button } from "@/components/ui/button";
 import { LetterDiff } from "@/components/session/letter-diff";
+import { ResultIcon } from "@/components/session/result-icon";
 import { SessionResults } from "@/components/session/session-results";
 import { SpellInput, SpellInputHelp } from "@/components/session/spell-input";
 import { TestClock } from "@/components/session/test-clock";
@@ -238,7 +239,8 @@ export function BasicDrill({
 
       {state.phase === "feedback" && word && (
         <div className="flex flex-col gap-3" aria-live="polite">
-          <p className="text-lg font-medium">
+          <p className="flex items-center gap-2 text-lg font-medium">
+            <ResultIcon mark={state.last} className="size-5" />
             {state.last.correct
               ? "Correct!"
               : state.last.soClose
