@@ -51,7 +51,8 @@ export function LetterDiff({ answer, word }: { answer: string; word: string }) {
               )}
               style={{ animationDelay: `${i * STAGGER_MS}ms` }}
             >
-              {tile?.letter}
+              {/* An empty tile still gets a line of text, so it's as tall as the rest. */}
+              {tile?.letter || "\u00a0"}
             </span>
           )),
         ])}
