@@ -8,19 +8,22 @@ import { summarize } from "@/lib/session/summary";
 import { cn } from "@/lib/utils";
 
 // The end of a drill or test: the score, then every word with what was
-// typed. Missed words come first.
+// typed. Missed words come first. Practice runs aren't `shareable`, so they
+// have no Copy result.
 export function SessionResults({
   words,
   results,
   saveFailed,
   mode,
   weekStartsOn,
+  shareable = true,
 }: {
   words: WordCard[];
   results: Result[];
   saveFailed: boolean;
   mode: Mode;
   weekStartsOn?: string;
+  shareable?: boolean;
 }) {
   const { correct, total, rows } = summarize(results);
   const text = new Map(words.map((w) => [w.id, w.text]));
@@ -68,7 +71,9 @@ export function SessionResults({
           </li>
         ))}
       </ul>
-      <CopyResult mode={mode} weekStartsOn={weekStartsOn} results={results} />
+      {shareable && (
+        <CopyResult mode={mode} weekStartsOn={weekStartsOn} results={results} />
+      )}
       <Button asChild variant="outline">
         <Link href="/">Done</Link>
       </Button>

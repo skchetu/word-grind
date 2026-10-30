@@ -9,6 +9,7 @@ import {
   WeekProgressSkeleton,
 } from "./home-skeletons";
 import { PendingTestsBanner } from "./pending-tests-banner";
+import { PracticeCard } from "./practice-card";
 import { TestCountdown } from "./test-countdown";
 import { ThisWeek } from "./this-week";
 import { TodaysDrillCard } from "./todays-drill-card";
@@ -34,6 +35,7 @@ export default function Home() {
           <Suspense fallback={<DrillCardSkeleton />}>
             <TodaysDrillCard />
           </Suspense>
+          <PracticeCard />
           <Suspense fallback={<LineSkeleton />}>
             <TestCountdown />
           </Suspense>

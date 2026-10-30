@@ -3,9 +3,10 @@ import { describe, expect, it } from "vitest";
 import { activeTab, showsNav } from "./nav";
 
 describe("activeTab", () => {
-  it("highlights Home on the home page, the drill and the test", () => {
+  it("highlights Home on the home page, the drill, practice and the test", () => {
     expect(activeTab("/")).toBe("/");
     expect(activeTab("/drill")).toBe("/");
+    expect(activeTab("/practice")).toBe("/");
     expect(activeTab("/test/2026-10-19")).toBe("/");
   });
 
