@@ -1,13 +1,12 @@
 import Link from "next/link";
 
-import { CopyResult } from "@/components/session/copy-result";
 import { Button } from "@/components/ui/button";
 import { drillMinutes } from "@/lib/srs/pick";
 
 import { todaysDrill } from "./drill/todays-drill";
 
 // How many words today's drill holds and roughly how long it takes, with
-// the button to start it. Once it's done, a button to copy today's result.
+// the button to start it. Once it's done, a link to today's full results.
 export async function TodaysDrillCard() {
   const drill = await todaysDrill();
   const count = drill?.words.length;
@@ -33,7 +32,9 @@ export async function TodaysDrillCard() {
             All caught up. Come back tomorrow.
           </p>
           {drill?.todaysMarks && (
-            <CopyResult mode="drill" results={drill.todaysMarks} size="sm" />
+            <Button asChild size="sm">
+              <Link href="/drill/results">See results</Link>
+            </Button>
           )}
         </div>
       ) : (

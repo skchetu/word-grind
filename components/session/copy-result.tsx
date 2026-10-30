@@ -13,12 +13,10 @@ export function CopyResult({
   mode,
   weekStartsOn,
   results,
-  size,
 }: {
   mode: Mode;
   weekStartsOn?: string;
   results: Mark[];
-  size?: "sm";
 }) {
   const [status, setStatus] = useState<"idle" | "copied" | "failed">("idle");
 
@@ -37,7 +35,7 @@ export function CopyResult({
 
   return (
     <div className="flex flex-col items-center gap-1">
-      <Button onClick={copy} size={size}>
+      <Button onClick={copy}>
         {status === "copied" ? "Copied!" : "Copy result"}
       </Button>
       <p aria-live="polite" className="text-sm text-muted-foreground">
