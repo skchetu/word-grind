@@ -7,6 +7,7 @@ import { saveSession } from "@/app/actions";
 
 import { Button } from "@/components/ui/button";
 import { LetterDiff } from "@/components/session/letter-diff";
+import { MistakeTip } from "@/components/session/mistake-tip";
 import { ResultIcon } from "@/components/session/result-icon";
 import { SessionResults } from "@/components/session/session-results";
 import { SpellInput, SpellInputHelp } from "@/components/session/spell-input";
@@ -258,6 +259,10 @@ export function BasicDrill({
           </p>
           {!state.last.correct && (
             <LetterDiff answer={state.last.answer} word={word.text} />
+          )}
+          {/* Seed words aren't in the database, so they have no tips. */}
+          {!state.last.correct && mode === "drill" && (weekId || practice) && (
+            <MistakeTip wordId={word.id} answer={state.last.answer} />
           )}
           <Button autoFocus onClick={() => send({ type: "NEXT" })}>
             Next
