@@ -12,12 +12,13 @@ function within(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-// The tab to highlight for a page. The drill and the test are started from
-// Home, so they count as Home.
+// The tab to highlight for a page. The drill, practice and the test are
+// started from Home, so they count as Home.
 export function activeTab(pathname: string): TabHref | undefined {
   if (
     pathname === "/" ||
     within(pathname, "/drill") ||
+    within(pathname, "/practice") ||
     within(pathname, "/test")
   ) {
     return "/";

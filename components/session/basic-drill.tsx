@@ -20,7 +20,8 @@ import { unlockAudio, useSpeech } from "@/lib/speech/use-speech";
 // A bare-bones drill that runs the session machine end to end. The polished
 // drill screen (audio hook, letter diff, shortcuts) replaces it on Day 4.
 // Drills and tests of a week's words are saved when they finish; the
-// seed-word drill has no `weekId` and isn't. In test mode there are no
+// seed-word drill has no `weekId` and isn't, nor is `practice`, a run
+// through a week's words that can be repeated freely. In test mode there are no
 // hints or feedback, and a one-hour clock ends the test.
 export function BasicDrill({
   words,
@@ -28,6 +29,7 @@ export function BasicDrill({
   weekStartsOn,
   lastDrillAt = null,
   mode = "drill",
+  practice = false,
 }: {
   words: DrillWord[];
   weekId?: string;
@@ -35,6 +37,7 @@ export function BasicDrill({
   // When the person last finished a drill, from any device.
   lastDrillAt?: string | null;
   mode?: Mode;
+  practice?: boolean;
 }) {
   const [state, send] = useReducer(transition, initialSession);
   const [startedAt, setStartedAt] = useState<number | null>(null);
@@ -150,7 +153,7 @@ export function BasicDrill({
       >
         {mode === "test"
           ? `Start test (${words.length} words, 1 hour)`
-          : `Start drill (${words.length} words)`}
+          : `Start ${practice ? "practice" : "drill"} (${words.length} words)`}
       </Button>
     );
   }
@@ -163,6 +166,7 @@ export function BasicDrill({
         saveFailed={saveFailed}
         mode={mode}
         weekStartsOn={weekStartsOn}
+        shareable={!practice}
       />
     );
   }
@@ -179,6 +183,11 @@ export function BasicDrill({
         {mode === "drill" && weekId && (
           <Button asChild variant="ghost" size="sm">
             <Link href="/">Exit (answers so far are saved)</Link>
+          </Button>
+        )}
+        {practice && (
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/">Exit</Link>
           </Button>
         )}
       </div>
