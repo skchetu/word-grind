@@ -72,35 +72,38 @@ export async function WordLibrary({ search }: { search: string }) {
             : "Words show up here after your first drill."}
         </p>
       ) : (
-        <table className="w-full text-left text-sm">
-          <thead className="text-muted-foreground">
-            <tr className="border-b">
-              <th className="py-2 font-medium">Word</th>
-              <th className="py-2 pl-3 text-right font-medium">Box</th>
-              <th className="py-2 pl-3 text-right font-medium">Missed</th>
-              <th className="py-2 pl-3 text-right font-medium">Next</th>
-            </tr>
-          </thead>
-          <tbody className="tabular-nums">
-            {rows.map((row) => (
-              <tr key={row.wordId} className="border-b last:border-0">
-                <td className="py-3 font-medium">
-                  <Link
-                    href={`/words/${encodeURIComponent(row.text)}`}
-                    className="underline-offset-4 hover:underline"
-                  >
-                    {row.text}
-                  </Link>
-                </td>
-                <td className="py-3 pl-3 text-right">{row.box} / 5</td>
-                <td className="py-3 pl-3 text-right">{row.misses}</td>
-                <td className="py-3 pl-3 text-right whitespace-nowrap">
-                  {formatDay(row.dueOn, false)}
-                </td>
+        // Boxed like the cards on the other tabs.
+        <div className="rounded-lg border px-4">
+          <table className="w-full text-left text-sm">
+            <thead className="text-muted-foreground">
+              <tr className="border-b">
+                <th className="py-2 font-medium">Word</th>
+                <th className="py-2 pl-3 text-right font-medium">Box</th>
+                <th className="py-2 pl-3 text-right font-medium">Missed</th>
+                <th className="py-2 pl-3 text-right font-medium">Next</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="tabular-nums">
+              {rows.map((row) => (
+                <tr key={row.wordId} className="border-b last:border-0">
+                  <td className="py-3 font-medium">
+                    <Link
+                      href={`/words/${encodeURIComponent(row.text)}`}
+                      className="underline-offset-4 hover:underline"
+                    >
+                      {row.text}
+                    </Link>
+                  </td>
+                  <td className="py-3 pl-3 text-right">{row.box} / 5</td>
+                  <td className="py-3 pl-3 text-right">{row.misses}</td>
+                  <td className="py-3 pl-3 text-right whitespace-nowrap">
+                    {formatDay(row.dueOn, false)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
