@@ -67,7 +67,8 @@ export function SiteHeader({ account }: { account: ReactNode }) {
         </div>
       </header>
 
-      <div className="fixed right-4 bottom-4 z-50 flex flex-col items-end gap-2 md:hidden">
+      {/* Hidden while typing, so it doesn't sit on top of the keyboard. */}
+      <div className="fixed right-4 bottom-4 z-50 flex flex-col items-end gap-2 md:hidden [body:has(input:focus)_&]:hidden">
         {open && (
           <nav
             id="phone-menu"

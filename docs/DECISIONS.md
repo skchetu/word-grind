@@ -136,3 +136,6 @@ Movement is opt-in with Tailwind's `motion-safe:` prefix: the letter diff's pop-
 
 ## Results never rely on colour alone
 Green, amber and red are hard to tell apart with colour blindness, so every outcome also has a shape and a word: a tick for correct, an alert for so close and a cross for missed, next to the label, on the results list and on the drill's feedback. The letter diff already marks tiles with +, × and ⇄, and the test clock's last five minutes turn bold with an alarm icon as well as red. The icons are hidden from screen readers because the label next to them already says it. The copy-result squares stay plain emoji, the format people know from Wordle.
+
+## The keyboard shrinks the page on Android
+The root layout sets `interactive-widget=resizes-content` in the viewport tag, so on Android the on-screen keyboard shrinks the page rather than sliding over it, and the answer box and Submit stay visible while typing. iOS Safari ignores the setting and scrolls the focused box into view on its own. Because the page is shorter while the keyboard is open, the floating menu button would ride up on top of it, so it hides while any input has focus (`body:has(input:focus)`). Pages size themselves with `min-h-full` and `flex-1` rather than `100vh`, so nothing else needs `dvh`.
