@@ -79,7 +79,7 @@ export async function ThisWeek() {
           </span>
           <ChevronDown
             aria-hidden
-            className="mt-1 size-5 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
+            className="mt-1 size-5 shrink-0 text-muted-foreground group-open:rotate-180 motion-safe:transition-transform"
           />
         </summary>
         <ol className="mt-3 divide-y border-t">
