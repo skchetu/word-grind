@@ -6,15 +6,10 @@ import {
   generateSentences,
   SENTENCES_MODEL,
 } from "@/lib/ai/generate-sentences";
-import { sentencesToPrune } from "@/lib/sentences/keep";
 import {
   wordsNeedingSentence,
   type WordWithSentences,
 } from "@/lib/sentences/refresh";
-import { AUDIO_BUCKET } from "@/lib/speech/audio-url";
-import { HOUSEHOLD_TIME_ZONE } from "@/lib/week/dates";
-
-type Sentence = WordWithSentences["word_sentences"][number];
 
 const topicsSchema = z.array(z.object({ topics: z.array(z.string()) }));
 const savedSchema = z.array(
@@ -28,18 +23,16 @@ const savedSchema = z.array(
   }),
 );
 
-// Gives each returning word a new sentence from Claude, at most once a day,
-// then deletes all but the word's newest three (and their clips). Returns
-// the new sentences by word id, for the drill to show. Any failure leaves
-// the words as they were, and the drill shows their newest saved sentence.
+// Gives each word with fewer than three sentences one more from Claude, in
+// one call. Returns the new sentences by word id. Any failure leaves the
+// words as they were.
 export async function addFreshSentences(
   supabase: SupabaseClient,
   userId: string,
   words: WordWithSentences[],
-  today: string,
 ): Promise<Map<string, z.infer<typeof savedSchema>[number]>> {
   const added = new Map<string, z.infer<typeof savedSchema>[number]>();
-  const needing = wordsNeedingSentence(words, today, HOUSEHOLD_TIME_ZONE);
+  const needing = wordsNeedingSentence(words);
   if (needing.length === 0) return added;
   if (!(await canCallClaude(supabase, userId, "sentences"))) return added;
 
@@ -79,40 +72,41 @@ export async function addFreshSentences(
   }
   for (const row of savedSchema.parse(data)) added.set(row.word_id, row);
 
-  // Older sentences beyond the newest three, for the words that got one.
-  const pruned: Sentence[] = needing.flatMap((w) => {
-    const fresh = added.get(w.id);
-    if (!fresh) return [];
-    return sentencesToPrune(
-      [...w.word_sentences, fresh].map((s) => ({
-        ...s,
-        createdAt: s.created_at,
-      })),
-    );
-  });
-  await prune(supabase, pruned);
   return added;
 }
 
-// Deletes the sentences, then their clips. A failure is only logged: the
-// next refresh tries again, and the drill already shows the newest sentence.
-async function prune(supabase: SupabaseClient, sentences: Sentence[]) {
-  if (sentences.length === 0) return;
-  const { error } = await supabase
-    .from("word_sentences")
-    .delete()
-    .in(
-      "id",
-      sentences.map((s) => s.id),
-    );
-  if (error) {
-    console.error("Pruning old sentences failed:", error.message);
-    return;
-  }
-  const clips = sentences.flatMap((s) => (s.audio_path ? [s.audio_path] : []));
-  if (clips.length === 0) return;
-  const { error: clipError } = await supabase.storage
-    .from(AUDIO_BUCKET)
-    .remove(clips);
-  if (clipError) console.error("Removing old clips failed:", clipError.message);
+const weekWordsSchema = z.array(
+  z.object({
+    words: z.object({
+      id: z.string(),
+      text: z.string(),
+      word_sentences: z.array(
+        z.object({
+          id: z.string(),
+          sentence: z.string(),
+          audio_path: z.string().nullable(),
+          created_at: z.string(),
+        }),
+      ),
+    }),
+  }),
+);
+
+// Tops up a new week's words to three sentences each, so they're ready (and
+// can be recorded) before anyone drills them.
+export async function topUpWeekSentences(
+  supabase: SupabaseClient,
+  userId: string,
+  weekId: string,
+) {
+  const { data, error } = await supabase
+    .from("week_words")
+    .select(
+      "words(id, text, word_sentences(id, sentence, audio_path, created_at))",
+    )
+    .eq("week_id", weekId);
+  if (error)
+    throw new Error(`Loading the week's words failed: ${error.message}`);
+  const words = weekWordsSchema.parse(data).map((row) => row.words);
+  await addFreshSentences(supabase, userId, words);
 }

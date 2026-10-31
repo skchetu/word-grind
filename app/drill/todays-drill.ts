@@ -53,8 +53,9 @@ const lastDrillSchema = z
 // drill saved on another device isn't resumed after it), plus that drill's
 // marks if it finished today. Null until the household has a list for this
 // week.
-// With `freshSentences`, each returning word first gets a new example
-// sentence; the home page's summary skips that so it never calls Claude.
+// With `freshSentences`, a returning word with fewer than three sentences
+// first gets one more; the home page's summary skips that so it never calls
+// Claude.
 export async function todaysDrill({ freshSentences = false } = {}): Promise<{
   weekId: string;
   words: DrillWord[];
@@ -94,7 +95,7 @@ export async function todaysDrill({ freshSentences = false } = {}): Promise<{
     const returning: WordWithSentences[] = rows
       .filter((r) => r.due_on <= today)
       .map((r) => r.words);
-    const added = await addFreshSentences(supabase, userId, returning, today);
+    const added = await addFreshSentences(supabase, userId, returning);
     for (const word of returning) {
       const sentence = added.get(word.id);
       if (sentence) word.word_sentences.push(sentence);
