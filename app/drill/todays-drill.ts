@@ -4,12 +4,14 @@ import type { DrillWord } from "@/data/seed-words";
 import { type Mark, todaysDrillMarks } from "@/lib/session/share";
 import { pickDrillWords } from "@/lib/srs/pick";
 import type { WordWithSentences } from "@/lib/sentences/refresh";
+import { answerCounts } from "@/lib/sentences/turns";
 import { createClient } from "@/lib/supabase/server";
 import { HOUSEHOLD_TIME_ZONE, todayIn, weekStart } from "@/lib/week/dates";
 import {
   DRILL_WORD_COLUMNS,
   toDrillWords,
   toReviews,
+  weekWordIds,
 } from "@/lib/week/drill-words";
 
 import { addFreshSentences } from "./fresh-sentences";
@@ -102,11 +104,24 @@ export async function todaysDrill({ freshSentences = false } = {}): Promise<{
     }
   }
 
-  const { due, reviewed } = toReviews(rows, today);
+  // The drill page plays each word's next sentence; the home summary doesn't
+  // show sentences, so it skips the extra read.
+  const turns =
+    freshSentences && userId
+      ? await answerCounts(supabase, userId, [
+          ...rows.map((r) => r.words.id),
+          ...weekWordIds(week.week_words),
+        ])
+      : undefined;
+  const { due, reviewed } = toReviews(rows, today, undefined, turns);
   const last = lastDrillSchema.parse(lastDrill);
   return {
     weekId: z.uuid().parse(week.id),
-    words: pickDrillWords(due, toDrillWords(week.week_words), reviewed),
+    words: pickDrillWords(
+      due,
+      toDrillWords(week.week_words, undefined, turns),
+      reviewed,
+    ),
     lastDrillAt: last?.finished_at ?? null,
     todaysMarks: todaysDrillMarks(
       last && { finishedAt: last.finished_at, attempts: last.attempts },

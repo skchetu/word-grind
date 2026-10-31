@@ -1,8 +1,13 @@
 import { BasicDrill } from "@/components/session/basic-drill";
+import { randomTurns } from "@/lib/sentences/turns";
 import { shuffle } from "@/lib/session/shuffle";
 import { createClient } from "@/lib/supabase/server";
 import { HOUSEHOLD_TIME_ZONE, todayIn, weekStart } from "@/lib/week/dates";
-import { DRILL_WORD_COLUMNS, toDrillWords } from "@/lib/week/drill-words";
+import {
+  DRILL_WORD_COLUMNS,
+  toDrillWords,
+  weekWordIds,
+} from "@/lib/week/drill-words";
 
 // This week's whole list in a fresh random order on every visit. Practice
 // isn't saved, so it never moves a word's review date or a score.
@@ -20,5 +25,12 @@ export async function WeekPractice() {
       </p>
     );
   }
-  return <BasicDrill words={shuffle(toDrillWords(week.week_words))} practice />;
+  // Each word plays one of its sentences at random.
+  const turns = randomTurns(weekWordIds(week.week_words));
+  return (
+    <BasicDrill
+      words={shuffle(toDrillWords(week.week_words, undefined, turns))}
+      practice
+    />
+  );
 }
