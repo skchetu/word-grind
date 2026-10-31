@@ -10,6 +10,7 @@ import {
   ATTEMPT_COLUMNS,
   savedAttemptsSchema,
 } from "@/lib/session/saved-results";
+import { answerCounts } from "@/lib/sentences/turns";
 import { createClient } from "@/lib/supabase/server";
 import {
   formatDay,
@@ -17,7 +18,11 @@ import {
   todayIn,
   weekStart,
 } from "@/lib/week/dates";
-import { DRILL_WORD_COLUMNS, toDrillWords } from "@/lib/week/drill-words";
+import {
+  DRILL_WORD_COLUMNS,
+  toDrillWords,
+  weekWordIds,
+} from "@/lib/week/drill-words";
 import { testDay } from "@/lib/week/pending-tests";
 
 const takenSchema = z
@@ -82,6 +87,12 @@ export async function WeekTest({ startsOn }: { startsOn?: string }) {
     );
   }
 
+  // Each word plays the next sentence after the ones heard in drills.
+  const turns = await answerCounts(
+    supabase,
+    userId,
+    weekWordIds(week.week_words),
+  );
   return (
     <div className="flex w-full flex-col items-center gap-4">
       <p className="text-sm text-muted-foreground">
@@ -92,7 +103,7 @@ export async function WeekTest({ startsOn }: { startsOn?: string }) {
         mode="test"
         weekId={weekId}
         weekStartsOn={monday}
-        words={toDrillWords(week.week_words)}
+        words={toDrillWords(week.week_words, undefined, turns)}
       />
     </div>
   );
