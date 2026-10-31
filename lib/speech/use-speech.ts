@@ -32,12 +32,19 @@ const playClip: AudioPlayer = (url, done) => {
 const SILENCE =
   "data:audio/wav;base64,UklGRnQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVAAAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==";
 
-// Call from a tap (like Start) so iOS lets later clips play without one.
+// Call from a tap (like Start) so iOS lets later clips and the browser voice
+// play without one. iOS Safari blocks speech that doesn't start from a tap
+// until something has been spoken from one, so this says an empty line too.
+// Without it, a sentence with no recorded clip is silently skipped.
 export function unlockAudio() {
-  if (typeof Audio === "undefined") return;
-  audio ??= new Audio();
-  audio.src = SILENCE;
-  audio.play().catch(() => {});
+  if (typeof Audio !== "undefined") {
+    audio ??= new Audio();
+    audio.src = SILENCE;
+    audio.play().catch(() => {});
+  }
+  if (typeof window !== "undefined" && "speechSynthesis" in window) {
+    window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
+  }
 }
 
 // One speaker per page, since the browser has one speech queue.
