@@ -148,3 +148,6 @@ The root layout sets `interactive-widget=resizes-content` in the viewport tag, s
 
 ## Sentry only runs on Vercel, and browser reports go through our own domain
 Sentry is turned on only when Vercel's environment variable is set, so `pnpm dev` and tests never send events or use up the free plan's monthly quota. Browser reports go to `/monitoring` on the app's own domain, which forwards them to Sentry, because ad blockers often block requests to sentry.io directly. The proxy skips that path so a signed-out visitor's errors still get through. Events carry the user's id but never the email or IP address.
+
+## The app works out the mistake before asking for a tip
+Haiku was asked to compare the typed word with the correct one itself and got letter counts wrong ("vacuum has three u's"), because models read words in chunks, not single letters. Now `describeMistakes` in `lib/grading/describe.ts` turns the same letter diff the feedback rows use into plain words, counting repeated letters for it (`"u" typed 3 times in a row where "vacuum" has it 2 times`), and the request also spells both words out letter by letter. The prompt says the listed mistakes are correct and not to count letters. Tips cached under the old prompt were deleted by a migration so they're all rewritten.

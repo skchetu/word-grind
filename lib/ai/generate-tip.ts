@@ -1,6 +1,9 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 
+import { align } from "@/lib/grading/align";
+import { describeMistakes } from "@/lib/grading/describe";
+
 import type { TokenUsage } from "./generate-week";
 import { buildTipRequest, TIP_SYSTEM_PROMPT } from "./prompts";
 
@@ -34,7 +37,16 @@ export async function generateTip(
       model: TIP_MODEL,
       max_tokens: 200,
       system: TIP_SYSTEM_PROMPT,
-      messages: [{ role: "user", content: buildTipRequest(word, wrong) }],
+      messages: [
+        {
+          role: "user",
+          content: buildTipRequest(
+            word,
+            wrong,
+            describeMistakes(align(wrong, word)),
+          ),
+        },
+      ],
     });
     usage.inputTokens = response.usage.input_tokens;
     usage.outputTokens = response.usage.output_tokens;

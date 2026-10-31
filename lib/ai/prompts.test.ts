@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildWeekRequest } from "./prompts";
+import { buildTipRequest, buildWeekRequest } from "./prompts";
 
 describe("buildWeekRequest", () => {
   it("asks for the list at the household's level", () => {
@@ -22,5 +22,21 @@ describe("buildWeekRequest", () => {
       "Set the example sentences around: food.",
       "Don't use any of these recent words: rhythm.",
     ]);
+  });
+});
+
+describe("buildTipRequest", () => {
+  it("gives both spellings letter by letter, with the mistakes", () => {
+    expect(
+      buildTipRequest("vacuum", "vacuuum", [
+        '"u" typed 3 times in a row where "vacuum" has it 2 times',
+      ]),
+    ).toBe(
+      [
+        "Correct spelling: vacuum (v-a-c-u-u-m)",
+        "They typed: vacuuum (v-a-c-u-u-u-m)",
+        'Mistakes: "u" typed 3 times in a row where "vacuum" has it 2 times',
+      ].join("\n"),
+    );
   });
 });
