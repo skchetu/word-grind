@@ -11,7 +11,7 @@ import {
   vi,
 } from "vitest";
 
-import { generateTip } from "./generate-tip";
+import { generateTip, plainTip } from "./generate-tip";
 
 const MESSAGES_URL = "https://api.anthropic.com/v1/messages";
 
@@ -61,20 +61,22 @@ describe("generateTip", () => {
     });
   });
 
-  it("falls back to the mnemonic when the tip runs long", async () => {
+  it("falls back to the plain mistake when the tip runs long", async () => {
     vi.spyOn(console, "warn").mockImplementation(() => {});
     server.use(
-      http.post(MESSAGES_URL, () => messageWith("word ".repeat(30).trim())),
+      http.post(MESSAGES_URL, () => messageWith("word ".repeat(31).trim())),
     );
 
     const result = await generateTip(mistake, { client: testClient() });
 
     expect(result.source).toBe("fallback");
-    expect(result.tip).toBe(mistake.mnemonic);
+    expect(result.tip).toBe(
+      '"c" typed 1 time in a row where "accommodate" has it 2 times.',
+    );
     expect(result.usage.outputTokens).toBe(15); // still billed
   });
 
-  it("falls back to the mnemonic on an API error", async () => {
+  it("falls back to the plain mistake on an API error", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     server.use(
       http.post(MESSAGES_URL, () =>
@@ -88,9 +90,23 @@ describe("generateTip", () => {
     const result = await generateTip(mistake, { client: testClient() });
 
     expect(result).toEqual({
-      tip: mistake.mnemonic,
+      tip: '"c" typed 1 time in a row where "accommodate" has it 2 times.',
       source: "fallback",
       usage: { inputTokens: 0, outputTokens: 0 },
     });
+  });
+});
+
+describe("plainTip", () => {
+  it("lists each mistake as a sentence", () => {
+    expect(plainTip("onomatopoeia", "onamatapoeia", "a poet wrote it")).toBe(
+      '"a" instead of "o" after "on"; "a" instead of "o" after "onomat".',
+    );
+  });
+
+  it("uses the mnemonic when there is no mistake to describe", () => {
+    expect(plainTip("vacuum", "vacuum", "a vacuum sucks up two u's")).toBe(
+      "a vacuum sucks up two u's",
+    );
   });
 });
