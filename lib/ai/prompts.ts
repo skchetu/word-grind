@@ -65,7 +65,7 @@ export function buildTopUpRequest(
 export const TIP_SYSTEM_PROMPT = `You coach adults on English spelling.
 
 You get the correct spelling of a word, what someone typed, and the exact mistakes, worked out letter by letter. The mistakes listed are correct: build the tip on them, and never count letters or say how many times a letter appears.
-Reply with one tip, at most 20 words, that gets someone who made exactly these mistakes to the correct spelling: point at the letters they got wrong and give a memorable way to get them right, such as a meaning link, a smaller word inside the word, or a sound to say in your head.
+Reply with one tip, at most 30 words, that gets someone who made exactly these mistakes to the correct spelling: point at the letters they got wrong and give a memorable way to get them right, such as a meaning link, a smaller word inside the word, or a sound to say in your head.
 Reply with the tip only: no greeting, no quotes, and don't write out their misspelling.`;
 
 // Spelled letter by letter too, so the model sees each letter rather than
