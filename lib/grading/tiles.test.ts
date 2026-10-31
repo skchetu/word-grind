@@ -1,38 +1,51 @@
 import { describe, expect, it } from "vitest";
 
 import { align } from "./align";
-import { toTiles } from "./tiles";
+import { type Tile, toRows } from "./tiles";
 
-const tiles = (answer: string, word: string) => toTiles(align(answer, word));
-const kinds = (answer: string, word: string) =>
-  tiles(answer, word)
+// Writes a row as text: plain letters as is, marked ones as [kind:letter].
+const show = (tiles: Tile[]) =>
+  tiles
     .map((t) => (t.kind === "ok" ? t.letter : `[${t.kind}:${t.letter}]`))
     .join("");
+const rows = (answer: string, word: string) => {
+  const { typed, correct } = toRows(align(answer, word));
+  return { typed: show(typed), correct: show(correct) };
+};
 
-describe("toTiles", () => {
-  it("marks every letter ok for a correct answer", () => {
-    expect(kinds("rhythm", "rhythm")).toBe("rhythm");
-  });
-
-  it("marks missing letters", () => {
-    expect(kinds("acomodate", "accommodate")).toBe(
-      "a[missing:c]co[missing:m]modate",
-    );
-  });
-
-  it("marks extra letters", () => {
-    expect(kinds("untill", "until")).toBe("unti[extra:l]l");
-  });
-
-  it("marks a wrong letter and keeps what was typed", () => {
-    expect(tiles("seperate", "separate")[3]).toEqual({
-      kind: "wrong",
-      letter: "a",
-      typed: "e",
+describe("toRows", () => {
+  it("shows the same plain word twice for a correct answer", () => {
+    expect(rows("rhythm", "rhythm")).toEqual({
+      typed: "rhythm",
+      correct: "rhythm",
     });
   });
 
-  it("marks both letters of a swap", () => {
-    expect(kinds("recieve", "receive")).toBe("rec[swapped:e][swapped:i]ve");
+  it("puts a wrong letter above its fix", () => {
+    expect(rows("seperate", "separate")).toEqual({
+      typed: "sep[wrong:e]rate",
+      correct: "sep[fix:a]rate",
+    });
+  });
+
+  it("leaves a gap above each missing letter", () => {
+    expect(rows("acomodate", "accommodate")).toEqual({
+      typed: "a[gap:]co[gap:]modate",
+      correct: "a[fix:c]co[fix:m]modate",
+    });
+  });
+
+  it("leaves extra letters out of the correct row", () => {
+    expect(rows("pharaoahs", "pharaoh")).toEqual({
+      typed: "pharao[extra:a]h[extra:s]",
+      correct: "pharaoh",
+    });
+  });
+
+  it("marks both swapped letters, then both fixes", () => {
+    expect(rows("recieve", "receive")).toEqual({
+      typed: "rec[swapped:i][swapped:e]ve",
+      correct: "rec[fix:e][fix:i]ve",
+    });
   });
 });
