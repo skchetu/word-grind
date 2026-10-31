@@ -11,6 +11,7 @@ import {
 import {
   checkCard,
   fallbackPoolSchema,
+  SENTENCES_PER_WORD,
   weekSchema,
   WORDS_PER_WEEK,
   wordCardSchema,
@@ -32,7 +33,11 @@ export type WeekResult = {
 
 // A card that fails the schema becomes null instead of sinking the whole
 // reply, so the good words can be kept. Claude still sees the full card shape.
-const cardsSchema = z.array(wordCardSchema.nullable().catch(null));
+// Claude is asked for all three sentences, even though backup cards have two.
+const claudeCardSchema = wordCardSchema.extend({
+  sentences: wordCardSchema.shape.sentences.length(SENTENCES_PER_WORD),
+});
+const cardsSchema = z.array(claudeCardSchema.nullable().catch(null));
 const draftSchema = z.object({
   theme: z.string().trim().min(1),
   // A missing or empty note shouldn't cost a retry; the theme still shows.

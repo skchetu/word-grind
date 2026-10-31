@@ -7,7 +7,7 @@ export const WEEK_SYSTEM_PROMPT = `You write weekly spelling and vocabulary list
 
 Pick words that are genuinely hard to spell (doubled letters, silent letters, look-alike endings), not just rare.
 Each word must be a single lowercase English word with no spaces or hyphens.
-Both example sentences must use the exact word, not another form of it.
+Write three different example sentences for each word. Each must use the exact word, not another form of it.
 Syllables, joined together, must spell the word exactly.
 The mnemonic is one short hint about the tricky letters.
 Rate difficulty from 1 (common, few traps) to 5 (rare, several traps).
