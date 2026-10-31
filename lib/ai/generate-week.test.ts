@@ -43,7 +43,15 @@ afterAll(() => server.close());
 // inside the SDK, so error cases don't wait on backoff.
 const testClient = () => new Anthropic({ apiKey: "test-key", maxRetries: 0 });
 const request = { difficulty: 3, topics: ["food"], avoid: [] };
-const goodWeek = fallbackWeek(1);
+// A backup week with the third sentence Claude is asked for.
+const backup = fallbackWeek(1);
+const goodWeek = {
+  ...backup,
+  words: backup.words.map((w) => ({
+    ...w,
+    sentences: [...w.sentences, `A third sentence for ${w.word}.`],
+  })),
+};
 
 describe("generateWeek", () => {
   it("returns Claude's week when it passes the checks", async () => {
@@ -98,6 +106,25 @@ describe("generateWeek", () => {
     expect(result.week.words.map((c) => c.word)).toEqual(
       words.map((c) => c.word),
     );
+  });
+
+  it("drops a word with only two sentences", async () => {
+    const [first, ...rest] = goodWeek.words;
+    const short = {
+      ...first!,
+      word: "short",
+      sentences: ["A short one.", "Short again."],
+    };
+    server.use(
+      http.post(MESSAGES_URL, () =>
+        messageWith({ ...goodWeek, words: [short, first, ...rest] }),
+      ),
+    );
+
+    const result = await generateWeek(request, { client: testClient() });
+
+    expect(result.week.words.map((c) => c.word)).not.toContain("short");
+    expect(result.week.words.every((c) => c.sentences.length === 3)).toBe(true);
   });
 
   it("asks only for the missing words when too few remain", async () => {

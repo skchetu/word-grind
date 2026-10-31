@@ -60,9 +60,14 @@ describe("wordCardSchema", () => {
     }
   });
 
-  it("needs exactly two sentences", () => {
-    const one = card({ sentences: ["Fame is ephemeral."] });
-    expect(wordCardSchema.safeParse(one).success).toBe(false);
+  it("needs two or three sentences", () => {
+    const fame = (n: number) =>
+      card({
+        sentences: Array.from({ length: n }, () => "Fame is ephemeral."),
+      });
+    expect(wordCardSchema.safeParse(fame(1)).success).toBe(false);
+    expect(wordCardSchema.safeParse(fame(3)).success).toBe(true);
+    expect(wordCardSchema.safeParse(fame(4)).success).toBe(false);
   });
 });
 

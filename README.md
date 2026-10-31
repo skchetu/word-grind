@@ -6,7 +6,7 @@ A spelling and vocabulary app for a two-person household. Each Monday, Claude wr
 
 ## What it does
 
-- **Weekly lists from Claude.** Each card has a definition, IPA pronunciation, syllables, origin, two example sentences and a memory hint. Every card is validated: bad cards are dropped and only the missing words are requested again, so the app never waits on a perfect reply. A curated list is the fallback if Claude can't be reached.
+- **Weekly lists from Claude.** Each card has a definition, IPA pronunciation, syllables, origin, three example sentences and a memory hint. Every card is validated: bad cards are dropped and only the missing words are requested again, so the app never waits on a perfect reply. A curated list is the fallback if Claude can't be reached.
 - **A spelling-bee drill.** The app reads the word, pauses, then reads an example sentence, and you type the spelling into a box with autocorrect off. The sentence is shown with the word blanked out. Space replays both.
 - **Fresh example sentences.** When a word comes back for review, Claude Haiku writes it a new sentence (one call for all the day's returning words, at most once a day per word), so you learn the word rather than one sentence. Each word keeps only its three newest sentences.
 - **Letter-by-letter feedback.** A wrong answer is lined up against the correct spelling, showing missing, extra, wrong and swapped letters.

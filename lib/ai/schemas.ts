@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+// Example sentences per word. The drill cycles through them, so a word
+// isn't always heard in the same sentence.
+export const SENTENCES_PER_WORD = 3;
+
 // One word as Claude returns it for the weekly list.
 export const wordCardSchema = z.object({
   // Case and stray spaces are fixed rather than rejected, so "Rhythm "
@@ -16,7 +20,9 @@ export const wordCardSchema = z.object({
   origin: z.string().min(1),
   mnemonic: z.string().min(1), // short spelling memory hint
   difficulty: z.int().min(1).max(5),
-  sentences: z.array(z.string().min(1)).length(2), // each must use the word
+  // Each must use the word. Claude writes three (see SENTENCES_PER_WORD);
+  // the older backup lists have two.
+  sentences: z.array(z.string().min(1)).min(2).max(SENTENCES_PER_WORD),
 });
 export type WordCardOutput = z.infer<typeof wordCardSchema>;
 
