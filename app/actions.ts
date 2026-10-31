@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { z } from "zod";
 
+import { topUpWeekSentences } from "@/app/drill/fresh-sentences";
 import { nextHouseholdLevel, saveHouseholdLevel } from "@/app/household-level";
 import { createWeekRecap } from "@/app/test/week-recap";
 import { canCallClaude, logClaudeCall } from "@/lib/ai/calls";
@@ -126,16 +127,22 @@ export async function generateThisWeek() {
     if (noteError) console.error("Saving the theme note failed:", noteError);
   }
 
-  // Recorded audio is made after the response, so the new list shows up
-  // straight away. Until a clip exists, the drill uses the browser voice.
+  // After the response, so the new list shows up straight away: words with
+  // fewer than three sentences (backup-list words, and words saved before
+  // lists had three) get topped up, then every missing clip is recorded.
+  // Until a clip exists, the drill uses the browser voice.
   const voice = elevenLabsConfig();
-  if (voice) {
-    after(() =>
-      recordWeekAudio(supabase, savedWeekId, voice).catch((failure: unknown) =>
-        console.error("Recording audio failed:", failure),
-      ),
-    );
-  }
+  after(async () => {
+    try {
+      await topUpWeekSentences(supabase, userId, savedWeekId);
+      if (voice) await recordWeekAudio(supabase, savedWeekId, voice);
+    } catch (failure) {
+      console.error(
+        "Preparing the week's sentences and audio failed:",
+        failure,
+      );
+    }
+  });
 
   revalidatePath("/");
 }

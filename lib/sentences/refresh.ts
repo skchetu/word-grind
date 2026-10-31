@@ -1,6 +1,4 @@
-import { todayIn } from "@/lib/week/dates";
-
-import { newestSentence } from "./keep";
+import { SENTENCES_PER_WORD } from "@/lib/ai/schemas";
 
 // A word as the drill loads it, with its saved sentences.
 export type WordWithSentences = {
@@ -14,18 +12,11 @@ export type WordWithSentences = {
   }[];
 };
 
-// The returning words that haven't been given a new sentence yet today, in
-// the household's time zone. Once a word has one, reloading the drill or the
-// other person's drill reuses it instead of calling Claude again.
+// The words with fewer than SENTENCES_PER_WORD sentences, which still need
+// one topped up. New lists come with three; backup-list words and words
+// saved before then have two.
 export function wordsNeedingSentence<T extends WordWithSentences>(
   words: T[],
-  today: string,
-  timeZone: string,
 ): T[] {
-  return words.filter((word) => {
-    const newest = newestSentence(
-      word.word_sentences.map((s) => ({ id: s.id, createdAt: s.created_at })),
-    );
-    return !newest || todayIn(timeZone, new Date(newest.createdAt)) < today;
-  });
+  return words.filter((w) => w.word_sentences.length < SENTENCES_PER_WORD);
 }

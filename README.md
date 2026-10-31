@@ -8,7 +8,7 @@ A spelling and vocabulary app for a two-person household. Each Monday, Claude wr
 
 - **Weekly lists from Claude.** Each card has a definition, IPA pronunciation, syllables, origin, three example sentences and a memory hint. Every card is validated: bad cards are dropped and only the missing words are requested again, so the app never waits on a perfect reply. A curated list is the fallback if Claude can't be reached.
 - **A spelling-bee drill.** The app reads the word, pauses, then reads an example sentence, and you type the spelling into a box with autocorrect off. The sentence is shown with the word blanked out. Space replays both.
-- **Fresh example sentences.** When a word comes back for review, Claude Haiku writes it a new sentence (one call for all the day's returning words, at most once a day per word), so you learn the word rather than one sentence. Each word keeps only its three newest sentences.
+- **Three example sentences per word.** Every word has three recorded sentences, so you learn the word rather than one sentence. Words from the backup lists or older weeks are topped up to three by Claude Haiku.
 - **Letter-by-letter feedback.** A wrong answer is lined up against the correct spelling, showing missing, extra, wrong and swapped letters.
 - **Spaced repetition.** Each day's drill is the words due for review plus this week's new words, up to 15. Every finished drill is saved, and each word moves through five Leitner boxes (1, 2, 4, 7 and 14 days), so missed words come back sooner.
 - **Results at the end.** A finished drill lists every word, missed words first, next to what was typed.
