@@ -104,7 +104,32 @@ export async function recordWeekAudio(
   if (error)
     throw new Error(`Loading the week's words failed: ${error.message}`);
 
-  return makeClips(clipJobs(data), {
+  return makeClips(clipJobs(data), clipSteps(supabase, config));
+}
+
+// Records the sentences that don't have a clip yet, such as a returning
+// word's new sentence. Runs on the server after the drill has loaded.
+export function recordSentenceAudio(
+  supabase: SupabaseClient,
+  sentences: { id: string; sentence: string; audio_path: string | null }[],
+  config: ElevenLabsConfig,
+) {
+  const jobs = sentences
+    .filter((s) => !s.audio_path)
+    .map((s) => ({
+      table: "word_sentences" as const,
+      id: s.id,
+      text: s.sentence,
+      path: `sentences/${s.id}.mp3`,
+    }));
+  return makeClips(jobs, clipSteps(supabase, config));
+}
+
+function clipSteps(
+  supabase: SupabaseClient,
+  config: ElevenLabsConfig,
+): ClipSteps {
+  return {
     record: (text) => synthesize(text, config),
     async store(path, mp3) {
       const { error } = await supabase.storage
@@ -122,5 +147,5 @@ export async function recordWeekAudio(
         .eq("id", id);
       if (error) throw error;
     },
-  });
+  };
 }

@@ -1,7 +1,10 @@
+import { after } from "next/server";
 import { z } from "zod";
 
 import type { DrillWord } from "@/data/seed-words";
 import { type Mark, todaysDrillMarks } from "@/lib/session/share";
+import { recordSentenceAudio, recordWeekAudio } from "@/lib/speech/clips";
+import { elevenLabsConfig } from "@/lib/speech/elevenlabs";
 import { pickDrillWords } from "@/lib/srs/pick";
 import type { WordWithSentences } from "@/lib/sentences/refresh";
 import { answerCounts } from "@/lib/sentences/turns";
@@ -101,6 +104,27 @@ export async function todaysDrill({ freshSentences = false } = {}): Promise<{
     for (const word of returning) {
       const sentence = added.get(word.id);
       if (sentence) word.word_sentences.push(sentence);
+    }
+
+    // Records any clip still missing, after the drill has loaded: this
+    // week's words and their sentences, and returning words' sentences.
+    // Anything unrecorded plays in the browser voice until then.
+    const voice = elevenLabsConfig();
+    const weekId = z.uuid().parse(week.id);
+    const inWeek = new Set(weekWordIds(week.week_words));
+    const unrecorded = returning
+      .filter((w) => !inWeek.has(w.id))
+      .flatMap((w) => w.word_sentences)
+      .filter((s) => !s.audio_path);
+    if (voice) {
+      after(async () => {
+        try {
+          await recordWeekAudio(supabase, weekId, voice);
+          await recordSentenceAudio(supabase, unrecorded, voice);
+        } catch (failure) {
+          console.error("Recording missing clips failed:", failure);
+        }
+      });
     }
   }
 
