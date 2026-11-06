@@ -44,7 +44,7 @@ export async function TodaysDrillCard() {
               ? "Practice with the starter words"
               : `About ${drillMinutes(count)} min`}
           </p>
-          <Button asChild>
+          <Button asChild variant="highlight">
             <Link href="/drill">Start</Link>
           </Button>
         </div>

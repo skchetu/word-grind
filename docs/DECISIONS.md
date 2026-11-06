@@ -166,3 +166,6 @@ The page, cards, borders and hint text used shadcn's hue-less greys, which look 
 
 ## Missed is crimson, and the players are forest and coral
 The new palette's coral (#F15B3D) sits at almost the same hue as the old "missed" red and the partner's orange, so a coral button next to a wrong answer would read as another error. "Missed" moves to a crimson (hue 15 instead of 27, and darker than coral in light mode) so the two reds never look alike, and coral stays off the drill, practice and test screens. On the scoreboard you are forest (sage in dark mode) and your partner is coral, so the chart uses the palette instead of an unrelated blue and orange. The two bars also differ in lightness, not just hue, and the chart keeps its legend, so they stay apart with colour blindness.
+
+## Coral is the one highlight, used sparingly
+The palette's coral (#F15B3D) is the loud colour, so it only marks what deserves the eye: the Start button on today's drill, a thin underline on the active nav tab, and the flame next to each streak. It never carries small text and never appears on the drill, practice or test screens, which stay forest so nothing distracts from spelling. Coral is too light for white text (3.3:1), so the button's label is a very dark forest instead (about 5:1), and the contrast test checks that pair along with coral against the page and cards.

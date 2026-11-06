@@ -1,3 +1,4 @@
+import { Flame } from "lucide-react";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -31,7 +32,11 @@ export async function Streaks() {
           <p className="text-sm text-muted-foreground">
             {m.id === userId ? "You" : m.display_name}
           </p>
-          <p className="text-3xl font-semibold tabular-nums">
+          <p className="flex items-center justify-center gap-1.5 text-3xl font-semibold tabular-nums">
+            <Flame
+              aria-hidden="true"
+              className="size-6 fill-highlight text-highlight"
+            />
             {streaks.get(m.id) ?? 0}
           </p>
           <p className="text-sm text-muted-foreground">day streak</p>

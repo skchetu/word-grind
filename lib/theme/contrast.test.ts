@@ -60,6 +60,9 @@ const pairs: [fg: string, bg: string, min: number][] = [
   ["primary", "background", MARK],
   ["player-1", "card", MARK],
   ["player-2", "card", MARK],
+  ["highlight-foreground", "highlight", TEXT],
+  ["highlight", "background", MARK],
+  ["highlight", "card", MARK],
 ];
 
 describe.each(Object.entries(themes))("%s theme", (_, tokens) => {
