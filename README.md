@@ -31,6 +31,8 @@ A spelling and vocabulary app for a two-person household. Each Monday, Claude wr
 | Hosting and CI | Vercel, GitHub Actions                                                    |
 | Monitoring     | Sentry (errors from the server and the browser)                           |
 
+The colour scheme (sage, forest and coral) was influenced by @andydandybuilds on TikTok.
+
 ## Algorithms
 
 The interesting logic is plain TypeScript in `lib/`, with unit tests next to each file. Items marked **TBD** aren't built yet.

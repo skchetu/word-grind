@@ -25,9 +25,10 @@
   --card-foreground: oklch(0.25 0.035 173);
   --popover: oklch(0.995 0.004 118);
   --popover-foreground: oklch(0.25 0.035 173);
-  /* Brand accent (violet): main buttons, links, focus ring, active tab. */
-  --primary: oklch(0.5 0.2 290);
-  --primary-foreground: oklch(0.985 0 0);
+  /* Brand colour: forest in light mode, sage in dark. Main buttons, links,
+     focus ring, active tab. */
+  --primary: oklch(0.326 0.046 173);
+  --primary-foreground: oklch(0.905 0.05 118.5);
   --secondary: oklch(0.93 0.035 118);
   --secondary-foreground: oklch(0.25 0.035 173);
   --muted: oklch(0.93 0.035 118);
@@ -37,7 +38,7 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.89 0.025 118);
   --input: oklch(0.89 0.025 118);
-  --ring: oklch(0.5 0.2 290);
+  --ring: oklch(0.326 0.046 173);
   /* Answer states, used for nothing else: correct, so close, missed. */
   --success: oklch(0.52 0.13 150);
   --success-subtle: oklch(0.96 0.04 150);
@@ -58,8 +59,8 @@
     --card-foreground: oklch(0.905 0.05 118.5);
     --popover: oklch(0.26 0.038 173);
     --popover-foreground: oklch(0.905 0.05 118.5);
-    --primary: oklch(0.74 0.14 290);
-    --primary-foreground: oklch(0.205 0 0);
+    --primary: oklch(0.905 0.05 118.5);
+    --primary-foreground: oklch(0.326 0.046 173);
     --secondary: oklch(0.326 0.046 173);
     --secondary-foreground: oklch(0.905 0.05 118.5);
     --muted: oklch(0.326 0.046 173);
@@ -69,7 +70,7 @@
     --destructive: oklch(0.704 0.191 22.216);
     --border: oklch(0.905 0.05 118.5 / 12%);
     --input: oklch(0.905 0.05 118.5 / 15%);
-    --ring: oklch(0.74 0.14 290);
+    --ring: oklch(0.905 0.05 118.5);
     --success: oklch(0.78 0.13 150);
     --success-subtle: oklch(0.78 0.13 150 / 15%);
     --warning: oklch(0.83 0.12 80);
