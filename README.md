@@ -48,6 +48,7 @@ The interesting logic is plain TypeScript in `lib/`, with unit tests next to eac
 | Weekly list repair                               | Validates each card on its own, drops bad ones, and asks Claude only for the missing words instead of regenerating the whole list.                                                                              | [generate-week.ts](lib/ai/generate-week.ts)                        |
 | Adaptive difficulty                              | Pools the household's Sunday answers: 85% or more moves the level up one, 60% or less moves it down one. Written and tested; **TBD**: wiring it to the weekly list.                                             | [adapt.ts](lib/difficulty/adapt.ts)                                |
 | Speech queue                                     | Reads the word, pauses, then reads the sentence. Plays the recorded clip when there is one, falls back to the browser voice if it fails, and handles quirks such as late-loading voices and interrupted speech. | [speaker.ts](lib/speech/speaker.ts)                                |
+| Theme contrast check                             | Converts each OKLCH colour token to sRGB and checks the WCAG contrast of every text and control pair in both themes, so a colour change that makes text hard to read fails the tests.                           | [contrast.ts](lib/theme/contrast.ts)                               |
 
 ## Tools and why
 
