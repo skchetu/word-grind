@@ -38,7 +38,7 @@ export function SiteHeader({ account }: { account: ReactNode }) {
       className={cn(
         "rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
         tab.href === current &&
-          "bg-primary/10 text-primary hover:bg-primary/10 hover:text-primary",
+          "bg-primary/10 text-primary shadow-[inset_0_-2px_0_var(--color-highlight)] hover:bg-primary/10 hover:text-primary",
       )}
     >
       {tab.label}
