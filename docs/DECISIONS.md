@@ -160,3 +160,6 @@ The app catches most Claude, ElevenLabs and Supabase failures and falls back (ba
 
 ## A test checks the theme's colour contrast
 `lib/theme/contrast.ts` converts the OKLCH tokens in `globals.css` to sRGB and works out the WCAG contrast ratio, and a test checks every pair the app shows in both themes: 4.5:1 for text, 3:1 for focus rings and chart marks. Colours are picked by eye in OKLCH, so this catches a token change that quietly makes hint text or a button label hard to read before anyone sees it. It reads the CSS file itself rather than a copy of the values, so the test can't drift from what ships.
+
+## Surfaces are tinted sage and forest
+The page, cards, borders and hint text used shadcn's hue-less greys, which look like a default template. They now carry a small tint from the new palette (#DCE5C0 sage, #173c32 forest): light mode is a pale sage page with near-white cards and forest text, and dark mode is a deep forest page with lighter forest cards and sage text, so depth comes from lighter surfaces rather than shadows. The tints are kept low in chroma so the green reads as a mood, not a colour, and leaves room for the brand colours that follow. Every text pair still clears 4.5:1 in the contrast test.
