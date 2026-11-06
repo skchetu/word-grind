@@ -154,3 +154,6 @@ Haiku was asked to compare the typed word with the correct one itself and got le
 
 ## Every daily drill is ten words
 A drill used to be whatever was due plus this week's unseen words, capped at 15, so it could be 15 words one day and 2 the next. Now it's 10 when there are 10 words to ask: due words first, then unseen week words, then the words due soonest after today. Reviewing a word a few days early still moves it through the Leitner boxes, which is a fair trade while the word bank is small and few words are due. The borrowing only fills the day's first drill; once it's finished the card says you're caught up, otherwise every finished drill would pull in the next ten words.
+
+## Caught service errors are reported with a service and reason tag
+The app catches most Claude, ElevenLabs and Supabase failures and falls back (backup list, browser voice, no tip), so Sentry would never see them on its own. `reportError` in `lib/monitoring/report-error.ts` sends them anyway, tagged with the service and a reason worked out from the error: quota, auth, rate_limit, outage, bad_output or other. Running out of credit is checked before the status code because ElevenLabs reports it as a 401, and it's sent with its own title ("Out of credit: Claude") and one fingerprint per service, so an alert rule and a Gmail filter can pick it out and repeats group into one issue.
