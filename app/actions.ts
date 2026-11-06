@@ -83,7 +83,7 @@ export async function generateThisWeek() {
       .select("text")
       .order("created_at", { ascending: false })
       .limit(100),
-    // Last week's recap, so the new list practises what we both missed.
+    // Last week's recap, so the new list practices what we both missed.
     supabase
       .from("week_recaps")
       .select("next_week_focus")

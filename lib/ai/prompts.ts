@@ -32,7 +32,7 @@ export function buildWeekRequest({
   ];
   if (focus.length > 0) {
     lines.push(
-      `Include words that practise these patterns from last week's misses: ${focus.join("; ")}.`,
+      `Include words that practice these patterns from last week's misses: ${focus.join("; ")}.`,
     );
   }
   if (topics.length > 0) {
@@ -110,7 +110,7 @@ export const RECAP_SYSTEM_PROMPT = `You write a short, friendly recap of a house
 You get each person's score and their misspellings (the word and what they typed).
 - headline: one line saying who won and by how much, or that it was a tie. Light and encouraging, at most 120 characters.
 - sharedPatterns: up to 3 spelling patterns behind the misses, such as "doubled consonants" or "-ence vs -ance". Prefer patterns more than one person struggled with. Empty if there were no misses.
-- nextWeekFocus: up to 3 short patterns next week's list should practise.`;
+- nextWeekFocus: up to 3 short patterns next week's list should practice.`;
 
 export function buildRecapRequest(players: RecapPlayer[]) {
   return players

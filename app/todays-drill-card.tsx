@@ -41,7 +41,7 @@ export async function TodaysDrillCard() {
         <div className="mt-3 flex items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground">
             {count === undefined
-              ? "Practise with the starter words"
+              ? "Practice with the starter words"
               : `About ${drillMinutes(count)} min`}
           </p>
           <Button asChild>
