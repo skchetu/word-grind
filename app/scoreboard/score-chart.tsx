@@ -1,8 +1,8 @@
 import type { ChartWeek } from "@/lib/scoreboard/chart";
 import { formatDay } from "@/lib/week/dates";
 
-// Fixed series colors: the first member (you) is always blue and the second
-// orange, so a color never swaps meaning between visits.
+// Fixed series colors: the first member (you) is always forest (sage in dark
+// mode) and the second coral, so a color never swaps meaning between visits.
 const SERIES = ["fill-player-1", "fill-player-2"];
 const W = 320;
 const H = 120; // plot height; labels sit below it
