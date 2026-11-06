@@ -18,7 +18,7 @@ describe("buildWeekRequest", () => {
     });
     expect(request.split("\n")).toEqual([
       "Write this week's list of exactly 10 words, aiming for difficulty 4.",
-      "Include words that practise these patterns from last week's misses: doubled consonants; -ence vs -ance.",
+      "Include words that practice these patterns from last week's misses: doubled consonants; -ence vs -ance.",
       "Set the example sentences around: food.",
       "Don't use any of these recent words: rhythm.",
     ]);

@@ -23,13 +23,13 @@ export async function loadStreaks(
     .not("finished_at", "is", null)
     .gte("finished_at", addDays(today, -366));
 
-  const practised = new Map<string, Set<string>>();
+  const practiced = new Map<string, Set<string>>();
   for (const s of sessionsSchema.parse(sessions ?? [])) {
-    const days = practised.get(s.profile_id) ?? new Set<string>();
+    const days = practiced.get(s.profile_id) ?? new Set<string>();
     days.add(todayIn(HOUSEHOLD_TIME_ZONE, new Date(s.finished_at)));
-    practised.set(s.profile_id, days);
+    practiced.set(s.profile_id, days);
   }
   return new Map(
-    [...practised].map(([id, days]) => [id, currentStreak(days, today)]),
+    [...practiced].map(([id, days]) => [id, currentStreak(days, today)]),
   );
 }
