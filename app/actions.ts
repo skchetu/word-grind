@@ -9,7 +9,7 @@ import { topUpWeekSentences } from "@/app/drill/fresh-sentences";
 import { nextHouseholdLevel, saveHouseholdLevel } from "@/app/household-level";
 import { createWeekRecap } from "@/app/test/week-recap";
 import { canCallClaude, logClaudeCall } from "@/lib/ai/calls";
-import { generateTip, TIP_MODEL } from "@/lib/ai/generate-tip";
+import { generateTip, plainTip, TIP_MODEL } from "@/lib/ai/generate-tip";
 import { generateWeek, WEEK_MODEL } from "@/lib/ai/generate-week";
 import { normalize } from "@/lib/grading/normalize";
 import type { Mode } from "@/lib/session/machine";
@@ -203,7 +203,9 @@ export async function getMistakeTip(wordId: string, answer: string) {
 
   const word = wordSchema.parse(wordRow);
   if (wrong === "" || wrong === word.text.toLowerCase()) return word.mnemonic;
-  if (!(await canCallClaude(supabase, userId, "tip"))) return word.mnemonic;
+  if (!(await canCallClaude(supabase, userId, "tip"))) {
+    return plainTip(word.text, wrong, word.mnemonic);
+  }
 
   const { tip, source, usage } = await generateTip({
     word: word.text,

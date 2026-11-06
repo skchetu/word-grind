@@ -64,11 +64,23 @@ export function buildTopUpRequest(
 
 export const TIP_SYSTEM_PROMPT = `You coach adults on English spelling.
 
-You get a word and how someone misspelled it. Reply with one tip, at most 20 words, about their specific mistake: which letters went wrong and a way to remember the right ones.
-Reply with the tip only: no greeting, no quotes, and don't repeat their misspelling.`;
+You get the correct spelling of a word, what someone typed, and the exact mistakes, worked out letter by letter. The mistakes listed are correct: build the tip on them, and never count letters or say how many times a letter appears.
+Reply with one tip, at most 30 words, that gets someone who made exactly these mistakes to the correct spelling: point at the letters they got wrong and give a memorable way to get them right, such as a meaning link, a smaller word inside the word, or a sound to say in your head.
+Reply with the tip only: no greeting, no quotes, and don't write out their misspelling.`;
 
-export function buildTipRequest(word: string, wrong: string) {
-  return `Word: ${word}\nThey typed: ${wrong}`;
+// Spelled letter by letter too, so the model sees each letter rather than
+// guessing from its tokens.
+export function buildTipRequest(
+  word: string,
+  wrong: string,
+  mistakes: string[],
+) {
+  const spell = (text: string) => Array.from(text).join("-");
+  return [
+    `Correct spelling: ${word} (${spell(word)})`,
+    `They typed: ${wrong} (${spell(wrong)})`,
+    `Mistakes: ${mistakes.join("; ")}`,
+  ].join("\n");
 }
 
 export const SENTENCES_SYSTEM_PROMPT = `You write example sentences for adults learning GRE-level English words.
