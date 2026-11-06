@@ -22,7 +22,7 @@ export async function TodaysDrillCard() {
         </h2>
         {count !== undefined && (
           <p className="text-sm text-muted-foreground">
-            {count === 1 ? "1 word due" : `${count} words due`}
+            {count === 1 ? "1 word" : `${count} words`}
           </p>
         )}
       </div>

@@ -21,7 +21,6 @@ import {
 } from "@/lib/session/records";
 import { recordWeekAudio } from "@/lib/speech/clips";
 import { elevenLabsConfig } from "@/lib/speech/elevenlabs";
-import { DRILL_CAP } from "@/lib/srs/pick";
 import { reviewStateSchema } from "@/lib/srs/schedule";
 import { createClient } from "@/lib/supabase/server";
 import { HOUSEHOLD_TIME_ZONE, todayIn, weekStart } from "@/lib/week/dates";
@@ -234,7 +233,9 @@ export async function getMistakeTip(wordId: string, answer: string) {
 const sessionInputSchema = z.object({
   weekId: z.uuid(),
   kind: z.enum(["drill", "test"]),
-  answers: z.array(answerSchema).min(1).max(DRILL_CAP),
+  // Drills were up to 15 words before they became 10, so a drill started
+  // then and resumed now can still be saved.
+  answers: z.array(answerSchema).min(1).max(15),
 });
 const textRowsSchema = z.array(z.object({ id: z.string(), text: z.string() }));
 // A review_state row as [word id, ReviewState], ready for a Map.

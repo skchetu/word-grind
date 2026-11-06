@@ -5,7 +5,7 @@ import type { DrillWord } from "@/data/seed-words";
 import { type Mark, todaysDrillMarks } from "@/lib/session/share";
 import { recordSentenceAudio, recordWeekAudio } from "@/lib/speech/clips";
 import { elevenLabsConfig } from "@/lib/speech/elevenlabs";
-import { pickDrillWords } from "@/lib/srs/pick";
+import { DRILL_SIZE, pickDrillWords } from "@/lib/srs/pick";
 import type { WordWithSentences } from "@/lib/sentences/refresh";
 import { answerCounts } from "@/lib/sentences/turns";
 import { createClient } from "@/lib/supabase/server";
@@ -97,8 +97,10 @@ export async function todaysDrill({ freshSentences = false } = {}): Promise<{
   const rows = reviewRowsSchema.parse(reviews ?? []);
   const userId = auth?.claims.sub;
   if (freshSentences && userId) {
+    // Due words, plus the soonest upcoming ones a short drill borrows.
     const returning: WordWithSentences[] = rows
-      .filter((r) => r.due_on <= today)
+      .toSorted((a, b) => a.due_on.localeCompare(b.due_on))
+      .slice(0, DRILL_SIZE)
       .map((r) => r.words);
     const added = await addFreshSentences(supabase, userId, returning);
     for (const word of returning) {
@@ -137,20 +139,24 @@ export async function todaysDrill({ freshSentences = false } = {}): Promise<{
           ...weekWordIds(week.week_words),
         ])
       : undefined;
-  const { due, reviewed } = toReviews(rows, today, undefined, turns);
+  const { due, reviewed, upcoming } = toReviews(rows, today, undefined, turns);
   const last = lastDrillSchema.parse(lastDrill);
+  const todaysMarks = todaysDrillMarks(
+    last && { finishedAt: last.finished_at, attempts: last.attempts },
+    today,
+    HOUSEHOLD_TIME_ZONE,
+  );
   return {
     weekId: z.uuid().parse(week.id),
+    // Upcoming words only fill out the day's first drill; once it's done,
+    // the day is caught up.
     words: pickDrillWords(
       due,
       toDrillWords(week.week_words, undefined, turns),
       reviewed,
+      todaysMarks ? [] : upcoming,
     ),
     lastDrillAt: last?.finished_at ?? null,
-    todaysMarks: todaysDrillMarks(
-      last && { finishedAt: last.finished_at, attempts: last.attempts },
-      today,
-      HOUSEHOLD_TIME_ZONE,
-    ),
+    todaysMarks,
   };
 }

@@ -76,22 +76,21 @@ export function weekWordIds(weekWords: unknown): string[] {
   return weekWordsSchema.parse(weekWords).map(({ words: w }) => w.id);
 }
 
-// Someone's review_state rows, as every word they've reviewed and the ones
-// due by `today`.
+// Someone's review_state rows, as every word they've reviewed, the ones due
+// by `today`, and the ones due after it.
 export function toReviews(
   rows: unknown,
   today: string,
   supabaseUrl?: string,
   turns?: Turns,
 ) {
-  const parsed = dueRowsSchema.parse(rows);
+  const parsed = dueRowsSchema.parse(rows).map((r) => ({
+    word: toDrillWord(r.words, supabaseUrl, turns),
+    dueOn: r.due_on,
+  }));
   return {
-    reviewed: new Set(parsed.map((r) => r.word_id)),
-    due: parsed
-      .filter((r) => r.due_on <= today)
-      .map((r) => ({
-        word: toDrillWord(r.words, supabaseUrl, turns),
-        dueOn: r.due_on,
-      })),
+    reviewed: new Set(parsed.map((r) => r.word.id)),
+    due: parsed.filter((r) => r.dueOn <= today),
+    upcoming: parsed.filter((r) => r.dueOn > today),
   };
 }

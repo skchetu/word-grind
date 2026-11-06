@@ -22,10 +22,23 @@ describe("pickDrillWords", () => {
     expect(picked.map((x) => x.id)).toEqual(["b"]);
   });
 
-  it("stops at the cap", () => {
+  it("tops up with the soonest upcoming words", () => {
+    const picked = pickDrillWords(
+      [{ word: w("a"), dueOn: "2026-11-05" }],
+      [w("b")],
+      new Set(["a"]),
+      [
+        { word: w("d"), dueOn: "2026-11-09" },
+        { word: w("c"), dueOn: "2026-11-07" },
+      ],
+      3,
+    );
+    expect(picked.map((x) => x.id)).toEqual(["a", "b", "c"]);
+  });
+
+  it("asks exactly ten words when there are enough", () => {
     const week = Array.from({ length: 20 }, (_, i) => w(`w${i}`));
-    expect(pickDrillWords([], week, new Set())).toHaveLength(15);
-    expect(pickDrillWords([], week, new Set(), 3)).toHaveLength(3);
+    expect(pickDrillWords([], week, new Set())).toHaveLength(10);
   });
 });
 
