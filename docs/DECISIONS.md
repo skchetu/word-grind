@@ -157,3 +157,6 @@ A drill used to be whatever was due plus this week's unseen words, capped at 15,
 
 ## Caught service errors are reported with a service and reason tag
 The app catches most Claude, ElevenLabs and Supabase failures and falls back (backup list, browser voice, no tip), so Sentry would never see them on its own. `reportError` in `lib/monitoring/report-error.ts` sends them anyway, tagged with the service and a reason worked out from the error: quota, auth, rate_limit, outage, bad_output or other. Running out of credit is checked before the status code because ElevenLabs reports it as a 401, and it's sent with its own title ("Out of credit: Claude") and one fingerprint per service, so an alert rule and a Gmail filter can pick it out and repeats group into one issue.
+
+## A test checks the theme's colour contrast
+`lib/theme/contrast.ts` converts the OKLCH tokens in `globals.css` to sRGB and works out the WCAG contrast ratio, and a test checks every pair the app shows in both themes: 4.5:1 for text, 3:1 for focus rings and chart marks. Colours are picked by eye in OKLCH, so this catches a token change that quietly makes hint text or a button label hard to read before anyone sees it. It reads the CSS file itself rather than a copy of the values, so the test can't drift from what ships.
