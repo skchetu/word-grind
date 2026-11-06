@@ -85,8 +85,8 @@ describe("toReviews", () => {
     },
   });
 
-  it("lists every reviewed word and the ones due by today", () => {
-    const { reviewed, due } = toReviews(
+  it("splits reviewed words into due by today and upcoming", () => {
+    const { reviewed, due, upcoming } = toReviews(
       [
         review("a", "2026-10-22"),
         review("b", "2026-10-23"),
@@ -100,5 +100,6 @@ describe("toReviews", () => {
       ["a", "2026-10-22"],
       ["b", "2026-10-23"],
     ]);
+    expect(upcoming.map((d) => d.word.id)).toEqual(["c"]);
   });
 });

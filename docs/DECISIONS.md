@@ -151,3 +151,6 @@ Sentry is turned on only when Vercel's environment variable is set, so `pnpm dev
 
 ## The app works out the mistake before asking for a tip
 Haiku was asked to compare the typed word with the correct one itself and got letter counts wrong ("vacuum has three u's"), because models read words in chunks, not single letters. Now `describeMistakes` in `lib/grading/describe.ts` turns the same letter diff the feedback rows use into plain words, counting repeated letters for it (`"u" typed 3 times in a row where "vacuum" has it 2 times`), and the request also spells both words out letter by letter. The prompt says the listed mistakes are correct and not to count letters. Tips cached under the old prompt were deleted by a migration so they're all rewritten.
+
+## Every daily drill is ten words
+A drill used to be whatever was due plus this week's unseen words, capped at 15, so it could be 15 words one day and 2 the next. Now it's 10 when there are 10 words to ask: due words first, then unseen week words, then the words due soonest after today. Reviewing a word a few days early still moves it through the Leitner boxes, which is a fair trade while the word bank is small and few words are due. The borrowing only fills the day's first drill; once it's finished the card says you're caught up, otherwise every finished drill would pull in the next ten words.
