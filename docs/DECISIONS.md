@@ -169,3 +169,6 @@ The new palette's coral (#F15B3D) sits at almost the same hue as the old "missed
 
 ## Coral is the one highlight, used sparingly
 The palette's coral (#F15B3D) is the loud colour, so it only marks what deserves the eye: the Start button on today's drill, a thin underline on the active nav tab, and the flame next to each streak. It never carries small text and never appears on the drill, practice or test screens, which stay forest so nothing distracts from spelling. Coral is too light for white text (3.3:1), so the button's label is a very dark forest instead (about 5:1), and the contrast test checks that pair along with coral against the page and cards.
+
+## The browser bar is tinted to match the page
+Android Chrome colours its address bar from the `theme-color` meta tag, so the `viewport` export in `app/layout.tsx` sets it to the page colour for light and dark mode. iOS 26 Safari ignores that tag and samples the top of the page instead, so the header now has a solid background rather than a transparent one. The meta tag follows the device's setting, so someone who picks a theme in Settings that differs from their device sees a mismatched bar on Android; that's a small cost for a static tag that works before any JavaScript runs. Selected text also uses the palette (forest on sage) instead of the browser's blue.

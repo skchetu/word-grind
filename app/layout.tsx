@@ -25,8 +25,16 @@ export const metadata: Metadata = {
 
 // On Android, the on-screen keyboard shrinks the page instead of covering
 // it, so the answer box and Submit stay in view while typing. iOS ignores
-// this and scrolls the focused box into view itself.
-export const viewport: Viewport = { interactiveWidget: "resizes-content" };
+// this and scrolls the focused box into view itself. The theme colours tint
+// Android Chrome's address bar to match the page (--background in
+// globals.css); iOS Safari tints from the header's own background instead.
+export const viewport: Viewport = {
+  interactiveWidget: "resizes-content",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f6f8ef" },
+    { media: "(prefers-color-scheme: dark)", color: "#071d17" },
+  ],
+};
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
@@ -42,7 +50,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       {/* Bottom padding on phones keeps content clear of the menu button. */}
       <body className="flex min-h-full flex-col pb-20 md:pb-0">
         {/* The header reads the URL, which dynamic pages only know at request time. */}
-        <Suspense fallback={<div className="h-14 border-b" />}>
+        <Suspense fallback={<div className="h-14 border-b bg-background" />}>
           <SiteHeader
             account={
               <Suspense>

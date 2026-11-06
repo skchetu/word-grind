@@ -47,7 +47,7 @@ export function SiteHeader({ account }: { account: ReactNode }) {
 
   return (
     <>
-      <header className="border-b">
+      <header className="border-b bg-background">
         <div
           className={cn(
             "mx-auto flex h-14 w-full items-center justify-center px-4 md:justify-start md:gap-8",
