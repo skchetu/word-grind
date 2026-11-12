@@ -132,6 +132,11 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Selected text is forest on sage in both themes. */
+  ::selection {
+    background-color: oklch(0.905 0.05 118.5);
+    color: oklch(0.326 0.046 173);
+  }
   /* No single word left alone on a heading's or paragraph's last line.
      Browsers without support wrap as before. */
   h1,
