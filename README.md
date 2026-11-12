@@ -1,8 +1,10 @@
-# Word Grind (in progress...)
+# Word Grind
 
-A spelling and vocabulary app for a two-person household. Each Monday, Claude writes a themed list of 10 GRE-style words at the household's difficulty level. Through the week, a short daily drill reads each word aloud and asks you to spell it, using spaced repetition. On Sunday, a timed test settles a head-to-head scoreboard.
+A spelling and vocab app for two people: AI-generated weekly lists, spaced repetition, and a head-to-head scoreboard.
 
-> Work in progress. Weekly lists, recorded audio, the daily drill with spaced repetition, fresh example sentences, the Sunday test, the scoreboard, the word library and settings work today. The weekly recap and adaptive difficulty are being built.
+**Live app: [word-grind.vercel.app](https://word-grind.vercel.app)**. Sign-in is invite-only (a magic link for our household).
+
+Each Monday, Claude writes a themed list of 10 GRE-style words at the household's difficulty level. Through the week, a short daily drill reads each word aloud and asks you to spell it, using spaced repetition. On Sunday, a timed test settles a head-to-head scoreboard, Claude writes a recap of the week's mistakes, and the difficulty moves up or down for next week.
 
 ## What it does
 
@@ -16,7 +18,16 @@ A spelling and vocabulary app for a two-person household. Each Monday, Claude wr
 - **A timed Sunday test.** The week's 10 words with a one-hour clock and no hints. A missed test stays open as a make-up, and each person can take it once.
 - **A head-to-head scoreboard.** Weekly scores side by side, daily practice streaks, a bar chart over time and each person's most-missed words.
 - **Word library and settings.** A searchable table of every word seen, with a detail page per word, plus settings for your name, topics, the household name and difficulty.
-- **Adaptive difficulty** (in progress). The household's level will go up or down by one after each Sunday test, based on everyone's accuracy.
+- **Weekly recap.** After the Sunday test, Claude looks at the week's test answers and writes the patterns behind the mistakes and what to focus on next.
+- **Adaptive difficulty.** The household's level goes up or down by one after each Sunday test, based on everyone's accuracy, and the next Monday list is written at the new level.
+
+## How it's built
+
+- **Next.js 16 on Vercel.** Pages are React Server Components that read straight from the database, and every write is a Server Action, so API keys, grading and scoring never reach the browser. Slow work such as recording audio runs after the response is sent (`after()`), so nothing waits on it.
+- **Supabase Postgres with row-level security.** Policies limit each household's sessions, answers and settings to its own members, so privacy is enforced by the database, not only by app code. Migrations live in the repo and a GitHub Action applies them when they merge.
+- **Claude with Zod-validated structured output.** Opus writes the weekly list, Sonnet the recap, and Haiku the mistake tips and extra sentences. Every reply is checked against a Zod schema, bad cards are dropped and only the missing words are requested again, and a curated list is the fallback. Tips and ElevenLabs audio clips are cached, so each is paid for once.
+- **Tests on every PR.** Vitest unit tests sit next to the pure logic in `lib/` (grading, scheduling, the session state machine), with fast-check property tests and MSW so tests never call a real API. GitHub Actions runs lint, typecheck, tests and a build, and Vercel deploys a preview of each PR.
+- **Sentry in production.** Errors from the server and browser, tagged by service and reason (so running out of API credit is its own alert), plus request traces and replays recorded only when an error happens.
 
 ## Tech stack
 
@@ -35,7 +46,7 @@ The colour scheme (sage, forest and coral) was influenced by @andydandybuilds on
 
 ## Algorithms
 
-The interesting logic is plain TypeScript in `lib/`, with unit tests next to each file. Items marked **TBD** aren't built yet.
+The interesting logic is plain TypeScript in `lib/`, with unit tests next to each file.
 
 | Algorithm                                        | What it does                                                                                                                                                                                                    | Code                                                               |
 | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
@@ -48,7 +59,7 @@ The interesting logic is plain TypeScript in `lib/`, with unit tests next to eac
 | Server-side regrading                            | Drills and tests send only what was typed. The server grades each answer again and scores a test against the week's whole list, so a browser can't fake a correct answer or skip a word.                        | [records.ts](lib/session/records.ts)                               |
 | Session state machine                            | One pure `transition(state, event)` function runs the drill and test, so repeated Enter presses or late audio callbacks can't skip a word or grade it twice.                                                    | [machine.ts](lib/session/machine.ts)                               |
 | Weekly list repair                               | Validates each card on its own, drops bad ones, and asks Claude only for the missing words instead of regenerating the whole list.                                                                              | [generate-week.ts](lib/ai/generate-week.ts)                        |
-| Adaptive difficulty                              | Pools the household's Sunday answers: 85% or more moves the level up one, 60% or less moves it down one. Written and tested; **TBD**: wiring it to the weekly list.                                             | [adapt.ts](lib/difficulty/adapt.ts)                                |
+| Adaptive difficulty                              | Pools the household's Sunday answers: 85% or more moves the level up one, 60% or less moves it down one, and the next list is written at that level.                                                            | [adapt.ts](lib/difficulty/adapt.ts)                                |
 | Speech queue                                     | Reads the word, pauses, then reads the sentence. Plays the recorded clip when there is one, falls back to the browser voice if it fails, and handles quirks such as late-loading voices and interrupted speech. | [speaker.ts](lib/speech/speaker.ts)                                |
 | Theme contrast check                             | Converts each OKLCH colour token to sRGB and checks the WCAG contrast of every text and control pair in both themes, so a colour change that makes text hard to read fails the tests.                           | [contrast.ts](lib/theme/contrast.ts)                               |
 
@@ -65,7 +76,7 @@ The interesting logic is plain TypeScript in `lib/`, with unit tests next to eac
 | **Web Speech API**             | Free and built into every browser, with no extra service. It reads any word that doesn't have a recorded clip yet.                                                                                                                                                                     |
 | **ElevenLabs**                 | Natural-sounding recorded audio for each word and sentence (Flash v2.5), made once when the list is generated and cached in Supabase Storage. The drill falls back to the browser voice for any word without a clip.                                                                   |
 | **Vitest, fast-check and MSW** | Fast unit tests, property-based tests for the scheduling and difficulty rules, and a mocked Claude API, so tests never make real AI calls.                                                                                                                                             |
-| **Playwright** (**TBD**)       | End-to-end tests of the drill and the Sunday test on phone and laptop sizes.                                                                                                                                                                                                           |
+| **Playwright** (planned)       | End-to-end tests of the drill and the Sunday test on phone and laptop sizes.                                                                                                                                                                                                           |
 | **Sentry**                     | One place to see errors from the server and the browser, with readable stack traces, request traces, warnings as searchable logs, and a replay of the clicks before a browser error. The free plan covers two users, and it only runs on Vercel, so local runs and tests send nothing. |
 | **Vercel and GitHub Actions**  | Every PR gets lint, typecheck, tests, a build and a live preview link. Merged migrations are applied to the database automatically.                                                                                                                                                    |
 | **pnpm**                       | Fast installs and a strict dependency tree, so a package can't quietly use something it didn't declare.                                                                                                                                                                                |
@@ -112,3 +123,11 @@ docs/DECISIONS.md    why things are built the way they are
 ```
 
 Design choices, and the alternatives that were considered, are logged in [docs/DECISIONS.md](docs/DECISIONS.md).
+
+## Roadmap
+
+- **Playwright end-to-end tests** of the drill and the Sunday test at phone and laptop sizes.
+- **A guest demo** with its own seeded household, so the app can be tried without an invite.
+- **Sign-in links that work on any device**, by switching magic links to Supabase's token-hash flow, plus a 6-digit code for the iPhone home-screen app.
+- **Sunday tests that mix in recently missed words**, not only the week's own list.
+- **Gentler review spacing** for long-known words: a little random "fuzz" on due dates, and longer boxes after 14 days.
