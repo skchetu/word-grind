@@ -7,6 +7,10 @@ export const sentryOptions = {
   enabled: Boolean(process.env.NEXT_PUBLIC_VERCEL_ENV),
   environment: process.env.NEXT_PUBLIC_VERCEL_ENV,
   sendDefaultPii: false,
+  // Every request and page load is traced. With two people using the app
+  // this stays far inside the free plan, and a slow drill can be followed
+  // from the browser through the server action to Claude or Supabase.
+  tracesSampleRate: 1,
   // Noise that isn't a bug: aborted fetches, iOS blocking audio until a
   // tap, and a harmless browser layout warning.
   ignoreErrors: [
