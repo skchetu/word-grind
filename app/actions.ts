@@ -25,6 +25,7 @@ import { reviewStateSchema } from "@/lib/srs/schedule";
 import { createClient } from "@/lib/supabase/server";
 import { HOUSEHOLD_TIME_ZONE, todayIn, weekStart } from "@/lib/week/dates";
 import { toSavePayload } from "@/lib/week/save";
+import { reportError } from "@/lib/monitoring/report-error";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -123,7 +124,8 @@ export async function generateThisWeek() {
       .from("weeks")
       .update({ theme_note: week.themeNote })
       .eq("id", savedWeekId);
-    if (noteError) console.error("Saving the theme note failed:", noteError);
+    if (noteError)
+      reportError("supabase", "Saving the theme note failed", noteError);
   }
 
   // After the response, so the new list shows up straight away: words with
@@ -136,8 +138,9 @@ export async function generateThisWeek() {
       await topUpWeekSentences(supabase, userId, savedWeekId);
       if (voice) await recordWeekAudio(supabase, savedWeekId, voice);
     } catch (failure) {
-      console.error(
-        "Preparing the week's sentences and audio failed:",
+      reportError(
+        "supabase",
+        "Preparing the week's sentences and audio failed",
         failure,
       );
     }
@@ -323,7 +326,7 @@ export async function saveSession(input: {
     .select("id")
     .single();
   if (error) {
-    console.error(`Saving the ${kind} session failed:`, error);
+    reportError("supabase", `Saving the ${kind} session failed`, error);
     return false;
   }
   const sessionId = z.object({ id: z.uuid() }).parse(session).id;
@@ -337,14 +340,15 @@ export async function saveSession(input: {
       .upsert(reviews.map((r) => ({ ...r, profile_id: userId }))),
   ]);
   for (const { error } of [saved, moved]) {
-    if (error) console.error(`Saving the ${kind} answers failed:`, error);
+    if (error)
+      reportError("supabase", `Saving the ${kind} answers failed`, error);
   }
 
   // The recap is written after the response, so the results show at once.
   if (kind === "test" && !saved.error) {
     after(() =>
       createWeekRecap(supabase, userId, weekId).catch((failure: unknown) =>
-        console.error("Writing the recap failed:", failure),
+        reportError("claude", "Writing the recap failed", failure),
       ),
     );
   }

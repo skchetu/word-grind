@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
 import { SENTENCES_PER_WORD } from "@/lib/ai/schemas";
+import { reportError } from "@/lib/monitoring/report-error";
 
 const answersSchema = z.array(z.object({ word_id: z.string() }));
 
@@ -18,7 +19,7 @@ export async function answerCounts(
     .select("word_id, sessions!inner(profile_id)")
     .eq("sessions.profile_id", userId)
     .in("word_id", wordIds);
-  if (error) console.error("Counting answers failed:", error.message);
+  if (error) reportError("supabase", "Counting answers failed", error);
   const counts = new Map<string, number>();
   for (const { word_id } of answersSchema.parse(data ?? [])) {
     counts.set(word_id, (counts.get(word_id) ?? 0) + 1);

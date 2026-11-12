@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
 import { canCallClaude, logClaudeCall } from "@/lib/ai/calls";
+import { reportError } from "@/lib/monitoring/report-error";
 import {
   generateSentences,
   SENTENCES_MODEL,
@@ -67,7 +68,7 @@ export async function addFreshSentences(
     .insert(rows)
     .select("id, word_id, sentence, cloze, audio_path, created_at");
   if (error) {
-    console.error("Saving new sentences failed:", error.message);
+    reportError("supabase", "Saving new sentences failed", error);
     return added;
   }
   for (const row of savedSchema.parse(data)) added.set(row.word_id, row);

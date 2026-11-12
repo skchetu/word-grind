@@ -40,4 +40,14 @@ describe("reportError", () => {
     expect(sent).toBeInstanceOf(Error);
     expect((sent as Error).message).toBe("Out of credit: ElevenLabs");
   });
+
+  it("wraps a plain Supabase error so its message is the title", () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const failure = { message: "permission denied", code: "42501", hint: "" };
+    reportError("supabase", "Saving the session failed", failure);
+    const [sent] = vi.mocked(Sentry.captureException).mock.calls[0] ?? [];
+    expect(sent).toBeInstanceOf(Error);
+    expect((sent as Error).message).toBe("permission denied");
+    expect((sent as Error).cause).toBe(failure);
+  });
 });
