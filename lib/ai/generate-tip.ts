@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { align } from "@/lib/grading/align";
 import { describeMistakes } from "@/lib/grading/describe";
+import { reportError } from "@/lib/monitoring/report-error";
 
 import type { TokenUsage } from "./generate-week";
 import { buildTipRequest, TIP_SYSTEM_PROMPT } from "./prompts";
@@ -68,7 +69,7 @@ export async function generateTip(
     if (tip.success) return { tip: tip.data, source: "claude", usage };
     console.warn("Tip rejected:", tip.error.issues[0]?.message);
   } catch (error) {
-    console.error("Tip generation failed:", error);
+    reportError("claude", "Tip generation failed", error);
   }
   return { tip: plainTip(word, wrong, mnemonic), source: "fallback", usage };
 }

@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { adaptDifficulty } from "@/lib/difficulty/adapt";
 import { addDays } from "@/lib/srs/schedule";
+import { reportError } from "@/lib/monitoring/report-error";
 
 const householdSchema = z.object({ id: z.uuid(), difficulty: z.int() });
 const answersSchema = z.array(z.object({ correct: z.boolean() }));
@@ -57,6 +58,6 @@ export async function saveHouseholdLevel(
           .eq("id", householdId),
   ]);
   for (const { error } of [week, household]) {
-    if (error) console.error("Saving the difficulty failed:", error.message);
+    if (error) reportError("supabase", "Saving the difficulty failed", error);
   }
 }

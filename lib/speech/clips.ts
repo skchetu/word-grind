@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { AUDIO_BUCKET } from "./audio-url";
 import { synthesize, type ElevenLabsConfig } from "./elevenlabs";
+import { reportError } from "@/lib/monitoring/report-error";
 
 // One recording to make: the text to read, where to store it, and the row
 // whose audio_path points at it.
@@ -79,7 +80,7 @@ export async function makeClips(
         await steps.link(job);
         made++;
       } catch (error) {
-        console.error(`Clip for ${job.path} failed:`, error);
+        reportError("elevenlabs", `Clip for ${job.path} failed`, error);
         failed++;
       }
     }

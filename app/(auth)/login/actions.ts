@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { z } from "zod";
 
 import { createClient } from "@/lib/supabase/server";
+import { reportError } from "@/lib/monitoring/report-error";
 
 export type LoginState =
   | { status: "idle" }
@@ -38,10 +39,11 @@ export async function sendMagicLink(
       message: "Too many attempts. Wait a minute and try again.",
     };
   }
-  if (error) {
-    // Unknown emails land here too. Reporting "sent" either way keeps the
-    // form from revealing which addresses have accounts.
-    console.error("Magic link not sent:", error.message);
+  // Unknown emails land here too ("otp_disabled", since sign-ups are off).
+  // Reporting "sent" either way keeps the form from revealing which
+  // addresses have accounts; only a real failure goes to Sentry.
+  if (error && error.code !== "otp_disabled") {
+    reportError("supabase", "Magic link not sent", error);
   }
   return { status: "sent", email: email.data };
 }

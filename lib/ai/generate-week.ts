@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
 import fallbackLists from "@/data/fallback-lists.json";
+import { reportError } from "@/lib/monitoring/report-error";
 import {
   buildTopUpRequest,
   buildWeekRequest,
@@ -99,7 +100,7 @@ export async function generateWeek(
     if (week.success) return { week: week.data, source: "claude", usage };
     console.warn(`Week still short after top-up: ${kept.length} words`);
   } catch (error) {
-    console.error("Week generation failed:", error);
+    reportError("claude", "Week generation failed", error);
   }
   return { week: fallbackWeek(weekNumber), source: "fallback", usage };
 }

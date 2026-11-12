@@ -9,6 +9,7 @@ import {
   type SentenceRequest,
 } from "./prompts";
 import { toCloze } from "./schemas";
+import { reportError } from "@/lib/monitoring/report-error";
 
 // Short sentences for a handful of words, so the small model is plenty.
 export const SENTENCES_MODEL = "claude-haiku-5-5";
@@ -59,7 +60,7 @@ export async function generateSentences(
       sentences.set(word, { sentence: text, cloze });
     }
   } catch (error) {
-    console.error("Sentence generation failed:", error);
+    reportError("claude", "Sentence generation failed", error);
   }
   return { sentences, usage };
 }

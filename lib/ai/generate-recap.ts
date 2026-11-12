@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 
 import { recapSchema, type Recap, type RecapPlayer } from "@/lib/recap/recap";
+import { reportError } from "@/lib/monitoring/report-error";
 
 import type { TokenUsage } from "./generate-week";
 import { buildRecapRequest, RECAP_SYSTEM_PROMPT } from "./prompts";
@@ -31,7 +32,7 @@ export async function generateRecap(
     usage.outputTokens = response.usage.output_tokens;
     return { recap: response.parsed_output, usage };
   } catch (error) {
-    console.error("Recap generation failed:", error);
+    reportError("claude", "Recap generation failed", error);
     return { recap: null, usage };
   }
 }

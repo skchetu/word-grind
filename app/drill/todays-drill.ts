@@ -10,6 +10,7 @@ import type { WordWithSentences } from "@/lib/sentences/refresh";
 import { answerCounts } from "@/lib/sentences/turns";
 import { createClient } from "@/lib/supabase/server";
 import { HOUSEHOLD_TIME_ZONE, todayIn, weekStart } from "@/lib/week/dates";
+import { reportError } from "@/lib/monitoring/report-error";
 import {
   DRILL_WORD_COLUMNS,
   toDrillWords,
@@ -124,7 +125,7 @@ export async function todaysDrill({ freshSentences = false } = {}): Promise<{
           await recordWeekAudio(supabase, weekId, voice);
           await recordSentenceAudio(supabase, unrecorded, voice);
         } catch (failure) {
-          console.error("Recording missing clips failed:", failure);
+          reportError("supabase", "Recording missing clips failed", failure);
         }
       });
     }

@@ -24,7 +24,23 @@ export function reportError(service: Service, what: string, error: unknown) {
         new Error(`Out of credit: ${NAMES[service]}`, { cause: error }),
       );
     } else {
-      Sentry.captureException(error);
+      Sentry.captureException(asError(error));
     }
   });
+}
+
+// Supabase hands back some failures as plain objects ({ message, code,
+// hint }). Wrapping them keeps the message as the Sentry issue title instead
+// of "Object captured as exception", with the full object kept as the cause.
+function asError(error: unknown): unknown {
+  if (error instanceof Error) return error;
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
+    return new Error(error.message, { cause: error });
+  }
+  return error;
 }

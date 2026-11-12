@@ -4,6 +4,7 @@ import { z } from "zod";
 import { elevenLabsConfig } from "@/lib/speech/elevenlabs";
 import { createClient } from "@/lib/supabase/server";
 import { HOUSEHOLD_TIME_ZONE, todayIn, weekStart } from "@/lib/week/dates";
+import { reportError } from "@/lib/monitoring/report-error";
 
 import { MakeThisWeek } from "./make-this-week";
 import { RecordAudio } from "./record-audio-button";
@@ -49,7 +50,7 @@ export async function ThisWeek() {
 
   // A failed read isn't a missing list: making one would only fail to save.
   if (error) {
-    console.error("Loading this week failed:", error.message);
+    reportError("supabase", "Loading this week failed", error);
     return (
       <p className="text-sm text-muted-foreground">
         This week&apos;s list couldn&apos;t be loaded. Try refreshing.

@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { householdFormSchema, profileFormSchema } from "@/lib/settings/profile";
 import { createClient } from "@/lib/supabase/server";
+import { reportError } from "@/lib/monitoring/report-error";
 
 export type ProfileState =
   | { status: "idle" | "saved" }
@@ -38,7 +39,7 @@ export async function saveProfile(
     .update({ display_name: form.data.displayName, topics: form.data.topics })
     .eq("id", userId);
   if (error) {
-    console.error("saveProfile failed", error);
+    reportError("supabase", "Saving the profile failed", error);
     return { status: "error", message: "Couldn't save. Try again." };
   }
   revalidatePath("/", "layout");
@@ -82,7 +83,7 @@ export async function saveHousehold(
     .update(form.data)
     .eq("id", householdId.data);
   if (error) {
-    console.error("saveHousehold failed", error);
+    reportError("supabase", "Saving the household failed", error);
     return { status: "error", message: "Couldn't save. Try again." };
   }
   revalidatePath("/", "layout");
