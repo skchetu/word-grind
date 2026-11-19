@@ -27,7 +27,7 @@ Each Monday, Claude writes a themed list of 10 GRE-style words at the household'
 - **Supabase Postgres with row-level security.** Policies limit each household's sessions, answers and settings to its own members, so privacy is enforced by the database, not only by app code. Migrations live in the repo and a GitHub Action applies them when they merge.
 - **Claude with Zod-validated structured output.** Opus writes the weekly list, Sonnet the recap, and Haiku the mistake tips and extra sentences. Every reply is checked against a Zod schema, bad cards are dropped and only the missing words are requested again, and a curated list is the fallback. Tips and ElevenLabs audio clips are cached, so each is paid for once.
 - **Tests on every PR.** Vitest unit tests sit next to the pure logic in `lib/` (grading, scheduling, the session state machine), with fast-check property tests and MSW so tests never call a real API. GitHub Actions runs lint, typecheck, tests and a build, and Vercel deploys a preview of each PR.
-- **Sentry in production.** Errors from the server and browser, tagged by service and reason (so running out of API credit is its own alert), plus request traces and replays recorded only when an error happens.
+- **Sentry in production.** Errors from the server and browser, tagged by service and reason (so running out of API credit is its own alert), plus request traces and replays recorded only when an error happens. An uptime monitor polls `/api/health`, which runs one database query, and emails when the app or Supabase goes down.
 
 ## Tech stack
 
@@ -40,7 +40,7 @@ Each Monday, Claude writes a themed list of 10 GRE-style words at the household'
 | Speech         | ElevenLabs clips, with the Web Speech API (`speechSynthesis`) as fallback |
 | Tests          | Vitest, fast-check, MSW (no real API calls in tests)                      |
 | Hosting and CI | Vercel, GitHub Actions                                                    |
-| Monitoring     | Sentry (errors, traces, logs and replays of errors)                       |
+| Monitoring     | Sentry (errors, traces, logs, replays of errors and an uptime monitor)    |
 
 The colour scheme (sage, forest and coral) was influenced by @andydandybuilds on TikTok.
 

@@ -8,8 +8,9 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Everything except static assets, image optimization and the Sentry
-    // tunnel (error reports must reach Sentry even when signed out).
-    "/((?!_next/static|_next/image|monitoring|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    // Everything except static assets, image optimization, the Sentry
+    // tunnel (error reports must reach Sentry even when signed out) and the
+    // health check (the uptime monitor has no session).
+    "/((?!_next/static|_next/image|monitoring|api/health|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
