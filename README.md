@@ -76,7 +76,7 @@ The interesting logic is plain TypeScript in `lib/`, with unit tests next to eac
 | **Web Speech API**             | Free and built into every browser, with no extra service. It reads any word that doesn't have a recorded clip yet.                                                                                                                                                                     |
 | **ElevenLabs**                 | Natural-sounding recorded audio for each word and sentence (Flash v2.5), made once when the list is generated and cached in Supabase Storage. The drill falls back to the browser voice for any word without a clip.                                                                   |
 | **Vitest, fast-check and MSW** | Fast unit tests, property-based tests for the scheduling and difficulty rules, and a mocked Claude API, so tests never make real AI calls.                                                                                                                                             |
-| **Playwright** (planned)       | End-to-end tests of the drill and the Sunday test on phone and laptop sizes.                                                                                                                                                                                                           |
+| **Playwright and axe**         | End-to-end tests in a real browser at phone and laptop sizes, against a local Supabase stack, with axe accessibility checks on every page they visit. Chosen over Cypress for built-in mobile emulation and parallel browsers. |
 | **Sentry**                     | One place to see errors from the server and the browser, with readable stack traces, request traces, warnings as searchable logs, and a replay of the clicks before a browser error. The free plan covers two users, and it only runs on Vercel, so local runs and tests send nothing. |
 | **Vercel and GitHub Actions**  | Every PR gets lint, typecheck, tests, a build and a live preview link. Merged migrations are applied to the database automatically.                                                                                                                                                    |
 | **pnpm**                       | Fast installs and a strict dependency tree, so a package can't quietly use something it didn't declare.                                                                                                                                                                                |
@@ -102,6 +102,15 @@ pnpm typecheck
 pnpm test
 pnpm build
 pnpm eval:week   # generates 5 real lists and checks them (costs a few cents)
+```
+
+End-to-end tests run a production build against a local Supabase stack, so they need Docker running:
+
+```bash
+pnpm dlx supabase@2.122.0 start   # first run downloads the images; applies every migration
+pnpm exec playwright install chromium
+pnpm e2e
+pnpm dlx supabase@2.122.0 stop
 ```
 
 The database schema lives in `supabase/migrations`. A GitHub Action applies new migrations to the production database when they merge to `main`.
@@ -130,4 +139,5 @@ Design choices, and the alternatives that were considered, are logged in [docs/D
 - **A guest demo** with its own seeded household, so the app can be tried without an invite.
 - **Sign-in links that work on any device**, by switching magic links to Supabase's token-hash flow, plus a 6-digit code for the iPhone home-screen app.
 - **Sunday tests that mix in recently missed words**, not only the week's own list.
+- **Bonus words**: either of us can give the other person an extra word to learn.
 - **Gentler review spacing** for long-known words: a little random "fuzz" on due dates, and longer boxes after 14 days.

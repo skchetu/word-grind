@@ -44,3 +44,8 @@ next-env.d.ts
 # Supabase CLI state written by `supabase link`
 supabase/.temp
 supabase/.branches
+
+# Playwright output and the signed-in test session
+/playwright-report
+/test-results
+/e2e/.auth
