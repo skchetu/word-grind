@@ -1,4 +1,3 @@
-import { ChevronDown } from "lucide-react";
 import { z } from "zod";
 
 import { elevenLabsConfig } from "@/lib/speech/elevenlabs";
@@ -9,6 +8,7 @@ import { reportError } from "@/lib/monitoring/report-error";
 import { MakeThisWeek } from "./make-this-week";
 import { RecordAudio } from "./record-audio-button";
 import { ThemeNote } from "./theme-note";
+import { WeekDisclosure } from "./week-disclosure";
 
 const weekSchema = z.object({
   theme: z.string(),
@@ -67,22 +67,19 @@ export async function ThisWeek() {
   return (
     <section className="w-full rounded-lg border p-4 text-left">
       {/* Closed by default so the list doesn't push the rest of the page
-          down; a native <details> opens with a tap, Enter or Space. */}
-      <details className="group">
-        <summary className="flex cursor-pointer list-none items-start justify-between gap-3 rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 [&::-webkit-details-marker]:hidden">
-          <span>
+          down. */}
+      <WeekDisclosure
+        heading={
+          <>
             <h2 className="text-sm font-medium text-muted-foreground">
               This week · {words.length} words
             </h2>
             <span className="block text-xl font-semibold">
               {week.theme} {themeNote && <ThemeNote note={themeNote} />}
             </span>
-          </span>
-          <ChevronDown
-            aria-hidden
-            className="mt-1 size-5 shrink-0 text-muted-foreground group-open:rotate-180 motion-safe:transition-transform"
-          />
-        </summary>
+          </>
+        }
+      >
         <ol className="mt-3 divide-y border-t">
           {words.map(({ words: word }) => (
             <li key={word.text} className="py-3">
@@ -93,7 +90,7 @@ export async function ThisWeek() {
             </li>
           ))}
         </ol>
-      </details>
+      </WeekDisclosure>
       {unrecorded > 0 && elevenLabsConfig() && (
         <RecordAudio count={unrecorded} />
       )}
