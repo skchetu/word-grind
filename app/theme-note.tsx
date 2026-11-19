@@ -26,8 +26,7 @@ export function ThemeNote({ note }: { note: string }) {
         aria-label="What this theme means"
         onPointerEnter={(event) => hover(event, true)}
         onPointerLeave={(event) => hover(event, false)}
-        // Inside the list's <summary>, so a tap here shouldn't also open the
-        // list. A click while hovering keeps it open rather than closing it.
+        // A click while hovering keeps it open rather than closing it.
         onClick={(event) => {
           event.preventDefault();
           setOpen((value) => hovering.current || !value);
